@@ -6,11 +6,11 @@
 
 #include <frc2/command/CommandPtr.h>
 
-#include "subsystems/ExampleSubsystem.h"
+#include "subsystems/Vision.h"
 
 namespace autos {
 /**
  * Example static factory for an autonomous command.
  */
-frc2::CommandPtr ExampleAuto(ExampleSubsystem* subsystem);
+frc2::CommandPtr ExampleAuto(Vision* subsystem);
 }  // namespace autos

@@ -7,9 +7,9 @@
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 
-class ExampleSubsystem : public frc2::SubsystemBase {
+class Vision : public frc2::SubsystemBase {
  public:
-  ExampleSubsystem();
+  Vision();
 
   /**
    * Example command factory method.
