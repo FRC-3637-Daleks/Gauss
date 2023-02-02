@@ -1,16 +1,22 @@
 #include "RobotContainer.h"
 
-#include <frc2/command/InstantCommand.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/button/Trigger.h>
 
-RobotContainer::RobotContainer() { ConfigureBindings(); }
+RobotContainer::RobotContainer() {
+  m_drivetrain.SetDefaultCommand(frc2::cmd::Run(
+      [this] {
+        m_drivetrain.Drive(-m_leftJoystick.GetY(), -m_rightJoystick.GetY(),
+                           true);
+      },
+      {&m_drivetrain}));
+
+  ConfigureBindings();
+}
 
 void RobotContainer::ConfigureBindings() {
-  // Schedule `ExampleMethodCommand` when the Xbox controller's B button is
-  // pressed, cancelling on release.
   m_leftJoystick.Button(1).OnTrue(
-      frc2::InstantCommand([this] { m_drivetrain.Reset(); }, {&m_drivetrain})
-          .ToPtr());
+      frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
