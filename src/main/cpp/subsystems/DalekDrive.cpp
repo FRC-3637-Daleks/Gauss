@@ -58,10 +58,37 @@ void DalekDrive::InitDriveMotors() {
   m_rightFront.ConfigClosedloopRamp(kTalonRampRate, kTalonTimeoutMs);
   m_rightFollower.ConfigOpenloopRamp(kTalonRampRate, kTalonTimeoutMs);
   m_rightFollower.ConfigClosedloopRamp(kTalonRampRate, kTalonTimeoutMs);
+  // Set PIDF values. PID slot 0 uses the Falcon 500's integrated encoder.
+  m_leftFront.Config_kF(0, kFDriveSpeed, kTalonTimeoutMs);
+  m_leftFront.Config_kP(0, kPDriveSpeed, kTalonTimeoutMs);
+  m_leftFront.Config_kI(0, kIDriveSpeed, kTalonTimeoutMs);
+  m_leftFront.Config_kD(0, kDDriveSpeed, kTalonTimeoutMs);
+  m_leftFront.Config_IntegralZone(0, kIzDriveSpeed, kTalonTimeoutMs);
+  m_rightFront.Config_kF(0, kFDriveSpeed, kTalonTimeoutMs);
+  m_rightFront.Config_kP(0, kPDriveSpeed, kTalonTimeoutMs);
+  m_rightFront.Config_kI(0, kIDriveSpeed, kTalonTimeoutMs);
+  m_rightFront.Config_kD(0, kDDriveSpeed, kTalonTimeoutMs);
+  m_rightFront.Config_IntegralZone(0, kIzDriveSpeed, kTalonTimeoutMs);
 }
 
 void DalekDrive::Drive(double left, double right, bool squareInputs) {
   m_drive.TankDrive(left, right, squareInputs);
+}
+
+void DalekDrive::TankDrive(double leftSpeed, double rightSpeed,
+                           bool squareInputs) {
+  auto [left, right] = m_drive.TankDriveIK(leftSpeed, rightSpeed, squareInputs);
+
+  SetWheelSpeeds(left * kMaxSpeed, right * kMaxSpeed);
+  m_drive.Feed();
+}
+
+void DalekDrive::ArcadeDrive(double forward, double rotation,
+                             bool squareInputs) {
+  auto [left, right] = m_drive.TankDriveIK(forward, rotation, squareInputs);
+
+  SetWheelSpeeds(left * kMaxSpeed, right * kMaxSpeed);
+  m_drive.Feed();
 }
 
 units::meter_t DalekDrive::GetDistance() {
@@ -101,4 +128,12 @@ void DalekDrive::Periodic() {
       kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition());
 
   m_field.SetRobotPose(GetPose());
+}
+
+void SetWheelSpeeds(units::meters_per_second_t leftSpeed,
+                    units::meters_per_second_t rightSpeed) {
+  m_leftFront.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,
+                  leftSpeed / kEncoderDistancePerPulse / (double)10 * 1_s);
+  m_rightFront.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,
+                   rightSpeed / kEncoderDistancePerPulse / (double)10 * 1_s);
 }

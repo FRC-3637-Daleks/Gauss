@@ -21,6 +21,10 @@ public:
 
   void Drive(double left, double right, bool squareInputs);
 
+  void TankDrive(double leftSpeed, double rightSpeed, bool squareInputs);
+
+  void ArcadeDrive(double forward, double rotation, bool squareInputs);
+
   units::meter_t GetDistance();
 
   units::degree_t GetHeading() const;
@@ -45,4 +49,7 @@ private:
 
   frc::DifferentialDriveOdometry m_odometry;
   frc::Field2d m_field;
+
+  void SetWheelSpeeds(units::meters_per_second_t leftSpeed,
+                      units::meters_per_second_t rightSpeed);
 };
