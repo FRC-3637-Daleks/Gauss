@@ -2,9 +2,11 @@
 
 #include <AHRS.h>
 #include <ctre/Phoenix.h>
+#include <frc/controller/ProfiledPIDController.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
 #include <frc/smartdashboard/Field2d.h>
+#include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/angle.h>
 #include <units/length.h>
@@ -24,6 +26,8 @@ public:
   void TankDrive(double leftSpeed, double rightSpeed, bool squareInputs);
 
   void ArcadeDrive(double forward, double rotation, bool squareInputs);
+
+  frc2::CommandPtr TurnToAngleCommand(units::degree_t target);
 
   units::meter_t GetDistance();
 
@@ -49,6 +53,8 @@ private:
 
   frc::DifferentialDriveOdometry m_odometry;
   frc::Field2d m_field;
+
+  frc::ProfiledPIDController<units::radian> m_turnController;
 
   void SetWheelSpeeds(units::meters_per_second_t leftSpeed,
                       units::meters_per_second_t rightSpeed);

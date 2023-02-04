@@ -2,6 +2,9 @@
 
 #include <numbers>
 
+#include <units/angle.h>
+#include <units/angular_acceleration.h>
+#include <units/angular_velocity.h>
 #include <units/length.h>
 #include <units/velocity.h>
 
@@ -17,6 +20,8 @@ constexpr auto kWheelDiameter = 8_in;
 constexpr auto kEncoderDistancePerPulse =
     std::numbers::pi * kWheelDiameter / (double)(kEncoderCPR * kGearReduction);
 
+constexpr bool kGyroReversed = true;
+
 constexpr double kTalonRampRate =
     0.5; // 0.5 seconds from neutral to full throttle.
 constexpr int kTalonTimeoutMs = 30;
@@ -29,6 +34,15 @@ constexpr double kPDriveSpeed = 0;
 constexpr double kIDriveSpeed = 0;
 constexpr double kDDriveSpeed = 0;
 constexpr double kIzDriveSpeed = 0;
+
+// NOTE: Guess value!
+constexpr double kPTurn = 0.75;
+
+constexpr auto kTurnTolerance = 5_deg;
+constexpr auto kTurnRateTolerance = 5_deg_per_s;
+
+constexpr auto kMaxTurnRate = std::numbers::pi * 1_rad_per_s;
+constexpr auto kMaxTurnAcceleration = std::numbers::pi * 1_rad_per_s_sq;
 } // namespace DriveConstants
 
 namespace OperatorConstants {

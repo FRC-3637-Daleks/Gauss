@@ -1,7 +1,10 @@
 #include "subsystems/DalekDrive.h"
 
+#include <cmath>
+
 #include <frc/SPI.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc2/command/FunctionalCommand.h>
 
 using namespace DriveConstants;
 
@@ -13,7 +16,11 @@ DalekDrive::DalekDrive()
           m_gyro.GetRotation2d(),
           kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
           kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition(),
-          frc::Pose2d{}} {
+          frc::Pose2d{}},
+      m_turnController{kPTurn, 0, 0, {kMaxTurnRate, kMaxTurnAcceleration}} {
+  m_turnController.EnableContinuousInput(-180_deg, 180_deg);
+  m_turnController.SetTolerance(kTurnTolerance, kTurnRateTolerance);
+
   InitDriveMotors();
 }
 
@@ -91,6 +98,24 @@ void DalekDrive::ArcadeDrive(double forward, double rotation,
   m_drive.Feed();
 }
 
+frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading
+             [this] {
+               Reset();
+               m_turnController.Reset(GetHeading());
+             },
+             // Use output from PID controller to turn robot.
+             [this, &target] {
+               double output = m_turnController.Calculate(GetHeading(), target);
+               ArcadeDrive(0, output, false);
+             },
+             // Stop robot.
+             [this](bool) -> void { ArcadeDrive(0, 0, false); },
+             [this] -> bool { return m_turnController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
 units::meter_t DalekDrive::GetDistance() {
   // Average encoder readings to get distance driven.
   return kEncoderDistancePerPulse *
@@ -100,7 +125,8 @@ units::meter_t DalekDrive::GetDistance() {
 }
 
 units::degree_t DalekDrive::GetHeading() const {
-  return -m_gyro.GetRotation2d().Degrees();
+  return units::degree_t{std::remainder(m_gyro.GetAngle(), 360) *
+                         (kGyroReversed ? -1.0 : 1.0)};
 }
 
 void DalekDrive::Reset() {
@@ -130,8 +156,8 @@ void DalekDrive::Periodic() {
   m_field.SetRobotPose(GetPose());
 }
 
-void SetWheelSpeeds(units::meters_per_second_t leftSpeed,
-                    units::meters_per_second_t rightSpeed) {
+void DalekDrive::SetWheelSpeeds(units::meters_per_second_t leftSpeed,
+                                units::meters_per_second_t rightSpeed) {
   m_leftFront.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,
                   leftSpeed / kEncoderDistancePerPulse / (double)10 * 1_s);
   m_rightFront.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,
