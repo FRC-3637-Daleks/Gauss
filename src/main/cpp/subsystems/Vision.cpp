@@ -8,15 +8,26 @@ Vision::Vision() {
   // Implementation of subsystem constructor goes here.
 }
 
-frc2::CommandPtr Vision::ExampleMethodCommand() {
-  // Inline construction of command goes here.
-  // Subsystem::RunOnce implicitly requires `this` subsystem.
-  return RunOnce([/* this */] { /* one-time action goes here */ });
-}
+frc2::CommandPtr Vision::CommandTurnToTarget() {
+  // double rotationSpeed;
 
-bool Vision::ExampleCondition() {
-  // Query some boolean state, such as a digital sensor.
-  return false;
+  // // Vision-alignment mode
+  // // Query the latest result from PhotonVision
+  // photonlib::PhotonPipelineResult result = camera.GetLatestResult();
+
+  // if (result.HasTargets()) {
+  //   // Rotation speed is the output of the PID controller
+  //   rotationSpeed = -controller.Calculate(result.GetBestTarget().GetYaw(),
+  //   0);
+  // } else {
+  //   // If we have no targets, stay still.
+  //   rotationSpeed = 0;
+  // }
+
+  // // Manual Driver Mode
+
+  // // Use our forward/turn speeds to control the drivetrain
+  // drive.ArcadeDrive(rotationSpeed);
 }
 
 void Vision::Periodic() {

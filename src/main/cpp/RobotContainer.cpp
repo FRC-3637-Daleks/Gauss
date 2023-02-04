@@ -25,4 +25,6 @@ void RobotContainer::ConfigureBindings() {
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // No auton.
   return frc2::CommandPtr{nullptr};
+  // No auton.
+  return frc2::CommandPtr{nullptr};
 }
