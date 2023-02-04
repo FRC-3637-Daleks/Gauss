@@ -3,35 +3,45 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/Vision.h"
+#include <frc/apriltag/AprilTagFieldLayout.h>
+
+
 
 Vision::Vision() {
   // Implementation of subsystem constructor goes here.
 }
 
 frc2::CommandPtr Vision::CommandTurnToTarget() {
-  // double rotationSpeed;
+  /*double rotationSpeed;
 
-  // // Vision-alignment mode
-  // // Query the latest result from PhotonVision
-  // photonlib::PhotonPipelineResult result = camera.GetLatestResult();
+  // Vision-alignment mode
+  // Query the latest result from PhotonVision
+  photonlib::PhotonPipelineResult result = camera.GetLatestResult();
 
-  // if (result.HasTargets()) {
-  //   // Rotation speed is the output of the PID controller
-  //   rotationSpeed = -controller.Calculate(result.GetBestTarget().GetYaw(),
-  //   0);
-  // } else {
-  //   // If we have no targets, stay still.
-  //   rotationSpeed = 0;
-  // }
+  if (result.HasTargets()) {
+    // Rotation speed is the output of the PID controller
+    rotationSpeed = -controller.Calculate(result.GetBestTarget().GetYaw(),
+    0);
+    
+  } else {
+    // If we have no targets, stay still.
+    rotationSpeed = 0;
+  }
+  */
 
-  // // Manual Driver Mode
+  // Manual Driver Mode
 
-  // // Use our forward/turn speeds to control the drivetrain
-  // drive.ArcadeDrive(rotationSpeed);
+  // Use our forward/turn speeds to control the drivetrain
+  //drive.ArcadeDrive(rotationSpeed);
 }
 
 void Vision::Periodic() {
   // Implementation of subsystem periodic method goes here.
+  bool foundTarget;
+  photonlib::PhotonPipelineResult result = camera.GetLatestResult();
+  if(result.HasTargets()){
+    foundTarget = true;
+  }
 }
 
 void Vision::SimulationPeriodic() {
