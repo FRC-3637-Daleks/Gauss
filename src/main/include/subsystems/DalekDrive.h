@@ -29,6 +29,8 @@ public:
 
   frc2::CommandPtr TurnToAngleCommand(units::degree_t target);
 
+  frc2::CommandPtr DriveToDistance(units::meter_t distance);
+
   units::meter_t GetDistance();
 
   units::degree_t GetHeading() const;
@@ -55,6 +57,7 @@ private:
   frc::Field2d m_field;
 
   frc::ProfiledPIDController<units::radian> m_turnController;
+  frc::ProfiledPIDController<units::meter> m_distanceController;
 
   void SetWheelSpeeds(units::meters_per_second_t leftSpeed,
                       units::meters_per_second_t rightSpeed);

@@ -2,6 +2,7 @@
 
 #include <numbers>
 
+#include <units/acceleration.h>
 #include <units/angle.h>
 #include <units/angular_acceleration.h>
 #include <units/angular_velocity.h>
@@ -37,6 +38,7 @@ constexpr double kIzDriveSpeed = 0;
 
 // NOTE: Guess value!
 constexpr double kPTurn = 0.75;
+constexpr double kPDistance = 0;
 
 constexpr auto kTurnTolerance = 5_deg;
 constexpr auto kTurnRateTolerance = 5_deg_per_s;
@@ -44,6 +46,11 @@ constexpr auto kTurnRateTolerance = 5_deg_per_s;
 constexpr auto kMaxTurnRate = std::numbers::pi * 1_rad_per_s;
 constexpr auto kMaxTurnAcceleration = std::numbers::pi * 1_rad_per_s_sq;
 } // namespace DriveConstants
+
+namespace AutoConstants {
+constexpr auto kMaxSpeed = 3_fps;
+constexpr auto kMaxAcceleration = units::feet_per_second_squared_t{10};
+} // namespace AutoConstants
 
 namespace OperatorConstants {
 constexpr int kLeftJoystickPort = 1;

@@ -17,7 +17,12 @@ DalekDrive::DalekDrive()
           kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
           kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition(),
           frc::Pose2d{}},
-      m_turnController{kPTurn, 0, 0, {kMaxTurnRate, kMaxTurnAcceleration}} {
+      m_turnController{kPTurn, 0, 0, {kMaxTurnRate, kMaxTurnAcceleration}},
+      m_distanceController{
+          kPDistance,
+          0,
+          0,
+          {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}} {
   m_turnController.EnableContinuousInput(-180_deg, 180_deg);
   m_turnController.SetTolerance(kTurnTolerance, kTurnRateTolerance);
 
@@ -100,7 +105,7 @@ void DalekDrive::ArcadeDrive(double forward, double rotation,
 
 frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
   return frc2::FunctionalCommand(
-             // Set controller input to current heading
+             // Set controller input to current heading.
              [this] {
                Reset();
                m_turnController.Reset(GetHeading());
@@ -112,7 +117,26 @@ frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
              },
              // Stop robot.
              [this](bool) -> void { ArcadeDrive(0, 0, false); },
-             [this] -> bool { return m_turnController.AtGoal(); }, {this})
+             [this]() -> bool { return m_turnController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
+frc2::CommandPtr DalekDrive::DriveToDistance(units::meter_t target) {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this] {
+               Reset();
+               m_distanceController.Reset(GetDistance());
+             },
+             // Use output from PID controller to turn robot.
+             [this, &target] {
+               double output =
+                   m_distanceController.Calculate(GetDistance(), target);
+               TankDrive(output, output, false);
+             },
+             // Stop robot.
+             [this](bool) -> void { TankDrive(0, 0, false); },
+             [this]() -> bool { return m_distanceController.AtGoal(); }, {this})
       .ToPtr();
 }
 
