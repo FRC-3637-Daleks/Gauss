@@ -35,25 +35,28 @@ public:
   void SimulationPeriodic() override;
 
 private:
+  // camera name
   photonlib::PhotonCamera camera{"limelight3637"};
-  const units::meter_t CAMERA_HEIGHT = 24_in;
-  const units::meter_t TARGET_HEIGHT = 5_ft;
+  // camera height and target height
+  const units::meter_t CAMERA_HEIGHT = 24_in; // tbd
+  const units::meter_t TARGET_HEIGHT = 14_in;
 
   // Angle between horizontal and the camera.
-  units::radian_t CAMERA_PITCH = 0_deg;
+  // units::radian_t CAMERA_PITCH = 0_deg;
 
-  // How far from the target we want to be
-  const units::meter_t GOAL_RANGE_METERS = 3_ft;
-
-  // PID constants should be tuned per robot
+  // PID constants should be tuned per robot --> all are tbd
   const double LINEAR_P = 0.1;
   const double LINEAR_D = 0.0;
-  // frc2::PIDController forwardController{LINEAR_P, 0.0, LINEAR_D};
-
   const double ANGULAR_P = 0.1;
   const double ANGULAR_D = 0.0;
-  // frc2::PIDController turnController{ANGULAR_P, 0.0, ANGULAR_D};
-private:
-  // Components (e.g. motor controllers and sensors) should generally be
-  // declared private and exposed only through public methods.
+
+  // boolean for hasTargets method in vision.cpp
+  bool HasTargets();
+  // vector which stores april tags
+  std::vector<frc::AprilTag> tags = {
+      {0, frc::Pose3d(units::meter_t(3), units::meter_t(3), units::meter_t(3), frc::Rotation3d())},
+      {1, frc::Pose3d(units::meter_t(5), units::meter_t(5), units::meter_t(5), frc::Rotation3d())}
+      };
+  // allows april tags to be shared and has field dimensions LxW
+  std::shared_ptr<frc::AprilTagFieldLayout> aprilTags = std::make_shared<frc::AprilTagFieldLayout>(tags, 54_ft, 27_ft);
 };
