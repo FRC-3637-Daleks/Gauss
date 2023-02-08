@@ -26,6 +26,8 @@ DalekDrive::DalekDrive()
   m_turnController.EnableContinuousInput(-180_deg, 180_deg);
   m_turnController.SetTolerance(kTurnTolerance, kTurnRateTolerance);
 
+  m_drive.SetMaxOutput(kMaxOutput);
+
   InitDriveMotors();
 }
 
