@@ -123,7 +123,30 @@ frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
       .ToPtr();
 }
 
-frc2::CommandPtr DalekDrive::DriveToDistance(units::meter_t target) {
+frc2::CommandPtr
+DalekDrive::TurnToPoseCommand(std::function<double()> getForward,
+                              std::function<frc::Pose2d()> getTarget) {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this] { m_turnController.Reset(GetHeading()); },
+             // Use output from PID controller to turn robot.
+             [this, &getForward, &getTarget] {
+               auto target = getTarget();
+               auto relativePose = target.RelativeTo(GetPose());
+               fmt::print("{} {}", relativePose.Rotation().Degrees().value(),
+                          target.Rotation().Degrees().value());
+               double output =
+                   m_turnController.Calculate(relativePose.Rotation().Radians(),
+                                              target.Rotation().Radians());
+               ArcadeDrive(getForward(), output, false);
+             },
+             // Stop robot
+             [this](bool) -> void { ArcadeDrive(0, 0, false); },
+             [this]() -> bool { return m_turnController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
+frc2::CommandPtr DalekDrive::DriveToDistanceCommand(units::meter_t target) {
   return frc2::FunctionalCommand(
              // Set controller input to current heading.
              [this] {

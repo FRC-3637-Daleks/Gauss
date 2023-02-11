@@ -4,6 +4,7 @@
 #include <ctre/Phoenix.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
 #include <frc/smartdashboard/Field2d.h>
 #include <frc2/command/CommandPtr.h>
@@ -29,7 +30,10 @@ public:
 
   frc2::CommandPtr TurnToAngleCommand(units::degree_t target);
 
-  frc2::CommandPtr DriveToDistance(units::meter_t distance);
+  frc2::CommandPtr TurnToPoseCommand(std::function<double()> getForward,
+                                     std::function<frc::Pose2d()> getTarget);
+
+  frc2::CommandPtr DriveToDistanceCommand(units::meter_t distance);
 
   units::meter_t GetDistance();
 
@@ -58,6 +62,7 @@ private:
 
   frc::ProfiledPIDController<units::radian> m_turnController;
   frc::ProfiledPIDController<units::meter> m_distanceController;
+  // frc::ProfiledPIDController<frc::Pose2d> m_poseController;
 
   void SetWheelSpeeds(units::meters_per_second_t leftSpeed,
                       units::meters_per_second_t rightSpeed);

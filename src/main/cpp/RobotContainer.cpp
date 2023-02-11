@@ -15,9 +15,6 @@ void RobotContainer::ConfigureBindings() {
 
   m_leftJoystick.Button(1).OnTrue(
       frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
-
-  m_leftJoystick.Button(2).OnTrue(
-      frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
