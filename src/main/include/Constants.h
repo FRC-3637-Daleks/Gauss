@@ -2,6 +2,8 @@
 
 #include <numbers>
 
+#include <frc/geometry/Transform3d.h>
+#include <photonlib/PhotonPoseEstimator.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
 #include <units/angular_acceleration.h>
@@ -20,6 +22,8 @@ constexpr int kGearReduction = 6;
 constexpr auto kWheelDiameter = 8_in;
 constexpr auto kEncoderDistancePerPulse =
     std::numbers::pi * kWheelDiameter / (double)(kEncoderCPR * kGearReduction);
+
+constexpr auto kTrackWidth = 24_in;
 
 constexpr bool kGyroReversed = true;
 
@@ -46,6 +50,21 @@ constexpr auto kTurnRateTolerance = 5_deg_per_s;
 constexpr auto kMaxTurnRate = std::numbers::pi * 1_rad_per_s;
 constexpr auto kMaxTurnAcceleration = std::numbers::pi * 1_rad_per_s_sq;
 } // namespace DriveConstants
+
+namespace VisionConstants {
+constexpr std::string_view kPhotonCameraName =
+    "limelight3637"; // Should be the camera as named in PhotonVision GUI.
+const frc::Transform3d kCameraToRobot{
+    {0_m, 36_in, 0_m},  // Camera is at the origin of the robot.
+    frc::Rotation3d{}}; // The camera location relative to the robot's center.
+const frc::AprilTagFieldLayout kAprilTagFieldLayout{
+    std::vector<frc::AprilTag>{
+        {0, frc::Pose3d(units::meter_t(3), units::meter_t(3), units::meter_t(3),
+                        frc::Rotation3d())},
+        {1, frc::Pose3d(units::meter_t(5), units::meter_t(5), units::meter_t(5),
+                        frc::Rotation3d())}},
+    54_ft, 27_ft};
+} // namespace VisionConstants
 
 namespace AutoConstants {
 constexpr auto kMaxSpeed = 3_fps;

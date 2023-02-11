@@ -12,11 +12,11 @@ DalekDrive::DalekDrive()
     : m_leftFront{kLeftFrontMotorId}, m_leftFollower{kLeftRearMotorId},
       m_rightFront{kRightFrontMotorId}, m_rightFollower{kRightRearMotorId},
       m_drive{m_leftFront, m_rightFront}, m_gyro{frc::SPI::Port::kMXP},
-      m_odometry{
-          m_gyro.GetRotation2d(),
+      m_DifferentialEstimator{
+          m_kinematics, m_gyro.GetRotation2d(),
           kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
           kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition(),
-          frc::Pose2d{}},
+          frc::Pose2d()},
       m_turnController{kPTurn, 0, 0, {kMaxTurnRate, kMaxTurnAcceleration}},
       m_distanceController{
           kPDistance,
@@ -159,10 +159,12 @@ void DalekDrive::Reset() {
   m_leftFront.SetSelectedSensorPosition(0);
 }
 
-frc::Pose2d DalekDrive::GetPose() const { return m_odometry.GetPose(); }
+frc::Pose2d DalekDrive::GetPose() const {
+  return m_DifferentialEstimator.GetEstimatedPosition();
+}
 
 void DalekDrive::ResetOdometry(const frc::Pose2d &pose) {
-  m_odometry.ResetPosition(
+  m_DifferentialEstimator.ResetPosition(
       m_gyro.GetRotation2d(),
       kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
       kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition(),
@@ -172,7 +174,7 @@ void DalekDrive::ResetOdometry(const frc::Pose2d &pose) {
 void DalekDrive::Periodic() {
   Log();
 
-  m_odometry.Update(
+  m_DifferentialEstimator.Update(
       m_gyro.GetRotation2d(),
       kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
       kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition());
@@ -186,4 +188,9 @@ void DalekDrive::SetWheelSpeeds(units::meters_per_second_t leftSpeed,
                   leftSpeed / kEncoderDistancePerPulse / (double)10 * 1_s);
   m_rightFront.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,
                    rightSpeed / kEncoderDistancePerPulse / (double)10 * 1_s);
+}
+
+void DalekDrive::AddVisionPoseEstimate(frc::Pose2d pose,
+                                       units::second_t timestamp) {
+  m_DifferentialEstimator.AddVisionMeasurement(pose, timestamp);
 }

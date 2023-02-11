@@ -2,9 +2,10 @@
 
 #include <AHRS.h>
 #include <ctre/Phoenix.h>
+#include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/drive/DifferentialDrive.h>
-#include <frc/kinematics/DifferentialDriveOdometry.h>
+#include <frc/estimator/DifferentialDrivePoseEstimator.h>
 #include <frc/smartdashboard/Field2d.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
@@ -35,6 +36,8 @@ public:
 
   units::degree_t GetHeading() const;
 
+  void AddVisionPoseEstimate(frc::Pose2d pose, units::second_t timestamp);
+
   void Reset();
 
   frc::Pose2d GetPose() const;
@@ -53,7 +56,8 @@ private:
 
   AHRS m_gyro;
 
-  frc::DifferentialDriveOdometry m_odometry;
+  frc::DifferentialDriveKinematics m_kinematics{DriveConstants::kTrackWidth};
+  frc::DifferentialDrivePoseEstimator m_DifferentialEstimator;
   frc::Field2d m_field;
 
   frc::ProfiledPIDController<units::radian> m_turnController;

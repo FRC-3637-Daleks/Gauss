@@ -1,76 +1,43 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 #include "subsystems/Vision.h"
-#include <frc/apriltag/AprilTagFieldLayout.h>
+#include "subsystems/DalekDrive.h"
 
-Vision::Vision() {
-  // Implementation of subsystem constructor goes here.
+#include <frc/apriltag/AprilTagFieldLayout.h>
+#include <photonlib/PhotonPipelineResult.h>
+#include <photonlib/PhotonTargetSortMode.h>
+#include <photonlib/PhotonTrackedTarget.h>
+#include <photonlib/PhotonUtils.h>
+
+Vision::Vision(
+    std::function<void(frc::Pose2d, units::second_t)> addVisionMeasurement,
+    std::function<frc::Pose2d()> getRobotPose)
+    : m_estimator{VisionConstants::kAprilTagFieldLayout,
+                  photonlib::AVERAGE_BEST_TARGETS, std::move(m_camera),
+                  VisionConstants::kCameraToRobot} {
+  m_addVisionMeasurement = addVisionMeasurement;
+  m_getRobotPose = getRobotPose;
 }
 
-// method which returns if targets are present or not
 bool Vision::HasTargets() {
-  photonlib::PhotonPipelineResult result = camera.GetLatestResult();
+  photonlib::PhotonPipelineResult result = m_camera.GetLatestResult();
 
   return result.HasTargets();
 }
 
-std::shared_ptr<photonlib::PhotonCamera> cameraOne = std::make_shared<photonlib::PhotonCamera>("limelight3637");
-// Camera is mounted facing forward, half a meter forward of center, half a
-// meter up from center.
-frc::Transform3d robotToCam = frc::Transform3d(frc::Translation3d(0.5_m, 0_m, 0.5_m), frc::Rotation3d(0_rad, 0_rad, 0_rad));
-
-// Assemble the list of cameras & mount locations
-std::vector<std::pair<std::shared_ptr<photonlib::PhotonCamera>, frc::Transform3d>>cameras;
-cameras.push_back(std::make_pair(cameraOne, robotToCam));
-
-photonlib::RobotPoseEstimator
-    estimator(aprilTags, photonlib::CLOSEST_TO_REFERENCE_POSE, cameras);
-std::pair<frc::Pose2d, units::millisecond_t> getEstimatedGlobalPose(frc::Pose3d prevEstimatedRobotPose) {
-  estimator.SetReferencePose(prevEstimatedRobotPose) units::millisecond_t currentTime = frc::Timer::GetFPGATimestamp();
-  auto result = robotPoseEstimator.Update();
-  if (result.second) {
-    return std::make_pair<>(result.first.ToPose2d(), currentTime - result.second);
-  }
-   else {
-    return std::make_pair(frc::Pose2d(), 0_ms);
-  }
+void Vision::CalculateRobotPoseEstimate() {
+  // m_estimator.setReferencePose(m_getRobotPose());
+  m_apriltagEstimate = m_estimator.Update();
 }
 
-// frc2::CommandPtr Vision::CommandTurnToTarget() {
-/*double rotationSpeed;
-
-// Vision-alignment mode
-// Query the latest result from PhotonVision
-photonlib::PhotonPipelineResult result = camera.GetLatestResult();
-
-if (result.HasTargets()) {
-  // Rotation speed is the output of the PID controller
-  rotationSpeed = -controller.Calculate(result.GetBestTarget().GetYaw(),
-  0);
-
-} else {
-  // If we have no targets, stay still.
-  rotationSpeed = 0;
-}
-*/
-
-// Manual Driver Mode
-
-// Use our forward/turn speeds to control the drivetrain
-// drive.ArcadeDrive(rotationSpeed);
-// }
+// AddVisionPoseEstimate takes in Pose2d and a timestamp, thus the conversion of
+// Pose3d to Pose2d is necessary
+// Also, the timestamp should be calcuated by taking the timestamp of the
+// current time and subtracting it from the result.second
+// make sure to do above before calling AddVisionPoseEstimate
 
 void Vision::Periodic() {
-  // Implementation of subsystem periodic method goes here.
-  bool foundTarget;
-  photonlib::PhotonPipelineResult result = camera.GetLatestResult();
-  if (result.HasTargets()) {
-    foundTarget = true;
+  CalculateRobotPoseEstimate();
+  if (m_apriltagEstimate.has_value()) {
+    m_addVisionMeasurement(m_apriltagEstimate.value().estimatedPose.ToPose2d(),
+                           m_apriltagEstimate.value().timestamp);
   }
-}
-
-void Vision::SimulationPeriodic() {
-  // Implementation of subsystem simulation periodic method goes here.
 }

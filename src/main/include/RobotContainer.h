@@ -18,11 +18,10 @@ private:
   frc2::CommandJoystick m_leftJoystick{OperatorConstants::kLeftJoystickPort};
   frc2::CommandJoystick m_rightJoystick{OperatorConstants::kRightJoystickPort};
   frc2::CommandXboxController m_driverController{
-      OperatorConstants::kXboxControllerPort};
-
-  // The robot's subsystems are defined here...
-  Vision m_subsystem;
+    OperatorConstants::kXboxControllerPort};
+  Vision m_vision;
   DalekDrive m_drivetrain;
+  
 
   void ConfigureBindings();
 };
