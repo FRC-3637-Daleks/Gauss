@@ -6,6 +6,7 @@
 
 #include "Constants.h"
 #include "subsystems/DalekDrive.h"
+#include "subsystems/Intake.h"
 
 class RobotContainer {
 public:
@@ -20,6 +21,7 @@ private:
       OperatorConstants::kXboxControllerPort};
 
   DalekDrive m_drivetrain;
+  Intake m_intake;
 
   void ConfigureBindings();
 };
