@@ -2,10 +2,12 @@
 
 #include <AHRS.h>
 #include <ctre/Phoenix.h>
-#include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/estimator/DifferentialDrivePoseEstimator.h>
+#include <frc/geometry/Pose2d.h>
+#include <frc/kinematics/DifferentialDriveKinematics.h>
+#include <frc/kinematics/DifferentialDriveOdometry.h>
 #include <frc/smartdashboard/Field2d.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
@@ -30,7 +32,10 @@ public:
 
   frc2::CommandPtr TurnToAngleCommand(units::degree_t target);
 
-  frc2::CommandPtr DriveToDistance(units::meter_t distance);
+  frc2::CommandPtr TurnToPoseCommand(std::function<double()> getForward,
+                                     std::function<frc::Pose2d()> getTarget);
+
+  frc2::CommandPtr DriveToDistanceCommand(units::meter_t distance);
 
   units::meter_t GetDistance();
 
@@ -45,6 +50,10 @@ public:
   void ResetOdometry(const frc::Pose2d &pose);
 
   void Periodic() override;
+
+  void InitTest();
+
+  void UpdatePIDValues();
 
 private:
   WPI_TalonFX m_leftFront;

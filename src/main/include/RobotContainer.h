@@ -1,5 +1,6 @@
 #pragma once
 
+#include <frc/filter/SlewRateLimiter.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/button/CommandJoystick.h>
 #include <frc2/command/button/CommandXboxController.h>
@@ -22,6 +23,9 @@ private:
   Vision m_vision;
   DalekDrive m_drivetrain;
   
+
+  frc::SlewRateLimiter<units::scalar> m_leftRateLimiter{3 / 1_s};
+  frc::SlewRateLimiter<units::scalar> m_rightRateLimiter{3 / 1_s};
 
   void ConfigureBindings();
 };

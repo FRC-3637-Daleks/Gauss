@@ -31,11 +31,14 @@ constexpr double kTalonRampRate =
     0.5; // 0.5 seconds from neutral to full throttle.
 constexpr int kTalonTimeoutMs = 30;
 
+// NOTE: Temporary, for open loop drive command.
+constexpr double kMaxOutput = 0.5;
+
 constexpr auto kMaxSpeed = 10_fps;
 
 // PID coefficients for closed-loop control of velocity.
-constexpr double kFDriveSpeed = 0;
-constexpr double kPDriveSpeed = 0;
+constexpr double kFDriveSpeed = 0.0656;
+constexpr double kPDriveSpeed = 0.1;
 constexpr double kIDriveSpeed = 0;
 constexpr double kDDriveSpeed = 0;
 constexpr double kIzDriveSpeed = 0;
@@ -72,6 +75,7 @@ constexpr auto kMaxAcceleration = units::feet_per_second_squared_t{10};
 } // namespace AutoConstants
 
 namespace OperatorConstants {
+constexpr bool kTesting = true;
 constexpr int kLeftJoystickPort = 1;
 constexpr int kRightJoystickPort = 2;
 constexpr int kXboxControllerPort = 3;
