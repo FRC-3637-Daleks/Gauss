@@ -29,6 +29,10 @@ DalekDrive::DalekDrive()
   m_drive.SetMaxOutput(kMaxOutput);
 
   InitDriveMotors();
+
+  if (OperatorConstants::kTesting) {
+    InitTest();
+  }
 }
 
 void DalekDrive::Log() {
@@ -197,6 +201,10 @@ void DalekDrive::ResetOdometry(const frc::Pose2d &pose) {
 void DalekDrive::Periodic() {
   Log();
 
+  if (OperatorConstants::kTesting) {
+    // PeriodicTest();
+  }
+
   m_odometry.Update(
       m_gyro.GetRotation2d(),
       kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
@@ -205,8 +213,48 @@ void DalekDrive::Periodic() {
   m_field.SetRobotPose(GetPose());
 }
 
+void DalekDrive::InitTest() {
+  frc::SmartDashboard::PutNumber("Velocity Kf", kFDriveSpeed);
+  frc::SmartDashboard::PutNumber("Velocity Kp", kPDriveSpeed);
+  frc::SmartDashboard::PutNumber("Velocity Ki", kIDriveSpeed);
+  frc::SmartDashboard::PutNumber("Velocity Kd", kDDriveSpeed);
+  frc::SmartDashboard::PutNumber("Velocity KIz", kIzDriveSpeed);
+}
+
+void DalekDrive::UpdatePIDValues() {
+  m_leftFront.Config_kF(
+      0, frc::SmartDashboard::GetNumber("Velocity Kf", kFDriveSpeed), 0);
+  m_leftFront.Config_kP(
+      0, frc::SmartDashboard::GetNumber("Velocity Kp", kPDriveSpeed), 0);
+  m_leftFront.Config_kI(
+      0, frc::SmartDashboard::GetNumber("Velocity Ki", kIDriveSpeed), 0);
+  m_leftFront.Config_kD(
+      0, frc::SmartDashboard::GetNumber("Velocity Kd", kDDriveSpeed), 0);
+  m_leftFront.Config_IntegralZone(
+      0, frc::SmartDashboard::GetNumber("Velocity KIz", kIzDriveSpeed), 0);
+
+  m_rightFront.Config_kF(
+      0, frc::SmartDashboard::GetNumber("Velocity Kf", kFDriveSpeed), 0);
+  m_rightFront.Config_kP(
+      0, frc::SmartDashboard::GetNumber("Velocity Kp", kFDriveSpeed), 0);
+  m_rightFront.Config_kI(
+      0, frc::SmartDashboard::GetNumber("Velocity Ki", kFDriveSpeed), 0);
+  m_rightFront.Config_kD(
+      0, frc::SmartDashboard::GetNumber("Velocity Kd", kFDriveSpeed), 0);
+  m_rightFront.Config_IntegralZone(
+      0, frc::SmartDashboard::GetNumber("Velocity KIz", kIzDriveSpeed), 0);
+}
+
 void DalekDrive::SetWheelSpeeds(units::meters_per_second_t leftSpeed,
                                 units::meters_per_second_t rightSpeed) {
+  if (OperatorConstants::kTesting) {
+    frc::SmartDashboard::PutNumber("Left speed setpoint",
+                                   leftSpeed / kEncoderDistancePerPulse /
+                                       (double)10 * 1_s);
+    frc::SmartDashboard::PutNumber("Right speed setpoint",
+                                   rightSpeed / kEncoderDistancePerPulse /
+                                       (double)10 * 1_s);
+  }
   m_leftFront.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,
                   leftSpeed / kEncoderDistancePerPulse / (double)10 * 1_s);
   m_rightFront.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,

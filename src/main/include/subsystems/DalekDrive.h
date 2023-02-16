@@ -47,6 +47,10 @@ public:
 
   void Periodic() override;
 
+  void InitTest();
+
+  void UpdatePIDValues();
+
 private:
   WPI_TalonFX m_leftFront;
   WPI_TalonFX m_leftFollower;
@@ -62,7 +66,6 @@ private:
 
   frc::ProfiledPIDController<units::radian> m_turnController;
   frc::ProfiledPIDController<units::meter> m_distanceController;
-  // frc::ProfiledPIDController<frc::Pose2d> m_poseController;
 
   void SetWheelSpeeds(units::meters_per_second_t leftSpeed,
                       units::meters_per_second_t rightSpeed);
