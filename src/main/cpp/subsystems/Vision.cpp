@@ -2,6 +2,7 @@
 #include "subsystems/DalekDrive.h"
 
 #include <frc/apriltag/AprilTagFieldLayout.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <photonlib/PhotonPipelineResult.h>
 #include <photonlib/PhotonTargetSortMode.h>
 #include <photonlib/PhotonTrackedTarget.h>
@@ -10,9 +11,10 @@
 Vision::Vision(
     std::function<void(frc::Pose2d, units::second_t)> addVisionMeasurement,
     std::function<frc::Pose2d()> getRobotPose)
-    : m_estimator{VisionConstants::kAprilTagFieldLayout,
-                  photonlib::AVERAGE_BEST_TARGETS, std::move(m_camera),
-                  VisionConstants::kCameraToRobot} {
+    : m_estimator{
+          frc::LoadAprilTagLayoutField(frc::AprilTagField::k2023ChargedUp),
+          photonlib::AVERAGE_BEST_TARGETS, std::move(m_camera),
+          VisionConstants::kCameraToRobot} {
   m_addVisionMeasurement = addVisionMeasurement;
   m_getRobotPose = getRobotPose;
 }

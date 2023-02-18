@@ -7,7 +7,6 @@
 #include <frc/estimator/DifferentialDrivePoseEstimator.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
-#include <frc/kinematics/DifferentialDriveOdometry.h>
 #include <frc/smartdashboard/Field2d.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
@@ -66,7 +65,7 @@ private:
   AHRS m_gyro;
 
   frc::DifferentialDriveKinematics m_kinematics{DriveConstants::kTrackWidth};
-  frc::DifferentialDrivePoseEstimator m_DifferentialEstimator;
+  frc::DifferentialDrivePoseEstimator m_poseEstimator;
   frc::Field2d m_field;
 
   frc::ProfiledPIDController<units::radian> m_turnController;

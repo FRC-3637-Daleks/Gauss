@@ -15,6 +15,8 @@ public:
 
   void Periodic() override;
 
+  void GetBestPose();
+
   bool HasTargets();
 
   void CalculateRobotPoseEstimate();

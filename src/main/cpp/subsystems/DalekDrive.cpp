@@ -12,7 +12,7 @@ DalekDrive::DalekDrive()
     : m_leftFront{kLeftFrontMotorId}, m_leftFollower{kLeftRearMotorId},
       m_rightFront{kRightFrontMotorId}, m_rightFollower{kRightRearMotorId},
       m_drive{m_leftFront, m_rightFront}, m_gyro{frc::SPI::Port::kMXP},
-      m_DifferentialEstimator{
+      m_poseEstimator{
           m_kinematics, m_gyro.GetRotation2d(),
           kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
           kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition(),
@@ -189,11 +189,11 @@ void DalekDrive::Reset() {
 }
 
 frc::Pose2d DalekDrive::GetPose() const {
-  return m_DifferentialEstimator.GetEstimatedPosition();
+  return m_poseEstimator.GetEstimatedPosition();
 }
 
 void DalekDrive::ResetOdometry(const frc::Pose2d &pose) {
-  m_DifferentialEstimator.ResetPosition(
+  m_poseEstimator.ResetPosition(
       m_gyro.GetRotation2d(),
       kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
       kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition(),
@@ -207,7 +207,8 @@ void DalekDrive::Periodic() {
     // PeriodicTest();
   }
 
-  m_DifferentialEstimator.Update(
+  m_poseEstimator.Update(
+      GetHeading(),
       kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
       kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition());
 
@@ -264,5 +265,5 @@ void DalekDrive::SetWheelSpeeds(units::meters_per_second_t leftSpeed,
 
 void DalekDrive::AddVisionPoseEstimate(frc::Pose2d pose,
                                        units::second_t timestamp) {
-  m_DifferentialEstimator.AddVisionMeasurement(pose, timestamp);
+  m_poseEstimator.AddVisionMeasurement(pose, timestamp);
 }

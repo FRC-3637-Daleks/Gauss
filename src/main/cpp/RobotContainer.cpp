@@ -23,10 +23,12 @@ void RobotContainer::ConfigureBindings() {
   m_leftJoystick.Button(1).OnTrue(
       frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
 
-  if (OperatorConstants::kTesting) {
-    m_leftJoystick.Button(2).OnTrue(frc2::cmd::RunOnce(
-        [this] { m_drivetrain.UpdatePIDValues(); }, {&m_drivetrain}));
-  }
+  // Brake.
+  m_leftJoystick.Button(2).WhileTrue(frc2::cmd::Run(
+      [this] { m_drivetrain.TankDrive(0, 0, true); }, {&m_drivetrain}));
+
+  m_leftJoystick.Button(3).OnTrue(frc2::cmd::RunOnce(
+      [this] { m_drivetrain.UpdatePIDValues(); }, {&m_drivetrain}));
 
   m_rightJoystick.Button(1).WhileTrue(frc2::cmd::Run(
       [this] {
