@@ -19,11 +19,11 @@ class Arm : public frc2::SubsystemBase {
 public:
   Arm();
 
-  void Arm::SetLegOut(bool isOut) { m_solenoid.Set(isOut); }
+  void SetLegOut(bool isOut) { m_solenoid.Set(isOut); }
 
-  bool Arm::IsLegOut() { return m_solenoid.Get(); }
+  bool IsLegOut() { return m_solenoid.Get(); }
 
-  void Arm::SwitchLegPosition() { m_solenoid.Set(IsLegOut()); }
+  void SwitchLegPosition() { m_solenoid.Set(IsLegOut()); }
 
   void SetNeckAngle(units::degree_t target);
 
@@ -43,8 +43,8 @@ private:
   frc::Solenoid m_solenoid;
   WPI_TalonFX m_motor;
 
-  frc::ProfiledPIDController<units::radian> m_neckController;
   frc::ArmFeedforward m_neckFeedforward;
+  frc::ProfiledPIDController<units::radian> m_neckController;
 
   // frc::DigitalInput m_limitSwitch;
 };

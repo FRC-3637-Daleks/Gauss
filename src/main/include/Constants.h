@@ -30,7 +30,7 @@ constexpr auto kA = 0_V * 0_s * 0_s / 1_rad; // Acceleration gain
 const frc::ArmFeedforward kFeedForward = {kS, kG, kV, kA};
 
 // PID Loop
-constexpr double kP = 0;
+constexpr double kP = 0.01;
 constexpr double kI = 0;
 constexpr double kD = 0;
 
@@ -38,7 +38,7 @@ constexpr auto kMaxTurnVelocity = std::numbers::pi * 1_rad_per_s;
 constexpr auto kMaxTurnAcceleration = std::numbers::pi * 1_rad_per_s_sq;
 
 constexpr int kEncoderCPR = 2048;
-constexpr double kGearReduction = 4;
+constexpr double kGearReduction = 16;
 constexpr auto kEncoderRotationPerPulse =
     2_rad * std::numbers::pi / (kEncoderCPR * kGearReduction);
 

@@ -17,9 +17,6 @@
 class RobotContainer {
 public:
   RobotContainer();
-  Arm m_arm;
-
-  void ConfigureDashboard();
 
   frc2::CommandPtr GetAutonomousCommand();
 
