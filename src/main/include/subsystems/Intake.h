@@ -1,5 +1,6 @@
 #pragma once
 
+#include <frc/AnalogInput.h>
 #include <frc/PWM.h>
 #include <frc/PneumaticsControlModule.h>
 #include <frc/Solenoid.h>
@@ -17,10 +18,17 @@ public:
 
   void SetIntake(bool leftPiston, bool rightPiston, bool middlePiston);
 
+  void SetIntake(bool leftPiston, bool rightPiston);
+
+  bool ReadyToPickUp();
+
+  double GetRangefidner();
+
   void Periodic() override;
 
 private:
   frc::Solenoid m_left;
   frc::Solenoid m_right;
   frc::Solenoid m_middle;
+  frc::AnalogInput m_rangefinder;
 };

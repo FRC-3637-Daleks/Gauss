@@ -26,6 +26,9 @@ constexpr int kPCMPort = 5;
 constexpr int kLeftPistonPort = 0;
 constexpr int kRightPistonPort = 0;
 constexpr int kMiddlePistonPort = 0;
+constexpr int kRangefinderPort = 0;
+
+constexpr int pickUpRange = 0;
 } // namespace IntakeConstants
 
 namespace OperatorConstants {
