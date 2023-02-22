@@ -1,22 +1,26 @@
 #include "RobotContainer.h"
 
-#include <frc2/command/button/JoystickButton.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/button/Trigger.h>
-#include <iostream>
 
 RobotContainer::RobotContainer() {
-  // Initialize all of your commands and subsystems here
+  m_drivetrain.SetDefaultCommand(frc2::cmd::Run(
+      [this] {
+        m_drivetrain.Drive(-m_leftJoystick.GetY(), -m_rightJoystick.GetY(),
+                           true);
+      },
+      {&m_drivetrain}));
 
-  // Configure the button bindings and dashboard
-  frc2::Trigger aButton = m_XboxController.A();
   ConfigureBindings();
   ConfigureDashboard();
 }
 
 void RobotContainer::ConfigureBindings() {
-  // Configure your trigger bindings here
+  m_leftJoystick.Button(1).OnTrue(
+      frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
 }
 
-void RobotContainer::ConfigureDashboard() {
-  frc::SmartDashboard::PutBoolean("A Button", m_XboxController.GetAButton());
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
+  // No auton.
+  return frc2::CommandPtr{nullptr};
 }

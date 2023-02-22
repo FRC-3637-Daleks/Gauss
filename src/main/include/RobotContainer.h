@@ -4,12 +4,15 @@
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/Command.h>
+#include <frc2/command/CommandPtr.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/InstantCommand.h>
+#include <frc2/command/button/CommandJoystick.h>
 #include <frc2/command/button/CommandXboxController.h>
 
 #include "Constants.h"
 #include "subsystems/Arm.h"
+#include "subsystems/DalekDrive.h"
 
 class RobotContainer {
 public:
@@ -18,14 +21,17 @@ public:
 
   void ConfigureDashboard();
 
+  frc2::CommandPtr GetAutonomousCommand();
+
 private:
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  frc2::CommandXboxController m_XboxController{
-      OperatorConstants::kXboxController};
+  frc2::CommandJoystick m_leftJoystick{OperatorConstants::kLeftJoystickPort};
+  frc2::CommandJoystick m_rightJoystick{OperatorConstants::kRightJoystickPort};
+  frc2::CommandXboxController m_driverController{
+      OperatorConstants::kXboxControllerPort};
 
-  // The robot's subsystems are defined here...
+  Arm m_arm;
 
-  // The robot's commands are defined here...
+  DalekDrive m_drivetrain;
 
   void ConfigureBindings();
 };
