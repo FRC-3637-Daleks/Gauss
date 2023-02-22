@@ -1,10 +1,7 @@
 #pragma once
 
 #include <ctre/Phoenix.h>
-#include <frc/AnalogInput.h>
-#include <frc/AnalogPotentiometer.h>
 #include <frc/DigitalInput.h>
-#include <frc/Encoder.h>
 #include <frc/Solenoid.h>
 #include <frc/controller/ArmFeedforward.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -21,17 +18,15 @@ class Arm : public frc2::SubsystemBase {
 
 public:
   Arm();
-  void SetLegPosition(bool isOut);
 
-  bool IsLegOut();
+  void Arm::SetLegOut(bool isOut) { m_solenoid.Set(isOut); }
 
-  void SwitchLegPosition();
+  bool Arm::IsLegOut() { return m_solenoid.Get(); }
 
-  double GetPotentiometer();
+  void Arm::SwitchLegPosition() { m_solenoid.Set(IsLegOut()); }
 
   void SetNeckAngle(units::degree_t target);
 
-  // Puts potentiometer output on the SmartDashboard
   void Log();
 
   void Periodic();
@@ -42,13 +37,14 @@ public:
 
   void SetArmZero(bool limitswitch);
 
-  void SetArmGoal(int goal);
+  void SetArmGoal(units::degree_t output);
 
 private:
   frc::Solenoid m_solenoid;
   WPI_TalonFX m_motor;
-  frc::AnalogInput m_analogPotentiometer;
+
   frc::ProfiledPIDController<units::radian> m_neckController;
-  frc::ArmFeedforward m_feedforward;
-  frc::DigitalInput m_limitSwitch;
+  frc::ArmFeedforward m_neckFeedforward;
+
+  // frc::DigitalInput m_limitSwitch;
 };
