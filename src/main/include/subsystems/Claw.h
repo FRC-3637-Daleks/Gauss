@@ -17,13 +17,15 @@ public:
 
   void Log();
 
-  void GetLimitSwtich();
+  //void GetLimitSwtich();
 
   void SetPosition(bool position);
+
+  void Toggle();
 
   void Periodic() override;
 
 private:
   frc::Solenoid m_claw;
-  frc::DigitalInput m_limitSwitch;
+  //frc::DigitalInput m_limitSwitch;
 };

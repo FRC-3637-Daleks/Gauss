@@ -2,15 +2,16 @@
 
 Claw::Claw()
     : m_claw{ClawConstants::kPCMPort, frc::PneumaticsModuleType::CTREPCM,
-             ClawConstants::kPistonPort},
-      m_limitSwitch{ClawConstants::kLimitSwitchPort} {
+             ClawConstants::kPistonPort} {
   m_claw.Set(0);
-  this->Periodic();
+  Periodic();
 }
 
 void Claw::SetPosition(bool position) { m_claw.Set(position); }
 
-void Claw::GetLimitSwtich() { m_limitSwitch.Get(); }
+void Claw::Toggle() { m_claw.Toggle(); }
+
+//void Claw::GetLimitSwtich() { m_limitSwitch.Get(); }
 
 void Claw::Log() {
   frc::SmartDashboard::PutBoolean("Piston", m_claw.Get());
