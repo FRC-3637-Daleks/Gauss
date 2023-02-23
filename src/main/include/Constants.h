@@ -10,8 +10,9 @@
 #include <units/voltage.h>
 
 namespace ArmConstants {
-constexpr int kPCMId = 3;
-constexpr int kPistonChannel = 0;
+constexpr int kPCMId = 5;
+constexpr int kPistonChannel = 1;
+constexpr int kClawChannel = 2;
 
 constexpr int kMotorId = 8;
 
@@ -30,7 +31,7 @@ constexpr auto kA = 0_V * 0_s * 0_s / 1_rad; // Acceleration gain
 const frc::ArmFeedforward kFeedForward = {kS, kG, kV, kA};
 
 // PID Loop
-constexpr double kP = 0.01;
+constexpr double kP = 0.3;
 constexpr double kI = 0;
 constexpr double kD = 0;
 

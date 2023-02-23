@@ -11,6 +11,7 @@
 #include <rev/CANAnalog.h>
 #include <units/angle.h>
 #include <units/voltage.h>
+#include <fmt/ostream.h>
 
 #include "Constants.h"
 
@@ -25,7 +26,7 @@ public:
 
   void SwitchLegPosition() { m_solenoid.Set(IsLegOut()); }
 
-  void SetNeckAngle(units::degree_t target);
+  frc2::CommandPtr SetNeckAngle(units::degree_t target);
 
   void Log();
 

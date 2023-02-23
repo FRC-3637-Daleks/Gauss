@@ -10,7 +10,6 @@ Arm::Arm()
     : m_solenoid{kPCMId, frc::PneumaticsModuleType::CTREPCM, kPistonChannel},
       m_motor{kMotorId}, m_neckFeedforward{kS, kG, kV, kA},
       m_neckController{kP, 0.0, 0.0, {kMaxTurnVelocity, kMaxTurnAcceleration}}
-//, m_limitSwitch{kLimitSwitchChannel}
 {
   m_motor.Config_kP(0, kP);
   m_motor.Config_kI(0, kI);
@@ -24,13 +23,22 @@ units::radian_t Arm::GetNeckAngle() {
                          kEncoderRotationPerPulse};
 }
 
-void Arm::SetNeckAngle(units::degree_t target) {
-  m_neckController.SetGoal(target);
-  while (!m_neckController.AtGoal()) {
-    m_motor.SetVoltage(
-        units::volt_t{m_neckController.Calculate(GetNeckAngle())});
-  }
-  m_motor.SetVoltage(0_V);
+frc2::CommandPtr Arm::SetNeckAngle(units::degree_t target) {
+  fmt::print("Calleď SetNeckAngle Command");
+  frc::SmartDashboard::PutBoolean("Running SetNeckAngle", true);
+  return frc2::FunctionalCommand(
+             [this, &target]() { m_neckController.SetGoal(target); },
+             [this, &target]() {
+               auto output =
+                   units::volt_t{m_neckController.Calculate(GetNeckAngle())};
+               m_motor.SetVoltage(output);
+             },
+             [this](bool) -> void {
+               frc::SmartDashboard::PutBoolean("Running SetNeckAngle", false);
+               m_motor.SetVoltage(0_V);
+             },
+             [this]() -> bool { return m_neckController.AtGoal(); })
+      .ToPtr();
 }
 
 // void Arm::SetNeckAngle(units::degree_t target) {
