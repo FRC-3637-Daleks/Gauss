@@ -64,6 +64,12 @@ constexpr double kTalonRampRate =
 constexpr int kTalonTimeoutMs = 30;
 } // namespace DriveConstants
 
+namespace ClawConstants {
+constexpr int kPCMPort = 5;
+constexpr int kPistonPort = 0;
+constexpr int kLimitSwitchPort = 1;
+} // namespace ClawConstants
+
 namespace OperatorConstants {
 constexpr int kLeftJoystickPort = 1;
 constexpr int kRightJoystickPort = 2;

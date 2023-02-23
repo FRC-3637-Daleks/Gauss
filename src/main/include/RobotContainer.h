@@ -12,6 +12,7 @@
 
 #include "Constants.h"
 #include "subsystems/Arm.h"
+#include "subsystems/Claw.h"
 #include "subsystems/DalekDrive.h"
 
 class RobotContainer {
@@ -29,6 +30,7 @@ private:
   Arm m_arm;
 
   DalekDrive m_drivetrain;
+  Claw m_claw;
 
   void ConfigureBindings();
 };
