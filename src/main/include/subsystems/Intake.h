@@ -1,10 +1,12 @@
 #pragma once
 
+#include "cameraserver/CameraServer.h"
 #include <frc/AnalogInput.h>
 #include <frc/PWM.h>
 #include <frc/PneumaticsControlModule.h>
 #include <frc/Solenoid.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 
@@ -22,7 +24,7 @@ public:
 
   bool ReadyToPickUp();
 
-  double GetRangefidner();
+  double GetRangefinder();
 
   void Periodic() override;
 

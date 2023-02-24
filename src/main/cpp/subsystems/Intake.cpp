@@ -8,6 +8,10 @@ Intake::Intake()
       m_middle{IntakeConstants::kPCMPort, frc::PneumaticsModuleType::CTREPCM,
                IntakeConstants::kMiddlePistonPort},
       m_rangefinder{IntakeConstants::kRangefinderPort} {
+  cs::UsbCamera intakeCamera = frc::CameraServer::StartAutomaticCapture();
+  intakeCamera.SetResolution(420, 320);
+  intakeCamera.SetFPS(20);
+
   m_left.Set(false);
   m_right.Set(false);
   m_middle.Set(false);
@@ -18,7 +22,7 @@ void Intake::Log() {
   frc::SmartDashboard::PutBoolean("Intake Pistons",
                                   m_left.Get() && m_right.Get());
   frc::SmartDashboard::PutBoolean("Middle Piston", m_middle.Get());
-  frc::SmartDashboard::PutNumber("RangeFinder", this->GetRangefidner());
+  frc::SmartDashboard::PutNumber("RangeFinder", this->GetRangefinder());
   frc::SmartDashboard::PutBoolean("Pistion Disabled", m_left.IsDisabled());
 }
 
@@ -34,9 +38,13 @@ void Intake::SetIntake(bool leftPiston, bool rightPiston) {
 }
 
 bool Intake::ReadyToPickUp() {
-  return true;
+  if ((this->GetRangefinder() <= IntakeConstants::pickUpRangeCone) ||
+      (this->GetRangefinder() <= IntakeConstants::pickUpRangeCube)) {
+    return true;
+  }
+  return false;
   // implications needed after testing
 }
-double Intake::GetRangefidner() { return m_rangefinder.GetVoltage(); }
+double Intake::GetRangefinder() { return m_rangefinder.GetVoltage(); }
 
 void Intake::Periodic() { this->Log(); }
