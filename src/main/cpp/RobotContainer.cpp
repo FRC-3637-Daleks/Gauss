@@ -25,14 +25,18 @@ void RobotContainer::ConfigureBindings() {
 
   m_leftJoystick.Button(3).WhileTrue(m_arm.SetNeckAngle(-20_deg));
 
-  m_leftJoystick.Button(4).WhileTrue(
-      frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}));
+  // m_leftJoystick.Button(4).WhileTrue(
+  //     frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}));
 
-  m_leftJoystick.Button(5).WhileTrue(
-      frc2::cmd::RunOnce([this] { m_arm.SetLegOut(false); }, {&m_arm}));
+  // m_leftJoystick.Button(5).WhileTrue(
+  //     frc2::cmd::RunOnce([this] { m_arm.SetLegOut(false); }, {&m_arm}));
 
-  m_rightJoystick.Button(2).OnTrue(
-      frc2::cmd::RunOnce([this] { m_claw.Toggle(); }, {&m_claw}));
+  m_driverController.X().ToggleOnTrue(
+      frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
+                          [&] { m_claw.SetPosition(false); }, {&m_claw}));
+  m_driverController.B().ToggleOnTrue(
+      frc2::cmd::StartEnd([&] { m_arm.SetLegOut(true); },
+                          [&] { m_arm.SetLegOut(false); }, {&m_arm}));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

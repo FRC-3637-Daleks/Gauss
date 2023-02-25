@@ -28,7 +28,6 @@ private:
       OperatorConstants::kXboxControllerPort};
 
   Arm m_arm;
-
   DalekDrive m_drivetrain;
   Claw m_claw;
 
