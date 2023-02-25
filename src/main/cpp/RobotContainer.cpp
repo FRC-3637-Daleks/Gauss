@@ -17,10 +17,10 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureBindings() {
   m_leftJoystick.Button(1).OnTrue(
       frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
-  m_driverController.A().OnTrue(
-      frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }, {&m_claw}));
-  m_driverController.B().OnTrue(
-      frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }, {&m_claw}));
+  // m_driverController.A().OnTrue(
+  //     frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }, {&m_claw}));
+  // m_driverController.B().OnTrue(
+  //     frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }, {&m_claw}));
 
   m_driverController.B().ToggleOnTrue(
       frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
