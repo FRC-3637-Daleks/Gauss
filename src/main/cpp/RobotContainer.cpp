@@ -23,33 +23,16 @@ void RobotContainer::ConfigureBindings() {
   m_leftJoystick.Button(1).OnTrue(
       frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
 
-  // Brake.
-  m_leftJoystick.Button(2).WhileTrue(frc2::cmd::Run(
-      [this] { m_drivetrain.TankDrive(0, 0, true); }, {&m_drivetrain}));
+  m_leftJoystick.Button(2).OnTrue(
+      frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
+  /*
+    frc2::Button button1 = frc2::Joystick::Button(*m_joystick, 1);
+    button1.WhenPressed(frc2::CommandBase::From([this] {
+        m_vision.SwitchPipeline(m_joystick);
+      }));
 
-  m_leftJoystick.Button(3).OnTrue(frc2::cmd::RunOnce(
-      [this] { m_drivetrain.UpdatePIDValues(); }, {&m_drivetrain}));
-
-  m_rightJoystick.Button(1).WhileTrue(frc2::cmd::Run(
-      [this] {
-        m_drivetrain.TankDrive(
-            m_leftRateLimiter.Calculate(-m_leftJoystick.GetY()),
-            m_rightRateLimiter.Calculate(-m_rightJoystick.GetY()), true);
-      },
-      {&m_drivetrain}));
-
-  m_rightJoystick.Button(2).WhileTrue(frc2::cmd::Run(
-      [this] {
-        m_drivetrain.TankDrive(
-            m_leftRateLimiter.Calculate(-m_leftJoystick.GetY()),
-            m_rightRateLimiter.Calculate(-m_rightJoystick.GetY()), true);
-      },
-      {&m_drivetrain}));
-
-  m_rightJoystick.Button(3).WhileTrue(frc2::cmd::Run(
-      [this] { m_drivetrain.TankDrive(0.15, 0.15, false); }, {&m_drivetrain}));
+  */
 }
-
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // No auton.
   return frc2::CommandPtr{nullptr};
