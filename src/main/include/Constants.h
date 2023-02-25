@@ -23,9 +23,7 @@ constexpr int kTalonTimeoutMs = 30;
 
 namespace IntakeConstants {
 constexpr int kPCMPort = 5;
-constexpr int kLeftPistonPort = 0;
-constexpr int kRightPistonPort = 0;
-constexpr int kMiddlePistonPort = 0;
+constexpr int kPistonPort = 0;
 constexpr int kRangefinderPort = 0;
 
 constexpr int pickUpRangeCone = 0;

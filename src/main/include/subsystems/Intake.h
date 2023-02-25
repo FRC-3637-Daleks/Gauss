@@ -18,9 +18,7 @@ public:
 
   void Log();
 
-  void SetIntake(bool leftPiston, bool rightPiston, bool middlePiston);
-
-  void SetIntake(bool leftPiston, bool rightPiston);
+  void SetIntakeOn(bool SetPiston);
 
   bool ReadyToPickUp();
 
@@ -29,8 +27,6 @@ public:
   void Periodic() override;
 
 private:
-  frc::Solenoid m_left;
-  frc::Solenoid m_right;
-  frc::Solenoid m_middle;
+  frc::Solenoid m_intakePiston;
   frc::AnalogInput m_rangefinder;
 };
