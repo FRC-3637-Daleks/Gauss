@@ -24,6 +24,10 @@ void RobotContainer::ConfigureBindings() {
   // middle piston closed
   m_driverController.RightBumper().ToggleOnTrue(frc2::cmd::RunOnce(
       [this] { m_intake.SetIntake(true, true, false); }, {&m_intake}));
+  // toggle for intake
+  m_driverController.RightBumper().ToggleOnTrue(frc2::cmd::StartEnd(
+      [&] { m_intake.SetIntake(true, true); },
+      [&] { m_intake.SetIntake(false, false); }, {&m_intake}));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
