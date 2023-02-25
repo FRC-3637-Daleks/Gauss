@@ -6,22 +6,32 @@
 
 RobotContainer::RobotContainer() {
   frc::SmartDashboard::PutBoolean("Running SetNeckAngle", false);
-  m_drivetrain.SetDefaultCommand(frc2::cmd::Run(
-      [this] {
-        // m_drivetrain.Drive(-m_leftJoystick.GetY(), -m_rightJoystick.GetY(),
-        //                    true);
-        m_drivetrain.Drive(0, 0, true);
-      },
-      {&m_drivetrain}));
-
-  m_arm.SetDefaultCommand(frc2::cmd::Run(
-      [this] { m_arm.SetNeckVoltage(-m_rightJoystick.GetY() * 1_V); },
-      {&m_arm}));
-
   ConfigureBindings();
 }
 
 void RobotContainer::ConfigureBindings() {
+  m_drivetrain.SetDefaultCommand(frc2::cmd::Run(
+      [this] {
+        // m_drivetrain.Drive(-m_leftJoystick.GetY(), -m_rightJoystick.GetY(),
+        //                    true);
+        m_drivetrain.TankDrive(-m_leftJoystick.GetY(), -m_rightJoystick.GetY(),
+                               true);
+      },
+      {&m_drivetrain}));
+
+  m_arm.SetDefaultCommand(frc2::cmd::Run(
+      [this] {
+        double powerMultiplier = 0;
+        if (m_arm.IsLegOut()) {
+          powerMultiplier = 5;
+        } else {
+          powerMultiplier = 2;
+        }
+        m_arm.SetNeckVoltage(powerMultiplier * -m_driverController.GetLeftY() *
+                             1_V);
+      },
+      {&m_arm}));
+
   m_leftJoystick.Button(1).OnTrue(
       frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
 
@@ -47,6 +57,24 @@ void RobotContainer::ConfigureBindings() {
   m_driverController.B().ToggleOnTrue(
       frc2::cmd::StartEnd([&] { m_arm.SetLegOut(true); },
                           [&] { m_arm.SetLegOut(false); }, {&m_arm}));
+
+  // Brake.
+  m_leftJoystick.Button(4).WhileTrue(frc2::cmd::Run(
+      [this] { m_drivetrain.TankDrive(0, 0, true); }, {&m_drivetrain}));
+
+  m_leftJoystick.Button(5).OnTrue(frc2::cmd::RunOnce(
+      [this] { m_drivetrain.UpdatePIDValues(); }, {&m_drivetrain}));
+
+  m_rightJoystick.Button(1).WhileTrue(frc2::cmd::Run(
+      [this] {
+        m_drivetrain.TankDrive(
+            m_leftRateLimiter.Calculate(-m_leftJoystick.GetY()),
+            m_rightRateLimiter.Calculate(-m_rightJoystick.GetY()), true);
+      },
+      {&m_drivetrain}));
+
+  m_rightJoystick.Button(3).WhileTrue(frc2::cmd::Run(
+      [this] { m_drivetrain.TankDrive(0.15, 0.15, false); }, {&m_drivetrain}));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
