@@ -1,8 +1,9 @@
 #pragma once
 
+#include <frc/Compressor.h>
 #include <frc/DigitalInput.h>
 #include <frc/PWM.h>
-#include <frc/PneumaticsControlModule.h>
+#include <frc/PneumaticsModuleType.h>
 #include <frc/Solenoid.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
@@ -21,9 +22,13 @@ public:
 
   void SetPosition(bool position);
 
+  void Toggle();
+
   void Periodic() override;
 
 private:
   frc::Solenoid m_claw;
+  frc::Compressor m_compressor{ClawConstants::kPCMPort,
+                               frc::PneumaticsModuleType::CTREPCM};
   // frc::DigitalInput m_limitSwitch;
 };

@@ -1,9 +1,11 @@
 #pragma once
 
 #include <ctre/Phoenix.h>
+#include <fmt/ostream.h>
 #include <frc/DigitalInput.h>
 #include <frc/Solenoid.h>
 #include <frc/controller/ArmFeedforward.h>
+#include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <frc2/command/CommandPtr.h>
@@ -11,7 +13,6 @@
 #include <rev/CANAnalog.h>
 #include <units/angle.h>
 #include <units/voltage.h>
-#include <fmt/ostream.h>
 
 #include "Constants.h"
 
@@ -26,7 +27,7 @@ public:
 
   void SwitchLegPosition() { m_solenoid.Set(IsLegOut()); }
 
-  frc2::CommandPtr SetNeckAngle(units::degree_t target);
+  frc2::CommandPtr SetNeckAngle(std::function<units::degree_t()> getTarget);
 
   void Log();
 
@@ -35,6 +36,8 @@ public:
   void Reset();
 
   units::radian_t GetNeckAngle();
+
+  void SetNeckVoltage(units::volt_t output);
 
   void SetArmZero(bool limitswitch);
 
@@ -46,6 +49,7 @@ private:
 
   frc::ArmFeedforward m_neckFeedforward;
   frc::ProfiledPIDController<units::radian> m_neckController;
+  frc::PIDController m_simpleNeckController;
 
   // frc::DigitalInput m_limitSwitch;
 };

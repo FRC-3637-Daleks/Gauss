@@ -6,10 +6,12 @@ Claw::Claw()
           ClawConstants::
               kPistonPort} /*m_limitSwitch{ClawConstants::kLimitSwitchPort}*/ {
   m_claw.Set(true);
-  this->Periodic();
+  Periodic();
 }
 
 void Claw::SetPosition(bool position) { m_claw.Set(position); }
+
+void Claw::Toggle() { m_claw.Toggle(); }
 
 // void Claw::GetLimitSwtich() { m_limitSwitch.Get(); }
 

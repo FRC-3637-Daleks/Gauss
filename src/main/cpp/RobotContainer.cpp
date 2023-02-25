@@ -2,6 +2,7 @@
 
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/Trigger.h>
+#include <units/voltage.h>
 
 RobotContainer::RobotContainer() {
   frc::SmartDashboard::PutBoolean("Running SetNeckAngle", false);
@@ -13,6 +14,10 @@ RobotContainer::RobotContainer() {
       },
       {&m_drivetrain}));
 
+  m_arm.SetDefaultCommand(frc2::cmd::Run(
+      [this] { m_arm.SetNeckVoltage(-m_rightJoystick.GetY() * 1_V); },
+      {&m_arm}));
+
   ConfigureBindings();
 }
 
@@ -23,7 +28,12 @@ void RobotContainer::ConfigureBindings() {
   m_leftJoystick.Button(2).OnTrue(
       frc2::cmd::RunOnce([this] { m_arm.SetArmZero(true); }, {&m_arm}));
 
-  m_leftJoystick.Button(3).WhileTrue(m_arm.SetNeckAngle(-20_deg));
+  frc::SmartDashboard::PutNumber("Turn goal input", 0);
+
+  m_leftJoystick.Button(3).WhileTrue(
+      m_arm.SetNeckAngle([this]() -> units::degree_t {
+        return 1_deg * frc::SmartDashboard::GetNumber("Turn goal input", 0);
+      }));
 
   // m_leftJoystick.Button(4).WhileTrue(
   //     frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}));

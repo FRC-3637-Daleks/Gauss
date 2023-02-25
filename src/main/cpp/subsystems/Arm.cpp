@@ -2,20 +2,18 @@
 
 #include <frc/AnalogInput.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/FunctionalCommand.h>
+#include <frc2/command/Command.h>
 
 using namespace ArmConstants;
 
 Arm::Arm()
     : m_solenoid{kPCMId, frc::PneumaticsModuleType::CTREPCM, kPistonChannel},
       m_motor{kMotorId}, m_neckFeedforward{kS, kG, kV, kA},
-      m_neckController{kP, 0.0, 0.0, {kMaxTurnVelocity, kMaxTurnAcceleration}}
-{
-  m_motor.Config_kP(0, kP);
-  m_motor.Config_kI(0, kI);
-  m_motor.Config_kD(0, kD);
-
-  m_neckController.SetTolerance(5_deg, 5_deg_per_s);
+      m_neckController{kP, 0.0, 0.0, {kMaxTurnVelocity, kMaxTurnAcceleration}},
+      m_simpleNeckController{kP, 0, 0} {
+  m_neckController.SetTolerance(3_deg, 3_deg_per_s);
+  m_neckController.SetIntegratorRange(0, 1);
+  m_motor.ConfigOpenloopRamp(0.5);
 }
 
 units::radian_t Arm::GetNeckAngle() {
@@ -23,22 +21,31 @@ units::radian_t Arm::GetNeckAngle() {
                          kEncoderRotationPerPulse};
 }
 
-frc2::CommandPtr Arm::SetNeckAngle(units::degree_t target) {
-  fmt::print("Calleď SetNeckAngle Command");
-  frc::SmartDashboard::PutBoolean("Running SetNeckAngle", true);
-  return frc2::FunctionalCommand(
-             [this, &target]() { m_neckController.SetGoal(target); },
-             [this, &target]() {
-               auto output =
-                   units::volt_t{m_neckController.Calculate(GetNeckAngle())};
-               m_motor.SetVoltage(output);
-             },
-             [this](bool) -> void {
-               frc::SmartDashboard::PutBoolean("Running SetNeckAngle", false);
-               m_motor.SetVoltage(0_V);
-             },
-             [this]() -> bool { return m_neckController.AtGoal(); })
-      .ToPtr();
+void Arm::SetNeckVoltage(units::volt_t output) {
+  m_motor.SetVoltage(output);
+  frc::SmartDashboard::PutNumber("neck voltage", output.value());
+}
+
+frc2::CommandPtr Arm::SetNeckAngle(std::function<units::degree_t()> getTarget) {
+  return frc2::Subsystem::RunOnce([this, &getTarget]() {
+           fmt::print("Setting goal...");
+           m_neckController.Reset(GetNeckAngle());
+           m_neckController.SetGoal(20_deg);
+         })
+      .AndThen(frc2::Subsystem::RunEnd(
+          // Sets motor output.
+          [this]() {
+            fmt::print("Setting output...");
+            auto output = 1_V * m_neckController.Calculate(GetNeckAngle());
+            frc::SmartDashboard::PutNumber("PID output", output.value());
+            fmt::print("{}", output.value());
+            SetNeckVoltage(output);
+          },
+          // Set output to zero when done.
+          [this]() {
+            fmt::print("done!");
+            SetNeckVoltage(0_V);
+          }));
 }
 
 // void Arm::SetNeckAngle(units::degree_t target) {
@@ -63,11 +70,11 @@ void Arm::Log() {
       units::degree_t{m_neckController.GetPositionError()}.value());
   frc::SmartDashboard::PutNumber(
       "PID setpoint",
-      units::degree_t{m_neckController.GetSetpoint().position()}.value());
+      units::degree_t{m_neckController.GetSetpoint().position}.value());
 
   frc::SmartDashboard::PutBoolean("Legs Out", IsLegOut());
-  frc::SmartDashboard::PutNumber("Angle",
-                                 units::degree_t{GetNeckAngle()}.value());
+  frc::SmartDashboard::PutNumber("Angle", GetNeckAngle().value());
+  frc::SmartDashboard::PutBoolean("at goal?", m_neckController.AtGoal());
 }
 
 void Arm::SetArmZero(bool limitswitch) {
