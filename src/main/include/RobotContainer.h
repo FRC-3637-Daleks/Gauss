@@ -15,6 +15,7 @@
 #include "subsystems/Arm.h"
 #include "subsystems/Claw.h"
 #include "subsystems/DalekDrive.h"
+#include "subsystems/Intake.h"
 #include "subsystems/Vision.h"
 
 class RobotContainer {
@@ -39,6 +40,7 @@ private:
 
   frc::SlewRateLimiter<units::scalar> m_leftRateLimiter{3 / 1_s};
   frc::SlewRateLimiter<units::scalar> m_rightRateLimiter{3 / 1_s};
+  Intake m_intake;
 
   void ConfigureBindings();
 };

@@ -6,7 +6,11 @@
 
 #include <frc2/command/CommandScheduler.h>
 
-void Robot::RobotInit() {}
+void Robot::RobotInit() {
+  m_compressor = new frc::Compressor(IntakeConstants::kPCMPort,
+                                     frc::PneumaticsModuleType::CTREPCM);
+  m_compressor->EnableDigital();
+}
 
 /**
  * This function is called every 20 ms, no matter the mode. Use

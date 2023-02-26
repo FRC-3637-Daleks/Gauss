@@ -129,6 +129,14 @@ namespace AutoConstants {
 constexpr auto kMaxSpeed = 3_fps;
 constexpr auto kMaxAcceleration = units::feet_per_second_squared_t{10};
 } // namespace AutoConstants
+namespace IntakeConstants {
+constexpr int kPCMPort = 5;
+constexpr int kPistonPort = 0;
+constexpr int kRangefinderPort = 0;
+
+constexpr int pickUpRangeCone = 0;
+constexpr int pickUpRangeCube = 0;
+} // namespace IntakeConstants
 
 namespace OperatorConstants {
 constexpr bool kTesting = true;

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <frc/Compressor.h>
 #include <optional>
 
 #include <frc/TimedRobot.h>
@@ -31,4 +32,5 @@ private:
   std::optional<frc2::CommandPtr> m_autonomousCommand;
 
   RobotContainer m_container;
+  frc::Compressor *m_compressor;
 };

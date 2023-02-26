@@ -75,6 +75,11 @@ void RobotContainer::ConfigureBindings() {
 
   m_rightJoystick.Button(3).WhileTrue(frc2::cmd::Run(
       [this] { m_drivetrain.TankDrive(0.15, 0.15, false); }, {&m_drivetrain}));
+  // When the left bumper is clicked, it will open all the pistons
+  // toggle for intake
+  m_driverController.RightBumper().ToggleOnTrue(frc2::cmd::StartEnd(
+      [this] { m_intake.SetIntakeOn(true); },
+      [this] { m_intake.SetIntakeOn(false); }, {&m_intake}));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
