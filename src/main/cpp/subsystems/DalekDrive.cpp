@@ -1,7 +1,10 @@
 #include "subsystems/DalekDrive.h"
 
+#include <cmath>
+
 #include <frc/SPI.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc2/command/FunctionalCommand.h>
 
 using namespace DriveConstants;
 
@@ -9,12 +12,27 @@ DalekDrive::DalekDrive()
     : m_leftFront{kLeftFrontMotorId}, m_leftFollower{kLeftRearMotorId},
       m_rightFront{kRightFrontMotorId}, m_rightFollower{kRightRearMotorId},
       m_drive{m_leftFront, m_rightFront}, m_gyro{frc::SPI::Port::kMXP},
-      m_odometry{
-          m_gyro.GetRotation2d(),
+      m_poseEstimator{
+          m_kinematics, m_gyro.GetRotation2d(),
           kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
           kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition(),
-          frc::Pose2d{}} {
+          frc::Pose2d()},
+      m_turnController{kPTurn, 0, 0, {kMaxTurnRate, kMaxTurnAcceleration}},
+      m_distanceController{
+          kPDistance,
+          0,
+          0,
+          {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}} {
+  m_turnController.EnableContinuousInput(-180_deg, 180_deg);
+  m_turnController.SetTolerance(kTurnTolerance, kTurnRateTolerance);
+
+  m_drive.SetMaxOutput(kMaxOutput);
+
   InitDriveMotors();
+
+  if (OperatorConstants::kTesting) {
+    InitTest();
+  }
 }
 
 void DalekDrive::Log() {
@@ -58,10 +76,97 @@ void DalekDrive::InitDriveMotors() {
   m_rightFront.ConfigClosedloopRamp(kTalonRampRate, kTalonTimeoutMs);
   m_rightFollower.ConfigOpenloopRamp(kTalonRampRate, kTalonTimeoutMs);
   m_rightFollower.ConfigClosedloopRamp(kTalonRampRate, kTalonTimeoutMs);
+  // Set PIDF values. PID slot 0 uses the Falcon 500's integrated encoder.
+  m_leftFront.Config_kF(0, kFDriveSpeed, kTalonTimeoutMs);
+  m_leftFront.Config_kP(0, kPDriveSpeed, kTalonTimeoutMs);
+  m_leftFront.Config_kI(0, kIDriveSpeed, kTalonTimeoutMs);
+  m_leftFront.Config_kD(0, kDDriveSpeed, kTalonTimeoutMs);
+  m_leftFront.Config_IntegralZone(0, kIzDriveSpeed, kTalonTimeoutMs);
+  m_rightFront.Config_kF(0, kFDriveSpeed, kTalonTimeoutMs);
+  m_rightFront.Config_kP(0, kPDriveSpeed, kTalonTimeoutMs);
+  m_rightFront.Config_kI(0, kIDriveSpeed, kTalonTimeoutMs);
+  m_rightFront.Config_kD(0, kDDriveSpeed, kTalonTimeoutMs);
+  m_rightFront.Config_IntegralZone(0, kIzDriveSpeed, kTalonTimeoutMs);
 }
 
 void DalekDrive::Drive(double left, double right, bool squareInputs) {
   m_drive.TankDrive(left, right, squareInputs);
+}
+
+void DalekDrive::TankDrive(double leftSpeed, double rightSpeed,
+                           bool squareInputs) {
+  auto [left, right] = m_drive.TankDriveIK(leftSpeed, rightSpeed, squareInputs);
+
+  SetWheelSpeeds(left * kMaxSpeed, right * kMaxSpeed);
+  m_drive.Feed();
+}
+
+void DalekDrive::ArcadeDrive(double forward, double rotation,
+                             bool squareInputs) {
+  auto [left, right] = m_drive.TankDriveIK(forward, rotation, squareInputs);
+
+  SetWheelSpeeds(left * kMaxSpeed, right * kMaxSpeed);
+  m_drive.Feed();
+}
+
+frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this] {
+               Reset();
+               m_turnController.Reset(GetHeading());
+             },
+             // Use output from PID controller to turn robot.
+             [this, &target] {
+               double output = m_turnController.Calculate(GetHeading(), target);
+               ArcadeDrive(0, output, false);
+             },
+             // Stop robot.
+             [this](bool) -> void { ArcadeDrive(0, 0, false); },
+             [this]() -> bool { return m_turnController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
+frc2::CommandPtr
+DalekDrive::TurnToPoseCommand(std::function<double()> getForward,
+                              std::function<frc::Pose2d()> getTarget) {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this] { m_turnController.Reset(GetHeading()); },
+             // Use output from PID controller to turn robot.
+             [this, &getForward, &getTarget] {
+               auto target = getTarget();
+               auto relativePose = target.RelativeTo(GetPose());
+               fmt::print("{} {}", relativePose.Rotation().Degrees().value(),
+                          target.Rotation().Degrees().value());
+               double output =
+                   m_turnController.Calculate(relativePose.Rotation().Radians(),
+                                              target.Rotation().Radians());
+               ArcadeDrive(getForward(), output, false);
+             },
+             // Stop robot
+             [this](bool) -> void { ArcadeDrive(0, 0, false); },
+             [this]() -> bool { return m_turnController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
+frc2::CommandPtr DalekDrive::DriveToDistanceCommand(units::meter_t target) {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this] {
+               Reset();
+               m_distanceController.Reset(GetDistance());
+             },
+             // Use output from PID controller to turn robot.
+             [this, &target] {
+               double output =
+                   m_distanceController.Calculate(GetDistance(), target);
+               TankDrive(output, output, false);
+             },
+             // Stop robot.
+             [this](bool) -> void { TankDrive(0, 0, false); },
+             [this]() -> bool { return m_distanceController.AtGoal(); }, {this})
+      .ToPtr();
 }
 
 units::meter_t DalekDrive::GetDistance() {
@@ -73,7 +178,8 @@ units::meter_t DalekDrive::GetDistance() {
 }
 
 units::degree_t DalekDrive::GetHeading() const {
-  return -m_gyro.GetRotation2d().Degrees();
+  return units::degree_t{std::remainder(m_gyro.GetAngle(), 360) *
+                         (kGyroReversed ? -1.0 : 1.0)};
 }
 
 void DalekDrive::Reset() {
@@ -82,10 +188,12 @@ void DalekDrive::Reset() {
   m_leftFront.SetSelectedSensorPosition(0);
 }
 
-frc::Pose2d DalekDrive::GetPose() const { return m_odometry.GetPose(); }
+frc::Pose2d DalekDrive::GetPose() const {
+  return m_poseEstimator.GetEstimatedPosition();
+}
 
 void DalekDrive::ResetOdometry(const frc::Pose2d &pose) {
-  m_odometry.ResetPosition(
+  m_poseEstimator.ResetPosition(
       m_gyro.GetRotation2d(),
       kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
       kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition(),
@@ -95,10 +203,67 @@ void DalekDrive::ResetOdometry(const frc::Pose2d &pose) {
 void DalekDrive::Periodic() {
   Log();
 
-  m_odometry.Update(
-      m_gyro.GetRotation2d(),
+  if (OperatorConstants::kTesting) {
+    // PeriodicTest();
+  }
+
+  m_poseEstimator.Update(
+      GetHeading(),
       kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
       kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition());
 
   m_field.SetRobotPose(GetPose());
+}
+
+void DalekDrive::InitTest() {
+  frc::SmartDashboard::PutNumber("Velocity Kf", kFDriveSpeed);
+  frc::SmartDashboard::PutNumber("Velocity Kp", kPDriveSpeed);
+  frc::SmartDashboard::PutNumber("Velocity Ki", kIDriveSpeed);
+  frc::SmartDashboard::PutNumber("Velocity Kd", kDDriveSpeed);
+  frc::SmartDashboard::PutNumber("Velocity KIz", kIzDriveSpeed);
+}
+
+void DalekDrive::UpdatePIDValues() {
+  m_leftFront.Config_kF(
+      0, frc::SmartDashboard::GetNumber("Velocity Kf", kFDriveSpeed), 0);
+  m_leftFront.Config_kP(
+      0, frc::SmartDashboard::GetNumber("Velocity Kp", kPDriveSpeed), 0);
+  m_leftFront.Config_kI(
+      0, frc::SmartDashboard::GetNumber("Velocity Ki", kIDriveSpeed), 0);
+  m_leftFront.Config_kD(
+      0, frc::SmartDashboard::GetNumber("Velocity Kd", kDDriveSpeed), 0);
+  m_leftFront.Config_IntegralZone(
+      0, frc::SmartDashboard::GetNumber("Velocity KIz", kIzDriveSpeed), 0);
+
+  m_rightFront.Config_kF(
+      0, frc::SmartDashboard::GetNumber("Velocity Kf", kFDriveSpeed), 0);
+  m_rightFront.Config_kP(
+      0, frc::SmartDashboard::GetNumber("Velocity Kp", kFDriveSpeed), 0);
+  m_rightFront.Config_kI(
+      0, frc::SmartDashboard::GetNumber("Velocity Ki", kFDriveSpeed), 0);
+  m_rightFront.Config_kD(
+      0, frc::SmartDashboard::GetNumber("Velocity Kd", kFDriveSpeed), 0);
+  m_rightFront.Config_IntegralZone(
+      0, frc::SmartDashboard::GetNumber("Velocity KIz", kIzDriveSpeed), 0);
+}
+
+void DalekDrive::SetWheelSpeeds(units::meters_per_second_t leftSpeed,
+                                units::meters_per_second_t rightSpeed) {
+  if (OperatorConstants::kTesting) {
+    frc::SmartDashboard::PutNumber("Left speed setpoint",
+                                   leftSpeed / kEncoderDistancePerPulse /
+                                       (double)10 * 1_s);
+    frc::SmartDashboard::PutNumber("Right speed setpoint",
+                                   rightSpeed / kEncoderDistancePerPulse /
+                                       (double)10 * 1_s);
+  }
+  m_leftFront.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,
+                  leftSpeed / kEncoderDistancePerPulse / (double)10 * 1_s);
+  m_rightFront.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,
+                   rightSpeed / kEncoderDistancePerPulse / (double)10 * 1_s);
+}
+
+void DalekDrive::AddVisionPoseEstimate(frc::Pose2d pose,
+                                       units::second_t timestamp) {
+  m_poseEstimator.AddVisionMeasurement(pose, timestamp);
 }
