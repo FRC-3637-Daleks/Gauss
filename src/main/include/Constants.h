@@ -27,14 +27,6 @@ constexpr int kLimitSwitchChannel = 0;
 // constexpr int kPotentiometerId = 0;
 // constexpr double kVoltToLengthConversionFactor = 6.41;
 
-// NOTE Feedforward control may be unnecessary, considering the gas spring.
-// Feedforward Loop
-constexpr auto kS = 0_V;                     // Static gain
-constexpr auto kG = 0_V;                     // Gravity gain
-constexpr auto kV = 0_V * 0_s / 1_rad;       // Velocity gain
-constexpr auto kA = 0_V * 0_s * 0_s / 1_rad; // Acceleration gain
-const frc::ArmFeedforward kFeedForward = {kS, kG, kV, kA};
-
 // PID Loop
 constexpr double kP = 10;
 constexpr double kI = 1;
@@ -44,12 +36,18 @@ constexpr double kIz = 5;
 constexpr auto kMaxTurnVelocity = std::numbers::pi * 1_rad_per_s;
 constexpr auto kMaxTurnAcceleration = std::numbers::pi * 1_rad_per_s_sq;
 
+constexpr bool kEncoderReversed = true;
 constexpr int kEncoderCPR = 2048;
 constexpr double kGearReduction = 16;
 constexpr auto kEncoderRotationPerPulse =
     2_rad * std::numbers::pi / (kEncoderCPR * kGearReduction);
 
-constexpr auto kOffset = units::radian_t{0}; // Angle of the arm at the stop.
+constexpr auto kLegExtensionPeriod = 1_s;
+
+constexpr auto kOffset =
+    units::degree_t{10}; // Angle of the arm when the limit switch is tripped.
+constexpr auto kLegOffset =
+    units::degree_t{17.1}; // Angle the arm moves when the legs are extended.
 
 constexpr bool kDefaultPosition = false;
 } // namespace ArmConstants
@@ -88,7 +86,7 @@ constexpr double kIzDriveSpeed = 1000;
 
 // NOTE: Guess value!
 constexpr double kPTurn = 0.75;
-constexpr double kPDistance = 0;
+constexpr double kPDistance = 0.1;
 
 constexpr auto kTurnTolerance = 5_deg;
 constexpr auto kTurnRateTolerance = 5_deg_per_s;
@@ -128,6 +126,13 @@ const frc::AprilTagFieldLayout kAprilTagFieldLayout{
 namespace AutoConstants {
 constexpr auto kMaxSpeed = 3_fps;
 constexpr auto kMaxAcceleration = units::feet_per_second_squared_t{10};
+
+constexpr double kPBalance = 0.1;
+constexpr double kIBalance = 0.0;
+constexpr double kDBalance = 0.0;
+
+constexpr double kBalanceTolerance = 5;
+
 } // namespace AutoConstants
 namespace IntakeConstants {
 constexpr int kPCMPort = 5;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <frc/Compressor.h>
 #include <frc/DigitalInput.h>
 #include <frc/PWM.h>
 #include <frc/PneumaticsModuleType.h>
@@ -28,7 +27,5 @@ public:
 
 private:
   frc::Solenoid m_claw;
-  frc::Compressor m_compressor{ClawConstants::kPCMPort,
-                               frc::PneumaticsModuleType::CTREPCM};
   // frc::DigitalInput m_limitSwitch;
 };

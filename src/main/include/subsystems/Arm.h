@@ -2,6 +2,7 @@
 
 #include <ctre/Phoenix.h>
 #include <fmt/ostream.h>
+#include <frc/Compressor.h>
 #include <frc/DigitalInput.h>
 #include <frc/Solenoid.h>
 #include <frc/controller/ArmFeedforward.h>
@@ -27,7 +28,8 @@ public:
 
   void SwitchLegPosition() { m_solenoid.Set(IsLegOut()); }
 
-  frc2::CommandPtr SetNeckAngle(std::function<units::degree_t()> getTarget);
+  frc2::CommandPtr
+  SetNeckAngleCommand(std::function<units::degree_t()> getTarget);
 
   void Log();
 
@@ -39,7 +41,7 @@ public:
 
   void SetNeckVoltage(units::volt_t output);
 
-  void SetArmZero(bool limitswitch);
+  void ZeroNeck();
 
   void SetArmGoal(units::degree_t output);
 
@@ -47,9 +49,11 @@ private:
   frc::Solenoid m_solenoid;
   WPI_TalonFX m_motor;
 
-  frc::ArmFeedforward m_neckFeedforward;
   frc::ProfiledPIDController<units::radian> m_neckController;
-  frc::PIDController m_simpleNeckController;
 
-  // frc::DigitalInput m_limitSwitch;
+  frc::DigitalInput m_limitSwitch;
+  bool m_stopped;
+
+  // frc::Compressor m_compressor{ArmConstants::kPCMId,
+  //                              frc::PneumaticsModuleType::CTREPCM};
 };

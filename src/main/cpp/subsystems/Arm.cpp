@@ -8,17 +8,24 @@ using namespace ArmConstants;
 
 Arm::Arm()
     : m_solenoid{kPCMId, frc::PneumaticsModuleType::CTREPCM, kPistonChannel},
-      m_motor{kMotorId}, m_neckFeedforward{kS, kG, kV, kA},
+      m_motor{kMotorId},
       m_neckController{kP, 0.0, 0.0, {kMaxTurnVelocity, kMaxTurnAcceleration}},
-      m_simpleNeckController{kP, 0, 0} {
+      m_limitSwitch{kLimitSwitchChannel} {
   m_neckController.SetTolerance(3_deg, 3_deg_per_s);
   m_neckController.SetIntegratorRange(0, 1);
   m_motor.ConfigOpenloopRamp(0.5);
+  // m_compressor.EnableDigital();
 }
 
 units::radian_t Arm::GetNeckAngle() {
-  return units::radian_t{m_motor.GetSelectedSensorPosition() *
-                         kEncoderRotationPerPulse};
+  auto offset = kOffset;
+  if (IsLegOut()) {
+    offset += kLegOffset;
+  }
+  return (kEncoderReversed ? -1.0 : 1.0) *
+             units::radian_t{m_motor.GetSelectedSensorPosition() *
+                             kEncoderRotationPerPulse} +
+         offset;
 }
 
 void Arm::SetNeckVoltage(units::volt_t output) {
@@ -26,7 +33,8 @@ void Arm::SetNeckVoltage(units::volt_t output) {
   frc::SmartDashboard::PutNumber("neck voltage", output.value());
 }
 
-frc2::CommandPtr Arm::SetNeckAngle(std::function<units::degree_t()> getTarget) {
+frc2::CommandPtr
+Arm::SetNeckAngleCommand(std::function<units::degree_t()> getTarget) {
   return frc2::Subsystem::RunOnce([this, &getTarget]() {
            fmt::print("Setting goal...");
            m_neckController.Reset(GetNeckAngle());
@@ -72,20 +80,24 @@ void Arm::Log() {
       "PID setpoint",
       units::degree_t{m_neckController.GetSetpoint().position}.value());
 
-  frc::SmartDashboard::PutBoolean("Legs Out", IsLegOut());
-  frc::SmartDashboard::PutNumber("Angle", GetNeckAngle().value());
+  frc::SmartDashboard::PutBoolean("Switch tripped?", m_limitSwitch.Get());
+  frc::SmartDashboard::PutBoolean("Legs Out?", IsLegOut());
+  frc::SmartDashboard::PutNumber("Angle",
+                                 units::degree_t{GetNeckAngle()}.value());
   frc::SmartDashboard::PutBoolean("at goal?", m_neckController.AtGoal());
 }
 
-void Arm::SetArmZero(bool limitswitch) {
-  if (limitswitch) {
-    Reset();
-  }
-}
+void Arm::ZeroNeck() { m_motor.SetSelectedSensorPosition(0); }
 
 void Arm::Periodic() {
   Log();
-  // SetArmZero(m_limitSwitch.Get());
+
+  if (!m_stopped && m_limitSwitch.Get()) {
+    ZeroNeck();
+    m_stopped = true;
+  } else if (!m_limitSwitch.Get()) {
+    m_stopped = false;
+  }
 }
 
 void Arm::Reset() { m_motor.SetSelectedSensorPosition(0); }
