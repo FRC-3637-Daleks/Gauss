@@ -1,11 +1,13 @@
 #include "RobotContainer.h"
 
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/Trigger.h>
 #include <units/voltage.h>
 
 RobotContainer::RobotContainer() {
   frc::SmartDashboard::PutBoolean("Running SetNeckAngle", false);
+  
   ConfigureBindings();
 }
 
@@ -66,6 +68,7 @@ void RobotContainer::ConfigureBindings() {
   m_leftJoystick.Button(5).OnTrue(frc2::cmd::RunOnce(
       [this] { m_drivetrain.UpdatePIDValues(); }, {&m_drivetrain}));
 
+  // Slow drive
   m_rightJoystick.Button(1).WhileTrue(frc2::cmd::Run(
       [this] {
         m_drivetrain.TankDrive(
@@ -79,6 +82,9 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
+  // Drive and balance on the charge station.
+  return std::move(m_chargeStationAuto);
+
   // No auton.
-  return frc2::CommandPtr{nullptr};
+  // return frc2::CommandPtr{nullptr};
 }

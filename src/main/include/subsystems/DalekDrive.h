@@ -25,6 +25,9 @@ public:
 
   void Drive(double left, double right, bool squareInputs);
 
+  void TankDrive(units::meters_per_second_t left,
+                 units::meters_per_second_t right);
+
   void TankDrive(double leftSpeed, double rightSpeed, bool squareInputs);
 
   void ArcadeDrive(double forward, double rotation, bool squareInputs);
@@ -36,11 +39,15 @@ public:
 
   frc2::CommandPtr DriveToDistanceCommand(units::meter_t distance);
 
+  frc2::CommandPtr BalanceCommand();
+
   units::meter_t GetDistance();
 
   units::degree_t GetHeading() const;
 
   void AddVisionPoseEstimate(frc::Pose2d pose, units::second_t timestamp);
+  
+  units::degree_t GetPitch();
 
   void Reset();
 
@@ -70,6 +77,7 @@ private:
 
   frc::ProfiledPIDController<units::radian> m_turnController;
   frc::ProfiledPIDController<units::meter> m_distanceController;
+  frc::PIDController m_balanceController;
 
   void SetWheelSpeeds(units::meters_per_second_t leftSpeed,
                       units::meters_per_second_t rightSpeed);
