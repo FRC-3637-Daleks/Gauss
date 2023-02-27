@@ -22,7 +22,12 @@ DalekDrive::DalekDrive()
           kPDistance,
           0,
           0,
-          {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}} {
+          {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}},
+      m_balanceController{
+          AutoConstants::kPBalance,
+          AutoConstants::kIBalance,
+          AutoConstants::kDBalance,
+      } {
   m_turnController.EnableContinuousInput(-180_deg, 180_deg);
   m_turnController.SetTolerance(kTurnTolerance, kTurnRateTolerance);
 
@@ -87,6 +92,14 @@ void DalekDrive::InitDriveMotors() {
   m_rightFront.Config_kI(0, kIDriveSpeed, kTalonTimeoutMs);
   m_rightFront.Config_kD(0, kDDriveSpeed, kTalonTimeoutMs);
   m_rightFront.Config_IntegralZone(0, kIzDriveSpeed, kTalonTimeoutMs);
+}
+
+// TODO: Refactor to use command factories for teleop driving (leaving just this
+// method)
+void DalekDrive::TankDrive(units::meters_per_second_t left,
+                           units::meters_per_second_t right) {
+  SetWheelSpeeds(left, right);
+  m_drive.Feed();
 }
 
 void DalekDrive::Drive(double left, double right, bool squareInputs) {
@@ -156,16 +169,48 @@ frc2::CommandPtr DalekDrive::DriveToDistanceCommand(units::meter_t target) {
              [this] {
                Reset();
                m_distanceController.Reset(GetDistance());
+               m_distanceController.SetTolerance(10_cm);
              },
              // Use output from PID controller to turn robot.
              [this, &target] {
                double output =
                    m_distanceController.Calculate(GetDistance(), target);
+               frc::SmartDashboard::PutNumber("DriveToDistance output", output);
+               frc::SmartDashboard::PutNumber(
+                   "DriveToDistance setpoint",
+                   m_distanceController.GetSetpoint().velocity.value());
                TankDrive(output, output, false);
              },
              // Stop robot.
              [this](bool) -> void { TankDrive(0, 0, false); },
              [this]() -> bool { return m_distanceController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
+frc2::CommandPtr DalekDrive::BalanceCommand() {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this]() {
+               m_balanceController.SetTolerance(
+                   AutoConstants::kBalanceTolerance); // In degrees
+               m_balanceController.SetSetpoint(0);
+               m_balanceController.EnableContinuousInput(-180, 180);
+             },
+             // Use output from PID controller to keep the robot balanced.
+             [this]() {
+               auto output = std::clamp<units::meters_per_second_t>(
+                   units::meters_per_second_t{
+                       m_balanceController.Calculate(GetPitch().value())},
+                   -AutoConstants::kMaxSpeed, AutoConstants::kMaxSpeed);
+               frc::SmartDashboard::PutNumber("Balance output", output.value());
+               frc::SmartDashboard::PutNumber(
+                   "Balance setpoint", m_balanceController.GetSetpoint());
+               TankDrive(output, output);
+             },
+             // Stop robot once balanced.
+             [this](bool) -> void { TankDrive(0, 0, false); },
+             [this]() -> bool { return m_balanceController.AtSetpoint(); },
+             {this})
       .ToPtr();
 }
 
@@ -180,6 +225,10 @@ units::meter_t DalekDrive::GetDistance() {
 units::degree_t DalekDrive::GetHeading() const {
   return units::degree_t{std::remainder(m_gyro.GetAngle(), 360) *
                          (kGyroReversed ? -1.0 : 1.0)};
+}
+
+units::degree_t DalekDrive::GetPitch() {
+  return units::degree_t{m_gyro.GetPitch()};
 }
 
 void DalekDrive::Reset() {
@@ -208,7 +257,7 @@ void DalekDrive::Periodic() {
   }
 
   m_poseEstimator.Update(
-      GetHeading(),
+      m_gyro.GetRotation2d(),
       kEncoderDistancePerPulse * m_leftFront.GetSelectedSensorPosition(),
       kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition());
 
@@ -221,6 +270,15 @@ void DalekDrive::InitTest() {
   frc::SmartDashboard::PutNumber("Velocity Ki", kIDriveSpeed);
   frc::SmartDashboard::PutNumber("Velocity Kd", kDDriveSpeed);
   frc::SmartDashboard::PutNumber("Velocity KIz", kIzDriveSpeed);
+
+  // for auton.
+  frc::SmartDashboard::PutNumber("Velocity kPBalance",
+                                 AutoConstants::kPBalance);
+  frc::SmartDashboard::PutNumber("Velocity kIBalance",
+                                 AutoConstants::kIBalance);
+  frc::SmartDashboard::PutNumber("Velocity kPBalance",
+                                 AutoConstants::kDBalance);
+  frc::SmartDashboard::PutNumber("Velocity kPDistance", kPDistance);
 }
 
 void DalekDrive::UpdatePIDValues() {

@@ -1,11 +1,13 @@
 #include "RobotContainer.h"
 
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/Trigger.h>
 #include <units/voltage.h>
 
 RobotContainer::RobotContainer() {
   frc::SmartDashboard::PutBoolean("Running SetNeckAngle", false);
+
   ConfigureBindings();
 }
 
@@ -65,6 +67,7 @@ void RobotContainer::ConfigureBindings() {
   m_leftJoystick.Button(5).OnTrue(frc2::cmd::RunOnce(
       [this] { m_drivetrain.UpdatePIDValues(); }, {&m_drivetrain}));
 
+  // Slow drive
   m_rightJoystick.Button(1).WhileTrue(frc2::cmd::Run(
       [this] {
         m_drivetrain.TankDrive(
@@ -73,7 +76,7 @@ void RobotContainer::ConfigureBindings() {
       },
       {&m_drivetrain}));
 
-  m_rightJoystick.Button(3).WhileTrue(frc2::cmd::Run(
+  m_rightJoystick.Button(2).WhileTrue(frc2::cmd::Run(
       [this] { m_drivetrain.TankDrive(0.15, 0.15, false); }, {&m_drivetrain}));
   // When the left bumper is clicked, it will open all the pistons
   // toggle for intake
@@ -83,6 +86,9 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
+  // Drive and balance on the charge station.
+  return std::move(m_chargeStationAuto);
+
   // No auton.
-  return frc2::CommandPtr{nullptr};
+  // return frc2::CommandPtr{nullptr};
 }

@@ -88,7 +88,7 @@ constexpr double kIzDriveSpeed = 1000;
 
 // NOTE: Guess value!
 constexpr double kPTurn = 0.75;
-constexpr double kPDistance = 0;
+constexpr double kPDistance = 0.1;
 
 constexpr auto kTurnTolerance = 5_deg;
 constexpr auto kTurnRateTolerance = 5_deg_per_s;
@@ -128,6 +128,13 @@ const frc::AprilTagFieldLayout kAprilTagFieldLayout{
 namespace AutoConstants {
 constexpr auto kMaxSpeed = 3_fps;
 constexpr auto kMaxAcceleration = units::feet_per_second_squared_t{10};
+
+constexpr double kPBalance = 0.1;
+constexpr double kIBalance = 0.0;
+constexpr double kDBalance = 0.0;
+
+constexpr double kBalanceTolerance = 5;
+
 } // namespace AutoConstants
 namespace IntakeConstants {
 constexpr int kPCMPort = 5;
