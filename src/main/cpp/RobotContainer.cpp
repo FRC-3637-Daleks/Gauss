@@ -7,7 +7,6 @@
 
 RobotContainer::RobotContainer() {
   frc::SmartDashboard::PutBoolean("Running SetNeckAngle", false);
-  
   ConfigureBindings();
 }
 
@@ -77,7 +76,7 @@ void RobotContainer::ConfigureBindings() {
       },
       {&m_drivetrain}));
 
-  m_rightJoystick.Button(3).WhileTrue(frc2::cmd::Run(
+  m_rightJoystick.Button(2).WhileTrue(frc2::cmd::Run(
       [this] { m_drivetrain.TankDrive(0.15, 0.15, false); }, {&m_drivetrain}));
   // When the left bumper is clicked, it will open all the pistons
   // toggle for intake
