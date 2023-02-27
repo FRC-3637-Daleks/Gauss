@@ -23,7 +23,7 @@ void RobotContainer::ConfigureBindings() {
       [this] {
         double powerMultiplier = 0;
         if (m_arm.IsLegOut()) {
-          powerMultiplier = 5;
+          powerMultiplier = 2;
         } else {
           powerMultiplier = 2;
         }
@@ -36,12 +36,12 @@ void RobotContainer::ConfigureBindings() {
       frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
 
   m_leftJoystick.Button(2).OnTrue(
-      frc2::cmd::RunOnce([this] { m_arm.SetArmZero(true); }, {&m_arm}));
+      frc2::cmd::RunOnce([this] { m_arm.ZeroNeck(); }, {&m_arm}));
 
   frc::SmartDashboard::PutNumber("Turn goal input", 0);
 
   m_leftJoystick.Button(3).WhileTrue(
-      m_arm.SetNeckAngle([this]() -> units::degree_t {
+      m_arm.SetNeckAngleCommand([this]() -> units::degree_t {
         return 1_deg * frc::SmartDashboard::GetNumber("Turn goal input", 0);
       }));
 
@@ -54,9 +54,10 @@ void RobotContainer::ConfigureBindings() {
   m_driverController.X().ToggleOnTrue(
       frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
                           [&] { m_claw.SetPosition(false); }, {&m_claw}));
-  m_driverController.B().ToggleOnTrue(
-      frc2::cmd::StartEnd([&] { m_arm.SetLegOut(true); },
-                          [&] { m_arm.SetLegOut(false); }, {&m_arm}));
+  m_driverController.B().ToggleOnTrue(frc2::cmd::Either(
+      frc2::cmd::RunOnce([&] { m_arm.SetLegOut(false); }, {&m_arm}),
+      frc2::cmd::RunOnce([&] { m_arm.SetLegOut(true); }, {&m_arm}),
+      [&]() -> bool { return m_arm.IsLegOut(); }));
 
   // Brake.
   m_leftJoystick.Button(4).WhileTrue(frc2::cmd::Run(
