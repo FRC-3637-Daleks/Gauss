@@ -32,5 +32,4 @@ private:
   std::optional<frc2::CommandPtr> m_autonomousCommand;
 
   RobotContainer m_container;
-  frc::Compressor *m_compressor;
 };

@@ -28,7 +28,7 @@ void RobotContainer::ConfigureBindings() {
         } else {
           powerMultiplier = 2;
         }
-        m_arm.SetNeckVoltage(powerMultiplier * -m_driverController.GetLeftY() *
+        m_arm.SetNeckVoltage(powerMultiplier * m_driverController.GetLeftY() *
                              1_V);
       },
       {&m_arm}));
@@ -45,20 +45,6 @@ void RobotContainer::ConfigureBindings() {
       m_arm.SetNeckAngleCommand([this]() -> units::degree_t {
         return 1_deg * frc::SmartDashboard::GetNumber("Turn goal input", 0);
       }));
-
-  // m_leftJoystick.Button(4).WhileTrue(
-  //     frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}));
-
-  // m_leftJoystick.Button(5).WhileTrue(
-  //     frc2::cmd::RunOnce([this] { m_arm.SetLegOut(false); }, {&m_arm}));
-
-  m_driverController.X().ToggleOnTrue(
-      frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
-                          [&] { m_claw.SetPosition(false); }, {&m_claw}));
-  m_driverController.B().ToggleOnTrue(frc2::cmd::Either(
-      frc2::cmd::RunOnce([&] { m_arm.SetLegOut(false); }, {&m_arm}),
-      frc2::cmd::RunOnce([&] { m_arm.SetLegOut(true); }, {&m_arm}),
-      [&]() -> bool { return m_arm.IsLegOut(); }));
 
   // Brake.
   m_leftJoystick.Button(4).WhileTrue(frc2::cmd::Run(
@@ -83,6 +69,15 @@ void RobotContainer::ConfigureBindings() {
   m_driverController.RightBumper().ToggleOnTrue(frc2::cmd::StartEnd(
       [this] { m_intake.SetIntakeOn(true); },
       [this] { m_intake.SetIntakeOn(false); }, {&m_intake}));
+  // toggle claw
+  m_driverController.X().ToggleOnTrue(
+      frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
+                          [&] { m_claw.SetPosition(false); }, {&m_claw}));
+  // toggle arm piston
+  m_driverController.B().ToggleOnTrue(frc2::cmd::Either(
+      frc2::cmd::RunOnce([&] { m_arm.SetLegOut(false); }, {&m_arm}),
+      frc2::cmd::RunOnce([&] { m_arm.SetLegOut(true); }, {&m_arm}),
+      [&]() -> bool { return m_arm.IsLegOut(); }));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
