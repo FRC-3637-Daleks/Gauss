@@ -21,18 +21,8 @@ void RobotContainer::ConfigureBindings() {
       {&m_drivetrain}));
 
   m_arm.SetDefaultCommand(frc2::cmd::Run(
-      [this] {
-        double powerMultiplier = 0;
-        if (m_arm.IsLegOut()) {
-          powerMultiplier = 2;
-        } else {
-          powerMultiplier = 2;
-        }
-        m_arm.SetNeckVoltage(powerMultiplier * m_driverController.GetLeftY() *
-                             1_V);
-      },
+      [this] { m_arm.SetNeckVoltage(2 * m_driverController.GetLeftY() * 1_V); },
       {&m_arm}));
-
   m_leftJoystick.Button(1).OnTrue(
       frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
 

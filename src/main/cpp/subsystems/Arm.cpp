@@ -29,6 +29,9 @@ units::radian_t Arm::GetNeckAngle() {
 }
 
 void Arm::SetNeckVoltage(units::volt_t output) {
+  if (GetNeckAngle() < 5_deg) {
+    output = std::clamp(output, -12_V, 0_V);
+  }
   m_motor.SetVoltage(output);
   frc::SmartDashboard::PutNumber("neck voltage", output.value());
 }
@@ -71,6 +74,7 @@ Arm::SetNeckAngleCommand(std::function<units::degree_t()> getTarget) {
 // }
 
 void Arm::Log() {
+  frc::SmartDashboard::PutBoolean("arm safe?", GetNeckAngle() > 5_deg);
   frc::SmartDashboard::PutNumber(
       "PID goal", units::degree_t{m_neckController.GetGoal().position}.value());
   frc::SmartDashboard::PutNumber(
