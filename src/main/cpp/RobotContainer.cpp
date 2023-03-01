@@ -26,9 +26,13 @@ void RobotContainer::ConfigureBindings() {
       },
       {&m_arm}));
 
-  // Reset odometry.
-  m_leftJoystick.Button(1).OnTrue(
-      frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
+  // Arcade controls.
+  m_leftJoystick.Button(1).OnTrue(frc2::cmd::Run(
+      [this] {
+        m_drivetrain.ArcadeDrive(-m_leftJoystick.GetY(),
+                                 -m_rightJoystick.GetX(), true);
+      },
+      {&m_drivetrain}));
 
   // Reset neck.
   m_leftJoystick.Button(2).OnTrue(
@@ -49,12 +53,10 @@ void RobotContainer::ConfigureBindings() {
   m_leftJoystick.Button(5).OnTrue(frc2::cmd::RunOnce(
       [this] { m_drivetrain.UpdatePIDValues(); }, {&m_drivetrain}));
 
-  // Slow drive
   m_rightJoystick.Button(1).WhileTrue(frc2::cmd::Run(
       [this] {
-        m_drivetrain.TankDrive(
-            m_leftRateLimiter.Calculate(-m_leftJoystick.GetY()),
-            m_rightRateLimiter.Calculate(-m_rightJoystick.GetY()), true);
+        m_drivetrain.PreciseDrive(-m_leftJoystick.GetY(),
+                                  -m_rightJoystick.GetY(), true);
       },
       {&m_drivetrain}));
 

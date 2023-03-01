@@ -28,6 +28,8 @@ public:
   void TankDrive(units::meters_per_second_t left,
                  units::meters_per_second_t right);
 
+  void PreciseDrive(double leftSpeed, double rightSpeed, bool squareInputs);
+
   void TankDrive(double leftSpeed, double rightSpeed, bool squareInputs);
 
   void ArcadeDrive(double forward, double rotation, bool squareInputs);
@@ -46,7 +48,7 @@ public:
   units::degree_t GetHeading() const;
 
   void AddVisionPoseEstimate(frc::Pose2d pose, units::second_t timestamp);
-  
+
   units::degree_t GetPitch();
 
   void Reset();
