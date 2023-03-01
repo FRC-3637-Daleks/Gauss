@@ -11,7 +11,7 @@ Arm::Arm()
       m_motor{kMotorId},
       m_neckController{kP, 0.0, 0.0, {kMaxTurnVelocity, kMaxTurnAcceleration}},
       m_limitSwitch{kLimitSwitchChannel} {
-  m_neckController.SetTolerance(3_deg, 3_deg_per_s);
+  m_neckController.SetTolerance(1_deg, 3_deg_per_s);
   m_neckController.SetIntegratorRange(0, 1);
   m_motor.ConfigOpenloopRamp(0.5);
   // m_compressor.EnableDigital();
@@ -30,9 +30,9 @@ units::radian_t Arm::GetNeckAngle() {
 
 void Arm::SetNeckVoltage(units::volt_t output) {
   if (GetNeckAngle() < 5_deg) {
-    output = std::clamp(output, -12_V, 0_V);
+    output = std::clamp(output, 0_V, 12_V);
   }
-  m_motor.SetVoltage(output);
+  m_motor.SetVoltage(-output);
   frc::SmartDashboard::PutNumber("neck voltage", output.value());
 }
 
@@ -41,7 +41,7 @@ Arm::SetNeckAngleCommand(std::function<units::degree_t()> getTarget) {
   return frc2::Subsystem::RunOnce([this, &getTarget]() {
            fmt::print("Setting goal...");
            m_neckController.Reset(GetNeckAngle());
-           m_neckController.SetGoal(20_deg);
+           m_neckController.SetGoal(45_deg);
          })
       .AndThen(frc2::Subsystem::RunEnd(
           // Sets motor output.

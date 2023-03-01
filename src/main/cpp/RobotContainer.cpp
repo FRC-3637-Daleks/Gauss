@@ -11,29 +11,35 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureBindings() {
+  // Drive forward, closed loop with squared inputs.
   m_drivetrain.SetDefaultCommand(frc2::cmd::Run(
       [this] {
-        // m_drivetrain.Drive(-m_leftJoystick.GetY(), -m_rightJoystick.GetY(),
-        //                    true);
         m_drivetrain.TankDrive(-m_leftJoystick.GetY(), -m_rightJoystick.GetY(),
                                true);
       },
       {&m_drivetrain}));
 
+  // Move neck with xbox joystick.
   m_arm.SetDefaultCommand(frc2::cmd::Run(
-      [this] { m_arm.SetNeckVoltage(2 * m_driverController.GetLeftY() * 1_V); },
+      [this] {
+        m_arm.SetNeckVoltage(-2 * m_driverController.GetLeftY() * 1_V);
+      },
       {&m_arm}));
+
+  // Reset odometry.
   m_leftJoystick.Button(1).OnTrue(
       frc2::cmd::RunOnce([this] { m_drivetrain.Reset(); }, {&m_drivetrain}));
 
+  // Reset neck.
   m_leftJoystick.Button(2).OnTrue(
       frc2::cmd::RunOnce([this] { m_arm.ZeroNeck(); }, {&m_arm}));
 
   frc::SmartDashboard::PutNumber("Turn goal input", 0);
 
+  // Set neck angle.
   m_leftJoystick.Button(3).WhileTrue(
       m_arm.SetNeckAngleCommand([this]() -> units::degree_t {
-        return 1_deg * frc::SmartDashboard::GetNumber("Turn goal input", 0);
+        return 1_deg * frc::SmartDashboard::GetNumber("Turn goal input", 40);
       }));
 
   // Brake.
@@ -56,15 +62,15 @@ void RobotContainer::ConfigureBindings() {
       [this] { m_drivetrain.TankDrive(0.15, 0.15, false); }, {&m_drivetrain}));
   // When the left bumper is clicked, it will open all the pistons
   // toggle for intake
-  m_driverController.RightBumper().ToggleOnTrue(frc2::cmd::StartEnd(
+  m_driverController.A().ToggleOnTrue(frc2::cmd::StartEnd(
       [this] { m_intake.SetIntakeOn(true); },
       [this] { m_intake.SetIntakeOn(false); }, {&m_intake}));
   // toggle claw
-  m_driverController.X().ToggleOnTrue(
+  m_driverController.RightBumper().ToggleOnTrue(
       frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
                           [&] { m_claw.SetPosition(false); }, {&m_claw}));
   // toggle arm piston
-  m_driverController.B().ToggleOnTrue(frc2::cmd::Either(
+  m_driverController.LeftBumper().ToggleOnTrue(frc2::cmd::Either(
       frc2::cmd::RunOnce([&] { m_arm.SetLegOut(false); }, {&m_arm}),
       frc2::cmd::RunOnce([&] { m_arm.SetLegOut(true); }, {&m_arm}),
       [&]() -> bool { return m_arm.IsLegOut(); }));

@@ -254,6 +254,7 @@ void DalekDrive::Periodic() {
 
   if (OperatorConstants::kTesting) {
     // PeriodicTest();
+    frc::SmartDashboard::PutNumber("Gyro Pitch", m_gyro.GetPitch());
   }
 
   m_poseEstimator.Update(
