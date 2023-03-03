@@ -49,6 +49,9 @@ void RobotContainer::ConfigureBindings() {
   m_leftJoystick.Button(5).OnTrue(frc2::cmd::RunOnce(
       [this] { m_drivetrain.UpdatePIDValues(); }, {&m_drivetrain}));
 
+  m_leftJoystick.Button(6).WhileTrue(frc2::cmd::Run(
+      [this] { m_drivetrain.TankDrive(1_mps, 1_mps); }, {&m_drivetrain}));
+
   // Slow drive
   m_rightJoystick.Button(1).WhileTrue(frc2::cmd::Run(
       [this] {
@@ -60,6 +63,10 @@ void RobotContainer::ConfigureBindings() {
 
   m_rightJoystick.Button(2).WhileTrue(frc2::cmd::Run(
       [this] { m_drivetrain.TankDrive(0.15, 0.15, false); }, {&m_drivetrain}));
+
+  m_rightJoystick.Button(3).WhileTrue(
+      m_drivetrain.DriveToDistanceCommand(3_ft));
+
   // When the left bumper is clicked, it will open all the pistons
   // toggle for intake
   m_driverController.A().ToggleOnTrue(frc2::cmd::StartEnd(
@@ -78,8 +85,8 @@ void RobotContainer::ConfigureBindings() {
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Drive and balance on the charge station.
-  return std::move(m_chargeStationAuto);
+  //return std::move(m_chargeStationAuto);
 
   // No auton.
-  // return frc2::CommandPtr{nullptr};
+  return frc2::CommandPtr{nullptr};
 }

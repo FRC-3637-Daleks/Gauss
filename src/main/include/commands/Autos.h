@@ -8,4 +8,6 @@
 
 namespace Autos {
     frc2::CommandPtr ChargeStationAuto(DalekDrive* m_drivetrain);
+
+    frc2::CommandPtr CommunityRunAuto(DalekDrive* m_drivetrain);
 } // namespace Autos
