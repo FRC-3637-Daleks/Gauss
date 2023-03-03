@@ -99,12 +99,13 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           // Get the neck to the angle for placing a cone.
           .AndThen(m_arm.SetNeckAngleCommand(AutoConstants::kPlacementAngle))
           // Open the claw.
-          .AndThen([this] { m_claw.SetPosition(false); })
+          .AndThen(frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }))
           // Hold the neck in...
-          .AndThen(m_arm.SetNeckAngleCommand(15_deg))
+          .AndThen(m_arm.SetNeckAngleCommand(12_deg))
           // and exit the community.
-          .AlongWith(frc2::cmd::Run(
-              [this] { m_drivetrain.Drive(-0.6, -0.6, false); }));
+          .AlongWith(frc2::cmd::Run([this] {
+                       m_drivetrain.Drive(-0.6, -0.6, false);
+                     }).WithTimeout(5_s));
 
   return placeMidCommand;
 }
