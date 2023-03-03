@@ -44,5 +44,7 @@ private:
 
   frc2::CommandPtr m_chargeStationAuto{Autos::ChargeStationAuto(&m_drivetrain)};
 
+  frc2::CommandPtr m_communityRunAuto{Autos::CommunityRunAuto(&m_drivetrain)};
+
   void ConfigureBindings();
 };

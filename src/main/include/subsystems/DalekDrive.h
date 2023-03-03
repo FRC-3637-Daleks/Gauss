@@ -41,6 +41,8 @@ public:
 
   frc2::CommandPtr DriveToDistanceCommand(units::meter_t distance);
 
+  frc2::CommandPtr DriveStraightCommand(units::meters_per_second_t forward);
+
   frc2::CommandPtr BalanceCommand();
 
   units::meter_t GetDistance();
@@ -78,7 +80,7 @@ private:
   frc::Field2d m_field;
 
   frc::ProfiledPIDController<units::radian> m_turnController;
-  frc::ProfiledPIDController<units::meter> m_distanceController;
+  frc::PIDController m_distanceController;
   frc::PIDController m_balanceController;
 
   void SetWheelSpeeds(units::meters_per_second_t leftSpeed,

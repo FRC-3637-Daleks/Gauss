@@ -5,6 +5,7 @@
 #include <frc/SPI.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/FunctionalCommand.h>
+#include <frc2/command/RunCommand.h>
 
 using namespace DriveConstants;
 
@@ -18,16 +19,15 @@ DalekDrive::DalekDrive()
           kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition(),
           frc::Pose2d()},
       m_turnController{kPTurn, 0, 0, {kMaxTurnRate, kMaxTurnAcceleration}},
-      m_distanceController{
-          kPDistance,
-          0,
-          0,
-          {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}},
+      m_distanceController{kPDistance, 0, 0},
       m_balanceController{
           AutoConstants::kPBalance,
           AutoConstants::kIBalance,
           AutoConstants::kDBalance,
-      } {
+      },
+      m_straightLeftController{kPLeftStraight, 0, 0}, m_straightRightController{
+                                                          kPRightStraight, 0,
+                                                          0} {
   m_turnController.EnableContinuousInput(-180_deg, 180_deg);
   m_turnController.SetTolerance(kTurnTolerance, kTurnRateTolerance);
 
@@ -53,6 +53,11 @@ void DalekDrive::Log() {
   frc::SmartDashboard::PutNumber("Gyro", m_gyro.GetAngle());
 
   frc::SmartDashboard::PutData("Field", &m_field);
+
+  frc::SmartDashboard::PutNumber("Right Voltage",
+                                 m_rightFront.GetMotorOutputVoltage());
+  frc::SmartDashboard::PutNumber("Left Voltage",
+                                 m_leftFront.GetMotorOutputVoltage());
 }
 
 void DalekDrive::InitDriveMotors() {
@@ -173,25 +178,42 @@ DalekDrive::TurnToPoseCommand(std::function<double()> getForward,
 
 frc2::CommandPtr DalekDrive::DriveToDistanceCommand(units::meter_t target) {
   return frc2::FunctionalCommand(
-             // Set controller input to current heading.
-             [this] {
-               Reset();
-               m_distanceController.Reset(GetDistance());
-               m_distanceController.SetTolerance(10_cm);
-             },
-             // Use output from PID controller to turn robot.
+             // Set controller input to current distance.
              [this, &target] {
-               double output =
-                   m_distanceController.Calculate(GetDistance(), target);
-               frc::SmartDashboard::PutNumber("DriveToDistance output", output);
+               Reset();
+               m_distanceController.Reset();
+               m_distanceController.SetTolerance(
+                   units::meter_t{kDistanceTolerance}.value());
+               m_distanceController.SetSetpoint(units::meter_t{1.5_ft}.value());
+               fmt::print("Running DriveToDistance Command.\n");
+             },
+             // Use output from PID controller to drive robot.
+             [this, &target] {
+               units::meters_per_second_t output =
+                   std::clamp<units::meters_per_second_t>(
+                       units::meters_per_second_t{
+                           m_distanceController.Calculate(
+                               GetDistance().value())},
+                       -AutoConstants::kMaxSpeed, AutoConstants::kMaxSpeed);
+               frc::SmartDashboard::PutNumber("DriveToDistance output",
+                                              output.value());
                frc::SmartDashboard::PutNumber(
                    "DriveToDistance setpoint",
-                   m_distanceController.GetSetpoint().velocity.value());
-               TankDrive(output, output, false);
+                   m_distanceController.GetSetpoint());
+               frc::SmartDashboard::PutNumber(
+                   "DriveToDistance error",
+                   m_distanceController.GetPositionError());
+
+               frc::SmartDashboard::PutNumber("DriveToDistance Target {}\n",
+                                              units::meter_t{target}.value());
+               fmt::print("output: {}\n", output.value());
+
+               TankDrive(output, output);
              },
              // Stop robot.
              [this](bool) -> void { TankDrive(0, 0, false); },
-             [this]() -> bool { return m_distanceController.AtGoal(); }, {this})
+             [this]() -> bool { return m_distanceController.AtSetpoint(); },
+             {this})
       .ToPtr();
 }
 
@@ -213,7 +235,7 @@ frc2::CommandPtr DalekDrive::BalanceCommand() {
                frc::SmartDashboard::PutNumber("Balance output", output.value());
                frc::SmartDashboard::PutNumber(
                    "Balance setpoint", m_balanceController.GetSetpoint());
-               TankDrive(output, output);
+               TankDrive(-output, -output);
              },
              // Stop robot once balanced.
              [this](bool) -> void { TankDrive(0, 0, false); },
@@ -288,6 +310,24 @@ void DalekDrive::InitTest() {
   frc::SmartDashboard::PutNumber("Velocity kPBalance",
                                  AutoConstants::kDBalance);
   frc::SmartDashboard::PutNumber("Velocity kPDistance", kPDistance);
+
+  frc::SmartDashboard::PutNumber("DriveToDistance output",
+                                 m_distanceController.Calculate(0, 0));
+  frc::SmartDashboard::PutNumber("DriveToDistance setpoint",
+                                 m_distanceController.GetSetpoint());
+
+  frc::SmartDashboard::PutNumber("Balance output", 0);
+  frc::SmartDashboard::PutNumber("Balance setpoint",
+                                 m_balanceController.GetSetpoint());
+
+  frc::SmartDashboard::PutNumber("Right Voltage",
+                                 m_rightFront.GetMotorOutputVoltage());
+  frc::SmartDashboard::PutNumber("Left Voltage",
+                                 m_leftFront.GetMotorOutputVoltage());
+  frc::SmartDashboard::PutNumber("Left Current",
+                                 m_leftFront.GetOutputCurrent());
+  frc::SmartDashboard::PutNumber("Right Current",
+                                 m_rightFront.GetOutputCurrent());
 }
 
 void DalekDrive::UpdatePIDValues() {
@@ -324,10 +364,12 @@ void DalekDrive::SetWheelSpeeds(units::meters_per_second_t leftSpeed,
                                    rightSpeed / kEncoderDistancePerPulse /
                                        (double)10 * 1_s);
   }
+  double leftOutput = leftSpeed / kEncoderDistancePerPulse / (double)10 * 1_s;
+  double rightOutput = rightSpeed / kEncoderDistancePerPulse / (double)10 * 1_s;
   m_leftFront.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,
-                  leftSpeed / kEncoderDistancePerPulse / (double)10 * 1_s);
+                  (-50 < leftOutput && leftOutput < 50) ? 0 : leftOutput);
   m_rightFront.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,
-                   rightSpeed / kEncoderDistancePerPulse / (double)10 * 1_s);
+                   (-50 < rightOutput && rightOutput < 50) ? 0 : rightOutput);
 }
 
 void DalekDrive::AddVisionPoseEstimate(frc::Pose2d pose,
