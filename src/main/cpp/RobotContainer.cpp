@@ -22,7 +22,7 @@ void RobotContainer::ConfigureBindings() {
   // Move neck with xbox joystick.
   m_arm.SetDefaultCommand(frc2::cmd::Run(
       [this] {
-        m_arm.SetNeckVoltage(-2 * m_driverController.GetLeftY() * 1_V);
+        m_arm.SetNeckVoltage(-1.5 * m_driverController.GetLeftY() * 1_V);
       },
       {&m_arm}));
 
@@ -35,20 +35,20 @@ void RobotContainer::ConfigureBindings() {
       {&m_drivetrain}));
 
   // Reset neck.
-  m_leftJoystick.Button(2).OnTrue(
-      frc2::cmd::RunOnce([this] { m_arm.ZeroNeck(); }, {&m_arm}));
+  //   m_leftJoystick.Button(2).OnTrue(
+  //       frc2::cmd::RunOnce([this] { m_arm.ZeroNeck(); }, {&m_arm}));
 
-  frc::SmartDashboard::PutNumber("Turn goal input", 0);
+  //   frc::SmartDashboard::PutNumber("Turn goal input", 0);
 
   // Set neck angle.
-  m_leftJoystick.Button(3).WhileTrue(
-      m_arm.SetNeckAngleCommand([this]() -> units::degree_t {
-        return 1_deg * frc::SmartDashboard::GetNumber("Turn goal input", 40);
-      }));
+  //   m_leftJoystick.Button(3).WhileTrue(
+  //       m_arm.SetNeckAngleCommand([this]() -> units::degree_t {
+  //         return 1_deg * frc::SmartDashboard::GetNumber("Turn goal input",
+  //         40);
+  //       }));
 
   // Brake.
-  m_leftJoystick.Button(4).WhileTrue(frc2::cmd::Run(
-      [this] { m_drivetrain.TankDrive(0, 0, true); }, {&m_drivetrain}));
+  m_leftJoystick.Button(4).WhileTrue(m_drivetrain.BrakeCommand());
 
   m_leftJoystick.Button(5).OnTrue(frc2::cmd::RunOnce(
       [this] { m_drivetrain.UpdatePIDValues(); }, {&m_drivetrain}));
@@ -89,7 +89,22 @@ void RobotContainer::ConfigureBindings() {
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Drive and balance on the charge station.
   // return std::move(m_chargeStationAuto);
+  frc2::CommandPtr placeMidCommand =
+      // Extend arm up while...
+      m_arm.SetNeckAngleCommand(AutoConstants::kTargetAngle)
+          .WithTimeout(3_s)
+          // driving forward about 2 feet. NOTE: distance goal is hardcoded
+          .AlongWith(
+              m_drivetrain.DriveToDistanceCommand(0.67_m).WithTimeout(3_s))
+          // Get the neck to the angle for placing a cone.
+          .AndThen(m_arm.SetNeckAngleCommand(AutoConstants::kPlacementAngle))
+          // Open the claw.
+          .AndThen([this] { m_claw.SetPosition(false); })
+          // Hold the neck in...
+          .AndThen(m_arm.SetNeckAngleCommand(15_deg))
+          // and exit the community.
+          .AlongWith(frc2::cmd::Run(
+              [this] { m_drivetrain.Drive(-0.6, -0.6, false); }));
 
-  // No auton.
-  return frc2::CommandPtr{nullptr};
+  return placeMidCommand;
 }

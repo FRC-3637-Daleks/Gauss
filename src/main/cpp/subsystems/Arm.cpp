@@ -36,12 +36,10 @@ void Arm::SetNeckVoltage(units::volt_t output) {
   frc::SmartDashboard::PutNumber("neck voltage", output.value());
 }
 
-frc2::CommandPtr
-Arm::SetNeckAngleCommand(std::function<units::degree_t()> getTarget) {
-  return frc2::Subsystem::RunOnce([this, &getTarget]() {
-           fmt::print("Setting goal...");
+frc2::CommandPtr Arm::SetNeckAngleCommand(units::degree_t target) {
+  return frc2::Subsystem::RunOnce([this, &target]() {
            m_neckController.Reset(GetNeckAngle());
-           m_neckController.SetGoal(45_deg);
+           m_neckController.SetGoal(target);
          })
       .AndThen(frc2::Subsystem::RunEnd(
           // Sets motor output.

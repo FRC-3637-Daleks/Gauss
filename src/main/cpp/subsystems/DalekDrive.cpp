@@ -4,6 +4,7 @@
 
 #include <frc/SPI.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/RunCommand.h>
 
@@ -131,6 +132,25 @@ void DalekDrive::ArcadeDrive(double forward, double rotation,
   m_drive.Feed();
 }
 
+frc2::CommandPtr DalekDrive::BrakeCommand() {
+  return frc2::cmd::RunOnce(
+             [this] {
+               m_leftFront.Config_kI(0, kIBrake);
+               m_rightFront.Config_kI(0, kIBrake);
+             },
+             {this})
+      .AndThen(frc2::cmd::RunEnd(
+          [this] {
+            m_leftFront.Set(0);
+            m_rightFront.Set(0);
+          },
+          [this] {
+            m_leftFront.Config_kI(0, kIDriveSpeed);
+            m_rightFront.Config_kI(0, kIDriveSpeed);
+          },
+          {this}));
+}
+
 frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
   return frc2::FunctionalCommand(
              // Set controller input to current heading.
@@ -180,7 +200,7 @@ frc2::CommandPtr DalekDrive::DriveToDistanceCommand(units::meter_t target) {
                m_distanceController.Reset();
                m_distanceController.SetTolerance(
                    units::meter_t{kDistanceTolerance}.value());
-               m_distanceController.SetSetpoint(units::meter_t{1.5_ft}.value());
+               m_distanceController.SetSetpoint(units::meter_t{2.2_ft}.value());
                fmt::print("Running DriveToDistance Command.\n");
              },
              // Use output from PID controller to drive robot.

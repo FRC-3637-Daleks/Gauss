@@ -81,10 +81,11 @@ constexpr auto kPreciseSpeed = 2_fps;
 // PID coefficients for closed-loop control of velocity.
 constexpr double kFDriveSpeed = 0.0656;
 constexpr double kPDriveSpeed = 0.1;
-// constexpr double kIDriveSpeed = 0.0001;
 constexpr double kIDriveSpeed = 0.000;
 constexpr double kDDriveSpeed = 0;
 constexpr double kIzDriveSpeed = 1000;
+
+constexpr double kIBrake = 0.0001;
 
 // NOTE: Guess value!
 constexpr double kPTurn = 0.75;
@@ -130,6 +131,9 @@ const frc::AprilTagFieldLayout kAprilTagFieldLayout{
 } // namespace VisionConstants
 
 namespace AutoConstants {
+constexpr auto kTargetAngle = 0_deg;
+constexpr auto kPlacementAngle = 0_deg;
+
 constexpr auto kMaxSpeed = 3_fps;
 constexpr auto kMaxAcceleration = units::feet_per_second_squared_t{10};
 

@@ -34,6 +34,8 @@ public:
 
   void ArcadeDrive(double forward, double rotation, bool squareInputs);
 
+  frc2::CommandPtr BrakeCommand();
+
   frc2::CommandPtr TurnToAngleCommand(units::degree_t target);
 
   frc2::CommandPtr TurnToPoseCommand(std::function<double()> getForward,

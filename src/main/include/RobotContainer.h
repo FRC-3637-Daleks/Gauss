@@ -11,12 +11,12 @@
 #include <frc2/command/button/CommandXboxController.h>
 
 #include "Constants.h"
+#include "commands/Autos.h"
 #include "subsystems/Arm.h"
 #include "subsystems/Claw.h"
 #include "subsystems/DalekDrive.h"
 #include "subsystems/Intake.h"
 #include "subsystems/Vision.h"
-#include "commands/Autos.h"
 
 class RobotContainer {
 public:
@@ -38,8 +38,6 @@ private:
                   },
                   [this] { return m_drivetrain.GetPose(); }};
 
-  frc::SlewRateLimiter<units::scalar> m_leftRateLimiter{3 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_rightRateLimiter{3 / 1_s};
   Intake m_intake;
 
   frc2::CommandPtr m_chargeStationAuto{Autos::ChargeStationAuto(&m_drivetrain)};

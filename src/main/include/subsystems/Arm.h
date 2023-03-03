@@ -28,8 +28,7 @@ public:
 
   void SwitchLegPosition() { m_solenoid.Set(IsLegOut()); }
 
-  frc2::CommandPtr
-  SetNeckAngleCommand(std::function<units::degree_t()> getTarget);
+  frc2::CommandPtr SetNeckAngleCommand(units::degree_t target);
 
   void Log();
 
