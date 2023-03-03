@@ -19,15 +19,11 @@ DalekDrive::DalekDrive()
           kEncoderDistancePerPulse * m_rightFront.GetSelectedSensorPosition(),
           frc::Pose2d()},
       m_turnController{kPTurn, 0, 0, {kMaxTurnRate, kMaxTurnAcceleration}},
-      m_distanceController{kPDistance, 0, 0},
-      m_balanceController{
-          AutoConstants::kPBalance,
-          AutoConstants::kIBalance,
-          AutoConstants::kDBalance,
-      },
-      m_straightLeftController{kPLeftStraight, 0, 0}, m_straightRightController{
-                                                          kPRightStraight, 0,
-                                                          0} {
+      m_distanceController{kPDistance, 0, 0}, m_balanceController{
+                                                  AutoConstants::kPBalance,
+                                                  AutoConstants::kIBalance,
+                                                  AutoConstants::kDBalance,
+                                              } {
   m_turnController.EnableContinuousInput(-180_deg, 180_deg);
   m_turnController.SetTolerance(kTurnTolerance, kTurnRateTolerance);
 
