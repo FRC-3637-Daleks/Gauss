@@ -131,8 +131,8 @@ const frc::AprilTagFieldLayout kAprilTagFieldLayout{
 } // namespace VisionConstants
 
 namespace AutoConstants {
-constexpr auto kTargetAngle = 0_deg;
-constexpr auto kPlacementAngle = 0_deg;
+constexpr auto kTargetAngle = 105_deg;
+constexpr auto kPlacementAngle = 90_deg;
 
 constexpr auto kMaxSpeed = 3_fps;
 constexpr auto kMaxAcceleration = units::feet_per_second_squared_t{10};

@@ -70,6 +70,9 @@ void RobotContainer::ConfigureBindings() {
   m_rightJoystick.Button(3).WhileTrue(
       m_drivetrain.DriveToDistanceCommand(3_ft));
 
+  m_driverController.B().WhileTrue(frc2::cmd::Run(
+      [this] { m_arm.SetNeckAngleCommand(AutoConstants::kPlacementAngle); },
+      {&m_arm}));
   // When the left bumper is clicked, it will open all the pistons
   // toggle for intake
   m_driverController.A().ToggleOnTrue(frc2::cmd::StartEnd(
