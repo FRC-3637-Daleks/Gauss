@@ -119,10 +119,10 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           .AndThen(m_arm.SetNeckAngleCommand(AutoConstants::kPlacementAngle)
                        .WithTimeout(1_s))
           .AndThen(frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }))
-          .AndThen(frc2::cmd::Parallel(m_arm.SetNeckAngleCommand(12_deg)),
-                   frc2::cmd::Run([this] {
-                     m_drivetrain.Drive(-0.2, -0.2, false)
-                   }).WithTimeout(3_s));
+          .AndThen(frc2::cmd::Race(m_arm.SetNeckAngleCommand(12_deg),
+                                   frc2::cmd::Run([this] {
+                                     m_drivetrain.Drive(-0.2, -0.2, false);
+                                   }).WithTimeout(3_s)));
 
   return placeMidCommand;
 }
