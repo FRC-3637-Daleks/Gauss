@@ -143,6 +143,7 @@ frc2::CommandPtr DalekDrive::BrakeCommand() {
           [this] {
             m_leftFront.Set(0);
             m_rightFront.Set(0);
+            m_drive.Feed();
           },
           [this] {
             m_leftFront.Config_kI(0, kIDriveSpeed);

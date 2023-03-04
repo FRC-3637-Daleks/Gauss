@@ -142,15 +142,12 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       m_arm.IntakeCommand(10_deg).WithTimeout(1_s),
       frc2::cmd::Run([this] {
         m_arm.SetNeckVoltage(-0.2_V);
-      }).WithTimeout(0.5_s),
+      }).WithTimeout(0.8_s),
       frc2::cmd::RunOnce([this] {
         m_intake.SetIntakeOn(true);
       }).WithTimeout(0.1_s),
-      frc2::cmd::Run(
-          [this] {
-            m_drivetrain.TankDrive(-0.4, -0.4, false);
-          },
-          {&m_drivetrain})
+      frc2::cmd::Run([this] { m_drivetrain.TankDrive(-0.4, -0.4, false); },
+                     {&m_drivetrain})
           .WithTimeout(4.5_s));
 
   return placeLowCommand;
