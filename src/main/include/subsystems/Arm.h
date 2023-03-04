@@ -8,6 +8,7 @@
 #include <frc/controller/ArmFeedforward.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
+#include <frc/geometry/Rotation2d.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
@@ -28,7 +29,7 @@ public:
 
   void SwitchLegPosition() { m_solenoid.Set(IsLegOut()); }
 
-  frc2::CommandPtr SetNeckAngleCommand(units::degree_t target);
+  frc2::CommandPtr SetNeckAngleCommand(frc::Rotation2d target);
 
   void Log();
 
@@ -51,7 +52,7 @@ private:
   frc::ProfiledPIDController<units::radian> m_neckController;
 
   frc::DigitalInput m_limitSwitch;
-  bool m_stopped;
+  bool m_stopped{false};
 
   // frc::Compressor m_compressor{ArmConstants::kPCMId,
   //                              frc::PneumaticsModuleType::CTREPCM};

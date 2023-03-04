@@ -4,6 +4,7 @@
 
 #include <frc/apriltag/AprilTagFields.h>
 #include <frc/controller/ArmFeedforward.h>
+#include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Transform3d.h>
 #include <photonlib/PhotonPoseEstimator.h>
 #include <units/acceleration.h>
@@ -131,8 +132,8 @@ const frc::AprilTagFieldLayout kAprilTagFieldLayout{
 } // namespace VisionConstants
 
 namespace AutoConstants {
-constexpr auto kTargetAngle = 105_deg;
-constexpr auto kPlacementAngle = 90_deg;
+constexpr auto kTargetAngle = frc::Rotation2d{105_deg};
+constexpr auto kPlacementAngle = frc::Rotation2d{90_deg};
 
 constexpr auto kMaxSpeed = 3_fps;
 constexpr auto kMaxAcceleration = units::feet_per_second_squared_t{10};

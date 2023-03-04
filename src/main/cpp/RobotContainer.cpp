@@ -22,7 +22,9 @@ void RobotContainer::ConfigureBindings() {
   // Move neck with xbox joystick.
   m_arm.SetDefaultCommand(frc2::cmd::Run(
       [this] {
-        m_arm.SetNeckVoltage(-1.5 * m_driverController.GetLeftY() * 1_V);
+        double output = m_driverController.GetLeftY();
+        m_arm.SetNeckVoltage(-1.5 * std::copysign(output * output, output) *
+                             1_V);
       },
       {&m_arm}));
 
@@ -70,9 +72,7 @@ void RobotContainer::ConfigureBindings() {
   m_rightJoystick.Button(3).WhileTrue(
       m_drivetrain.DriveToDistanceCommand(3_ft));
 
-  m_driverController.B().WhileTrue(frc2::cmd::Run(
-      [this] { m_arm.SetNeckAngleCommand(AutoConstants::kPlacementAngle); },
-      {&m_arm}));
+  m_driverController.B().WhileTrue(m_arm.SetNeckAngleCommand(15_deg));
   // When the left bumper is clicked, it will open all the pistons
   // toggle for intake
   m_driverController.A().ToggleOnTrue(frc2::cmd::StartEnd(
@@ -119,10 +119,11 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           .AndThen(m_arm.SetNeckAngleCommand(AutoConstants::kPlacementAngle)
                        .WithTimeout(1_s))
           .AndThen(frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }))
-          .AndThen(frc2::cmd::Race(m_arm.SetNeckAngleCommand(12_deg),
-                                   frc2::cmd::Run([this] {
-                                     m_drivetrain.Drive(-0.2, -0.2, false);
-                                   }).WithTimeout(3_s)));
+      //   .AndThen(frc2::cmd::Race(m_arm.SetNeckAngleCommand(12_deg),
+      //                            frc2::cmd::Run([this] {
+      //                              m_drivetrain.Drive(-0.2, -0.2, false);
+      //                            }).WithTimeout(3_s)))
+      ;
 
   return placeMidCommand;
 }
