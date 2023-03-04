@@ -36,16 +36,14 @@ void Arm::SetNeckVoltage(units::volt_t output) {
   frc::SmartDashboard::PutNumber("neck voltage", output.value());
 }
 
-frc2::CommandPtr Arm::SetNeckAngleCommand(frc::Rotation2d target) {
+frc2::CommandPtr Arm::LowAngleCommand(frc::Rotation2d target) {
   return frc2::Subsystem::RunOnce([this, &target]() {
-           fmt::print("Starting neck command...\n");
            m_neckController.Reset(GetNeckAngle());
-           m_neckController.SetGoal(target.Radians());
+           m_neckController.SetGoal(45_deg);
          })
       .AndThen(frc2::Subsystem::RunEnd(
           // Sets motor output.
           [this]() {
-            fmt::print("Setting output...\n");
             auto output = 1_V * m_neckController.Calculate(GetNeckAngle());
             SetNeckVoltage(output);
             frc::SmartDashboard::PutNumber("Arm PID output", output.value());
@@ -53,16 +51,58 @@ frc2::CommandPtr Arm::SetNeckAngleCommand(frc::Rotation2d target) {
                 "Arm PID setpoint",
                 m_neckController.GetSetpoint().position.value());
             frc::SmartDashboard::PutNumber(
-                "Arm PID goal",
-                m_neckController.GetSetpoint().position.value());
+                "Arm PID goal", m_neckController.GetGoal().position.value());
             frc::SmartDashboard::PutNumber(
                 "Arm PID error", m_neckController.GetPositionError().value());
           },
           // Set output to zero when done.
+          [this]() { SetNeckVoltage(0_V); }));
+}
+
+frc2::CommandPtr Arm::HighAngleCommand(frc::Rotation2d target) {
+  return frc2::Subsystem::RunOnce([this, &target]() {
+           m_neckController.Reset(GetNeckAngle());
+           m_neckController.SetGoal(90_deg);
+         })
+      .AndThen(frc2::Subsystem::RunEnd(
+          // Sets motor output.
           [this]() {
-            fmt::print("Done!\n");
-            SetNeckVoltage(0_V);
-          }));
+            auto output = 1_V * m_neckController.Calculate(GetNeckAngle());
+            SetNeckVoltage(output);
+            frc::SmartDashboard::PutNumber("Arm PID output", output.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID setpoint",
+                m_neckController.GetSetpoint().position.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID goal", m_neckController.GetGoal().position.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID error", m_neckController.GetPositionError().value());
+          },
+          // Set output to zero when done.
+          [this]() { SetNeckVoltage(0_V); }));
+}
+
+frc2::CommandPtr Arm::IntakeCommand(frc::Rotation2d target) {
+  return frc2::Subsystem::RunOnce([this, &target]() {
+           m_neckController.Reset(GetNeckAngle());
+           m_neckController.SetGoal(10_deg);
+         })
+      .AndThen(frc2::Subsystem::RunEnd(
+          // Sets motor output.
+          [this]() {
+            auto output = 1_V * m_neckController.Calculate(GetNeckAngle());
+            SetNeckVoltage(output);
+            frc::SmartDashboard::PutNumber("Arm PID output", output.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID setpoint",
+                m_neckController.GetSetpoint().position.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID goal", m_neckController.GetGoal().position.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID error", m_neckController.GetPositionError().value());
+          },
+          // Set output to zero when done.
+          [this]() { SetNeckVoltage(0_V); }));
 }
 
 // void Arm::SetNeckAngle(units::degree_t target) {

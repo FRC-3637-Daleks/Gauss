@@ -29,7 +29,11 @@ public:
 
   void SwitchLegPosition() { m_solenoid.Set(IsLegOut()); }
 
-  frc2::CommandPtr SetNeckAngleCommand(frc::Rotation2d target);
+  frc2::CommandPtr LowAngleCommand(frc::Rotation2d target);
+
+  frc2::CommandPtr HighAngleCommand(frc::Rotation2d target);
+
+  frc2::CommandPtr IntakeCommand(frc::Rotation2d target);
 
   void Log();
 

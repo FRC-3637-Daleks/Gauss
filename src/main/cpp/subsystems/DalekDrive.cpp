@@ -126,7 +126,7 @@ void DalekDrive::PreciseDrive(double leftSpeed, double rightSpeed,
 
 void DalekDrive::ArcadeDrive(double forward, double rotation,
                              bool squareInputs) {
-  auto [left, right] = m_drive.TankDriveIK(forward, rotation, squareInputs);
+  auto [left, right] = m_drive.ArcadeDriveIK(forward, rotation, squareInputs);
 
   SetWheelSpeeds(left * kMaxSpeed, right * kMaxSpeed);
   m_drive.Feed();

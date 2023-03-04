@@ -34,7 +34,7 @@ constexpr double kI = 1;
 constexpr double kD = 0;
 constexpr double kIz = 5;
 
-constexpr auto kMaxTurnVelocity = 0.5 * std::numbers::pi * 1_rad_per_s;
+constexpr auto kMaxTurnVelocity = 0.3 * std::numbers::pi * 1_rad_per_s;
 constexpr auto kMaxTurnAcceleration = std::numbers::pi * 1_rad_per_s_sq;
 
 constexpr bool kEncoderReversed = true;

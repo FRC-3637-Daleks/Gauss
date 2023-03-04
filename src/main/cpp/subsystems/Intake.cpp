@@ -7,9 +7,9 @@ Intake::Intake()
       m_rangefinder{IntakeConstants::kRangefinderPort} {
 
   cs::UsbCamera intakeCamera = frc::CameraServer::StartAutomaticCapture();
-  intakeCamera.SetResolution(315, 240);
-  intakeCamera.SetFPS(20);
-
+  intakeCamera.SetResolution(240, 160);
+  intakeCamera.SetFPS(10);
+  // intakeCamera.SetCompression(50);
   m_intakePiston.Set(false);
   this->Periodic();
 }

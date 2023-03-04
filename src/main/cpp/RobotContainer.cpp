@@ -29,7 +29,7 @@ void RobotContainer::ConfigureBindings() {
       {&m_arm}));
 
   // Arcade controls.
-  m_leftJoystick.Button(1).OnTrue(frc2::cmd::Run(
+  m_rightJoystick.Button(1).OnTrue(frc2::cmd::Run(
       [this] {
         m_drivetrain.ArcadeDrive(-m_leftJoystick.GetY(),
                                  -m_rightJoystick.GetX(), true);
@@ -59,10 +59,10 @@ void RobotContainer::ConfigureBindings() {
       [this] { m_drivetrain.TankDrive(1_mps, 1_mps); }, {&m_drivetrain}));
 
   // Slow drive
-  m_rightJoystick.Button(1).WhileTrue(frc2::cmd::Run(
+  m_leftJoystick.Button(1).WhileTrue(frc2::cmd::Run(
       [this] {
         m_drivetrain.PreciseDrive(-m_leftJoystick.GetY(),
-                                  -m_rightJoystick.GetY(), true);
+                                  -m_rightJoystick.GetY(), false);
       },
       {&m_drivetrain}));
 
@@ -72,7 +72,8 @@ void RobotContainer::ConfigureBindings() {
   m_rightJoystick.Button(3).WhileTrue(
       m_drivetrain.DriveToDistanceCommand(3_ft));
 
-  m_driverController.B().WhileTrue(m_arm.SetNeckAngleCommand(15_deg));
+  m_driverController.B().WhileTrue(m_arm.LowAngleCommand(20_deg));
+  m_driverController.Y().WhileTrue(m_arm.HighAngleCommand(20_deg));
   // When the left bumper is clicked, it will open all the pistons
   // toggle for intake
   m_driverController.A().ToggleOnTrue(frc2::cmd::StartEnd(
@@ -113,10 +114,9 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   //                      }).WithTimeout(5_s));
   frc2::CommandPtr placeMidCommand =
       frc2::cmd::Parallel(
-          m_arm.SetNeckAngleCommand(AutoConstants::kTargetAngle)
-              .WithTimeout(3_s),
+          m_arm.LowAngleCommand(AutoConstants::kTargetAngle).WithTimeout(3_s),
           m_drivetrain.DriveToDistanceCommand(0.67_m).WithTimeout(3_s))
-          .AndThen(m_arm.SetNeckAngleCommand(AutoConstants::kPlacementAngle)
+          .AndThen(m_arm.LowAngleCommand(AutoConstants::kPlacementAngle)
                        .WithTimeout(1_s))
           .AndThen(frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }))
       //   .AndThen(frc2::cmd::Race(m_arm.SetNeckAngleCommand(12_deg),
@@ -125,5 +125,33 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       //                            }).WithTimeout(3_s)))
       ;
 
-  return placeMidCommand;
+  //   frc2::CommandPtr placeLowCommand =
+  //       frc2::cmd::RunOnce([this] { m_intake.SetIntakeOn(false); })
+  //           .AndThen(m_arm.LowAngleCommand(25_deg).WithTimeout(3_s).AndThen(
+  //               frc2::cmd::RunOnce([this] {
+  //                 m_claw.SetPosition(true);
+  //               }).AndThen(frc2::cmd::Run([this] {
+  //                            m_drivetrain.Drive(-0.4, -0.4, false);
+  //                          }).WithTimeout(2_s))));
+  frc2::CommandPtr placeLowCommand = frc2::cmd::Sequence(
+      frc2::cmd::RunOnce([this] { m_intake.SetIntakeOn(false); }),
+      frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
+      m_arm.LowAngleCommand(25_deg).WithTimeout(3_s),
+      frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }),
+      // Get arm back into intake.
+      m_arm.IntakeCommand(10_deg).WithTimeout(1_s),
+      frc2::cmd::Run([this] {
+        m_arm.SetNeckVoltage(-0.2_V);
+      }).WithTimeout(0.5_s),
+      frc2::cmd::RunOnce([this] {
+        m_intake.SetIntakeOn(true);
+      }).WithTimeout(0.1_s),
+      frc2::cmd::Run(
+          [this] {
+            m_drivetrain.TankDrive(-0.4, -0.4, false);
+          },
+          {&m_drivetrain})
+          .WithTimeout(4.5_s));
+
+  return placeLowCommand;
 }
