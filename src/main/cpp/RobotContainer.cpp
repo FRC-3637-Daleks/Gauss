@@ -23,7 +23,7 @@ void RobotContainer::ConfigureBindings() {
   m_arm.SetDefaultCommand(frc2::cmd::Run(
       [this] {
         double output = m_driverController.GetLeftY();
-        m_arm.SetNeckVoltage(-1.5 * std::copysign(output * output, output) *
+        m_arm.SetNeckVoltage(-2.0 * std::copysign(output * output, output) *
                              1_V);
       },
       {&m_arm}));
@@ -91,48 +91,6 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  // Drive and balance on the charge station.
-  // return std::move(m_chargeStationAuto);
-  //   frc2::CommandPtr placeMidCommand =
-  //       // Extend arm up while...
-  //       m_arm.SetNeckAngleCommand(AutoConstants::kTargetAngle)
-  //           .WithTimeout(3_s)
-  //           // driving forward about 2 feet. NOTE: distance goal is hardcoded
-  //           .AlongWith(
-  //               m_drivetrain.DriveToDistanceCommand(0.67_m).WithTimeout(3_s))
-  //           // Get the neck to the angle for placing a cone.
-  //           .AndThen(m_arm.SetNeckAngleCommand(AutoConstants::kPlacementAngle))
-  //           .WithTimeout(1_s)
-  //           // Open the claw.
-  //           .AndThen(frc2::cmd::RunOnce([this] { m_claw.SetPosition(false);
-  //           }))
-  //           // Hold the neck in...
-  //           .AndThen(m_arm.SetNeckAngleCommand(12_deg))
-  //           // and exit the community.
-  //           .AlongWith(frc2::cmd::Run([this] {
-  //                        m_drivetrain.Drive(-0.6, -0.6, false);
-  //                      }).WithTimeout(5_s));
-  frc2::CommandPtr placeMidCommand =
-      frc2::cmd::Parallel(
-          m_arm.LowAngleCommand(AutoConstants::kTargetAngle).WithTimeout(3_s),
-          m_drivetrain.DriveToDistanceCommand(0.67_m).WithTimeout(3_s))
-          .AndThen(m_arm.LowAngleCommand(AutoConstants::kPlacementAngle)
-                       .WithTimeout(1_s))
-          .AndThen(frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }))
-      //   .AndThen(frc2::cmd::Race(m_arm.SetNeckAngleCommand(12_deg),
-      //                            frc2::cmd::Run([this] {
-      //                              m_drivetrain.Drive(-0.2, -0.2, false);
-      //                            }).WithTimeout(3_s)))
-      ;
-
-  //   frc2::CommandPtr placeLowCommand =
-  //       frc2::cmd::RunOnce([this] { m_intake.SetIntakeOn(false); })
-  //           .AndThen(m_arm.LowAngleCommand(25_deg).WithTimeout(3_s).AndThen(
-  //               frc2::cmd::RunOnce([this] {
-  //                 m_claw.SetPosition(true);
-  //               }).AndThen(frc2::cmd::Run([this] {
-  //                            m_drivetrain.Drive(-0.4, -0.4, false);
-  //                          }).WithTimeout(2_s))));
   frc2::CommandPtr placeLowCommand = frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { m_intake.SetIntakeOn(false); }),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
