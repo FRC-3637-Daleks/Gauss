@@ -24,6 +24,9 @@ constexpr int kMotorId = 8;
 
 constexpr int kLimitSwitchChannel = 0;
 
+constexpr auto kNeckPhysicalLowerBound = -5_deg;
+constexpr auto kNeckPhysicalUpperBound = 120_deg;
+
 // No pot for now.
 // constexpr int kPotentiometerId = 0;
 // constexpr double kVoltToLengthConversionFactor = 6.41;

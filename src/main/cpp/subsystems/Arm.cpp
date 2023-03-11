@@ -36,6 +36,13 @@ void Arm::SetNeckVoltage(units::volt_t output) {
   frc::SmartDashboard::PutNumber("neck voltage", output.value());
 }
 
+frc2::CommandPtr Arm::ResetSwitchCommand() {
+  return frc2::Subsystem::Run([this] { SetNeckVoltage(-1_V); })
+      .Until([this]() -> bool { return m_limitSwitch.Get(); })
+      .WithTimeout(1_s)
+      .AndThen([this] { ZeroNeck(); });
+}
+
 frc2::CommandPtr Arm::LowAngleCommand(frc::Rotation2d target) {
   return frc2::Subsystem::RunOnce([this, &target]() {
            m_neckController.Reset(GetNeckAngle());

@@ -30,6 +30,11 @@ private:
   frc2::CommandXboxController m_driverController{
       OperatorConstants::kXboxControllerPort};
 
+  frc2::Trigger m_armResetTrigger{[this]() -> bool {
+    return m_arm.GetNeckAngle() < ArmConstants::kNeckPhysicalLowerBound ||
+           m_arm.GetNeckAngle() > ArmConstants::kNeckPhysicalUpperBound;
+  }};
+
   Arm m_arm;
   DalekDrive m_drivetrain;
   Claw m_claw;

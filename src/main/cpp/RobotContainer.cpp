@@ -88,6 +88,11 @@ void RobotContainer::ConfigureBindings() {
       frc2::cmd::RunOnce([&] { m_arm.SetLegOut(false); }, {&m_arm}),
       frc2::cmd::RunOnce([&] { m_arm.SetLegOut(true); }, {&m_arm}),
       [&]() -> bool { return m_arm.IsLegOut(); }));
+
+  // Reset the arm if the limit switch gets accidentally tripped. (or if Arm
+  // angle returns less than Physical Lower Bound or greater than Physical Upper
+  // Bound)
+  m_armResetTrigger.Debounce(100_ms).WhileTrue(m_arm.ResetSwitchCommand());
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
