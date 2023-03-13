@@ -79,9 +79,8 @@ void RobotContainer::ConfigureBindings() {
   m_driverController.Y().WhileTrue(m_arm.HighAngleCommand(20_deg));
   // When the left bumper is clicked, it will open all the pistons
   // toggle for intake
-  m_driverController.A().ToggleOnTrue(frc2::cmd::StartEnd(
-      [this] { m_intake.SetIntakeOn(true); },
-      [this] { m_intake.SetIntakeOn(false); }, {&m_intake}));
+  m_driverController.A().WhileTrue(
+      frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); }, {&m_intake}));
   // toggle claw
   m_driverController.RightBumper().ToggleOnTrue(
       frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },

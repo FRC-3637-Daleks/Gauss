@@ -23,7 +23,7 @@ public:
 
   void SetIntakeMotors();
 
-  void DetectionIntake();
+  // void DetectionIntake();
 
   bool ReadyToPickUp();
 

@@ -39,12 +39,6 @@ bool Intake::ReadyToPickUp() {
   // implications needed after testing
 }
 
-void Intake::DetectionIntake() {
-  if(ReadyToPickUp()) {
-    SetIntakeMotors();
-  }
-}
-
 double Intake::GetRangefinder() { return m_rangefinder.GetVoltage(); }
 
 void Intake::Periodic() { this->Log(); }
