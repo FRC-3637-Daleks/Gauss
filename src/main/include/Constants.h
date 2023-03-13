@@ -92,7 +92,7 @@ constexpr double kIzDriveSpeed = 1000;
 constexpr double kIBrake = 0.0001;
 
 // NOTE: Guess value!
-constexpr double kPTurn = 0.75;
+constexpr double kPTurn = 3;
 constexpr double kPDistance = 2;
 constexpr auto kDistanceTolerance = 7_cm;
 
@@ -157,8 +157,11 @@ constexpr auto kSubstationShelf = 100_deg;
 namespace IntakeConstants {
 constexpr int kPCMPort = 5;
 constexpr int kPistonPort = 0;
+constexpr int kLeftMotorPort = 15;
+constexpr int kRightMotorPort = 16;
 constexpr int kRangefinderPort = 0;
 
+constexpr double kIntakeMotorSpeed = 0.5;
 constexpr int pickUpRangeCone = 0;
 constexpr int pickUpRangeCube = 0;
 } // namespace IntakeConstants

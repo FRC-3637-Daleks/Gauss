@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cameraserver/CameraServer.h"
+#include <ctre/Phoenix.h>
 #include <frc/AnalogInput.h>
 #include <frc/PWM.h>
 #include <frc/PneumaticsControlModule.h>
@@ -20,6 +21,10 @@ public:
 
   void SetIntakeOn(bool SetPiston);
 
+  void SetIntakeMotors();
+
+  void DetectionIntake();
+
   bool ReadyToPickUp();
 
   double GetRangefinder();
@@ -29,4 +34,6 @@ public:
 private:
   frc::Solenoid m_intakePiston;
   frc::AnalogInput m_rangefinder;
+  WPI_TalonSRX m_leftIntakeMotor;
+  WPI_TalonSRX m_rightIntakeMotor;
 };

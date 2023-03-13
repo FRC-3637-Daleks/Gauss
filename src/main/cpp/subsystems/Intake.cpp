@@ -4,7 +4,9 @@ Intake::Intake()
     : m_intakePiston{IntakeConstants::kPCMPort,
                      frc::PneumaticsModuleType::CTREPCM,
                      IntakeConstants::kPistonPort},
-      m_rangefinder{IntakeConstants::kRangefinderPort} {
+      m_rangefinder{IntakeConstants::kRangefinderPort},
+      m_leftIntakeMotor{IntakeConstants::kLeftMotorPort},
+      m_rightIntakeMotor{IntakeConstants::kRightMotorPort} {
 
   cs::UsbCamera intakeCamera = frc::CameraServer::StartAutomaticCapture();
   intakeCamera.SetResolution(240, 160);
@@ -23,6 +25,11 @@ void Intake::Log() {
 
 void Intake::SetIntakeOn(bool SetPiston) { m_intakePiston.Set(SetPiston); }
 
+void Intake::SetIntakeMotors() {
+  m_leftIntakeMotor.Set(IntakeConstants::kIntakeMotorSpeed);
+  m_rightIntakeMotor.Set(IntakeConstants::kIntakeMotorSpeed);
+}
+
 bool Intake::ReadyToPickUp() {
   if ((this->GetRangefinder() <= IntakeConstants::pickUpRangeCone) ||
       (this->GetRangefinder() <= IntakeConstants::pickUpRangeCube)) {
@@ -31,6 +38,13 @@ bool Intake::ReadyToPickUp() {
   return false;
   // implications needed after testing
 }
+
+void Intake::DetectionIntake() {
+  if(ReadyToPickUp()) {
+    SetIntakeMotors();
+  }
+}
+
 double Intake::GetRangefinder() { return m_rangefinder.GetVoltage(); }
 
 void Intake::Periodic() { this->Log(); }

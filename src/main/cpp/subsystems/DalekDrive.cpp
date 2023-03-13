@@ -155,13 +155,19 @@ frc2::CommandPtr DalekDrive::BrakeCommand() {
 frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
   return frc2::FunctionalCommand(
              // Set controller input to current heading.
-             [this] {
-               Reset();
+             [this, &target] {
+               Reset(); 
+               m_turnController.SetGoal(target);
                m_turnController.Reset(GetHeading());
              },
              // Use output from PID controller to turn robot.
-             [this, &target] {
-               double output = m_turnController.Calculate(GetHeading(), target);
+             [this] {
+               double output = m_turnController.Calculate(GetHeading());
+               frc::SmartDashboard::PutNumber("TurnToAngle Output", output);
+               frc::SmartDashboard::PutNumber(
+                   "TurnToAngle Setpoint",
+                   m_turnController.GetSetpoint().position.value());
+               fmt::print("output: {}\n", output);
                ArcadeDrive(0, output, false);
              },
              // Stop robot.
@@ -345,6 +351,9 @@ void DalekDrive::InitTest() {
                                  m_leftFront.GetOutputCurrent());
   frc::SmartDashboard::PutNumber("Right Current",
                                  m_rightFront.GetOutputCurrent());
+  frc::SmartDashboard::PutNumber("TurnToAngle Output", 0);
+  frc::SmartDashboard::PutNumber(
+      "TurnToAngle Setpoint", m_turnController.GetSetpoint().position.value());
 }
 
 void DalekDrive::UpdatePIDValues() {
