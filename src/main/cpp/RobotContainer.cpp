@@ -97,16 +97,16 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  frc2::CommandPtr placeLowCommand = frc2::cmd::Sequence(
+  // XXX: Not tested!
+  frc2::CommandPtr cubeMidCommand = frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { m_intake.SetIntakeOn(false); }),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
       m_arm.LowAngleCommand().WithTimeout(3_s),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }),
       // Get arm back into intake.
-      m_arm.IntakeCommand().WithTimeout(1_s),
-      frc2::cmd::Run([this] {
-        m_arm.SetNeckVoltage(-0.2_V);
-      }).WithTimeout(0.8_s),
+      m_arm.IntakeCommand().WithTimeout(1_s), frc2::cmd::Run([this] {
+                                                m_arm.SetNeckVoltage(-0.2_V);
+                                              }).WithTimeout(0.8_s),
       frc2::cmd::RunOnce([this] {
         m_intake.SetIntakeOn(true);
       }).WithTimeout(0.1_s),
@@ -139,4 +139,3 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
               .WithTimeout(1.75_s)));
 
   return placeHighCommand;
-}
