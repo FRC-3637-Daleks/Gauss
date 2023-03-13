@@ -176,6 +176,24 @@ frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
       .ToPtr();
 }
 
+frc2::CommandPtr DalekDrive::HalfTurnCommand() {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this] {
+               Reset();
+               m_turnController.Reset(GetHeading());
+             },
+             // Use output from PID controller to turn robot.
+             [this] {
+               double output = m_turnController.Calculate(GetHeading(), 180_deg);
+               ArcadeDrive(0, output, false);
+             },
+             // Stop robot.
+             [this](bool) -> void { ArcadeDrive(0, 0, false); },
+             [this]() -> bool { return m_turnController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
 frc2::CommandPtr
 DalekDrive::TurnToPoseCommand(std::function<double()> getForward,
                               std::function<frc::Pose2d()> getTarget) {

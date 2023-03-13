@@ -31,11 +31,13 @@ public:
 
   frc2::CommandPtr ResetSwitchCommand();
 
-  frc2::CommandPtr LowAngleCommand(frc::Rotation2d target);
+  frc2::CommandPtr LowAngleCommand();
 
-  frc2::CommandPtr HighAngleCommand(frc::Rotation2d target);
+  frc2::CommandPtr MidAngleCommand();
 
-  frc2::CommandPtr IntakeCommand(frc::Rotation2d target);
+  frc2::CommandPtr HighAngleCommand();
+
+  frc2::CommandPtr IntakeCommand();
 
   void Log();
 

@@ -38,6 +38,8 @@ public:
 
   frc2::CommandPtr TurnToAngleCommand(units::degree_t target);
 
+  frc2::CommandPtr HalfTurnCommand();
+
   frc2::CommandPtr TurnToPoseCommand(std::function<double()> getForward,
                                      std::function<frc::Pose2d()> getTarget);
 

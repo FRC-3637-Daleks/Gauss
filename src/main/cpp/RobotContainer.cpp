@@ -73,10 +73,8 @@ void RobotContainer::ConfigureBindings() {
   m_rightJoystick.Button(3).WhileTrue(
       m_drivetrain.DriveToDistanceCommand(3_ft));
 
-  m_rightJoystick.Button(4).WhileTrue(m_drivetrain.TurnToAngleCommand(90_deg));
-
-  m_driverController.B().WhileTrue(m_arm.LowAngleCommand(20_deg));
-  m_driverController.Y().WhileTrue(m_arm.HighAngleCommand(20_deg));
+  m_driverController.B().WhileTrue(m_arm.LowAngleCommand());
+  m_driverController.Y().WhileTrue(m_arm.HighAngleCommand());
   // When the left bumper is clicked, it will open all the pistons
   // toggle for intake
   m_driverController.A().ToggleOnTrue(frc2::cmd::StartEnd(
@@ -99,45 +97,43 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  // frc2::CommandPtr placeLowCommand = frc2::cmd::Sequence(
-  //     frc2::cmd::RunOnce([this] { m_intake.SetIntakeOn(false); }),
-  //     frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
-  //     m_arm.LowAngleCommand(25_deg).WithTimeout(3_s),
-  //     frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }),
-  //     // Get arm back into intake.
-  //     m_arm.IntakeCommand(10_deg).WithTimeout(1_s),
-  //     frc2::cmd::Run([this] {
-  //       m_arm.SetNeckVoltage(-0.2_V);
-  //     }).WithTimeout(0.8_s),
-  //     frc2::cmd::RunOnce([this] {
-  //       m_intake.SetIntakeOn(true);
-  //     }).WithTimeout(0.1_s),
-  //     frc2::cmd::Run([this] { m_drivetrain.TankDrive(-0.4, -0.4, false); },
-  //                    {&m_drivetrain})
-  //         .WithTimeout(4.5_s));
-
-  // return placeLowCommand;
-  frc2::CommandPtr placeHighCommand = frc2::cmd::Sequence(
+  frc2::CommandPtr placeLowCommand = frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { m_intake.SetIntakeOn(false); }),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
-      m_arm.HighAngleCommand(25_deg).WithTimeout(3_s),
-      frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}),
-      m_arm.HighAngleCommand(25_deg).WithTimeout(1_s),
-      frc2::cmd::Run([this] { m_drivetrain.TankDrive(0.25, 0.25, false); },
-                     {&m_drivetrain})
-          .WithTimeout(0.05_s),
+      m_arm.LowAngleCommand().WithTimeout(3_s),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }),
       // Get arm back into intake.
-      m_arm.IntakeCommand(10_deg).WithTimeout(1_s),
+      m_arm.IntakeCommand().WithTimeout(1_s),
       frc2::cmd::Run([this] {
         m_arm.SetNeckVoltage(-0.2_V);
       }).WithTimeout(0.8_s),
       frc2::cmd::RunOnce([this] {
         m_intake.SetIntakeOn(true);
       }).WithTimeout(0.1_s),
+      frc2::cmd::Run([this] { m_drivetrain.TankDrive(-0.4, -0.4, false); },
+                     {&m_drivetrain})
+          .WithTimeout(4.5_s));
+
+  frc2::CommandPtr placeHighCommand = frc2::cmd::Sequence(
+      frc2::cmd::RunOnce([this] { m_intake.SetIntakeOn(false); }),
+      frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
+      m_arm.HighAngleCommand().WithTimeout(3_s),
+      frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}),
+      m_arm.HighAngleCommand().WithTimeout(1_s),
+      frc2::cmd::Run([this] { m_drivetrain.TankDrive(0.25, 0.25, false); },
+                     {&m_drivetrain})
+          .WithTimeout(0.05_s),
+      frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }),
+      // Get arm back into intake.
+      m_arm.IntakeCommand().WithTimeout(1_s), frc2::cmd::Run([this] {
+                                                m_arm.SetNeckVoltage(-0.2_V);
+                                              }).WithTimeout(0.8_s),
+      frc2::cmd::RunOnce([this] {
+        m_intake.SetIntakeOn(true);
+      }).WithTimeout(0.1_s),
       frc2::cmd::RunOnce([this] { m_arm.SetLegOut(false); }, {&m_arm}),
       frc2::cmd::Parallel(
-          m_arm.IntakeCommand(10_deg).WithTimeout(1_s),
+          m_arm.IntakeCommand().WithTimeout(1_s),
           frc2::cmd::Run([this] { m_drivetrain.TankDrive(-0.8, -0.8, false); },
                          {&m_drivetrain})
               .WithTimeout(1.75_s)));
