@@ -81,6 +81,13 @@ void RobotContainer::ConfigureBindings() {
   // toggle for intake
   m_driverController.A().WhileTrue(
       frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); }, {&m_intake}));
+  m_driverController.A().OnFalse(
+      frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
+
+  m_driverController.X().WhileTrue(
+      frc2::cmd::Run([this] { m_intake.ReverseIntakeMotors(); }, {&m_intake}));
+  m_driverController.X().OnFalse(
+      frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
   // toggle claw
   m_driverController.RightBumper().ToggleOnTrue(
       frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
@@ -121,10 +128,10 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
       m_arm.HighAngleCommand(25_deg).WithTimeout(3_s),
       frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}),
-      m_arm.HighAngleCommand(25_deg).WithTimeout(1_s),
-      frc2::cmd::Run([this] { m_drivetrain.TankDrive(0.25, 0.25, false); },
+      m_arm.HighAngleCommand(25_deg).WithTimeout(2_s),
+      frc2::cmd::Run([this] { m_drivetrain.TankDrive(0.15, 0.15, false); },
                      {&m_drivetrain})
-          .WithTimeout(0.05_s),
+          .WithTimeout(0.2_s),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }),
       // Get arm back into intake.
       m_arm.IntakeCommand(10_deg).WithTimeout(1_s),
