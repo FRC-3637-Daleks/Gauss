@@ -110,7 +110,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       frc2::cmd::RunOnce([this] {
         m_intake.SetIntakeOn(true);
       }).WithTimeout(0.1_s),
-      frc2::cmd::Run([this] { m_drivetrain.TankDrive(-0.4, -0.4, false); },
+      frc2::cmd::Run([this] { m_drivetrain.TankDrive(-3.2_fps, -3.2_fps); },
                      {&m_drivetrain})
           .WithTimeout(4.5_s));
 
@@ -120,7 +120,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       m_arm.HighAngleCommand().WithTimeout(3_s),
       frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}),
       m_arm.HighAngleCommand().WithTimeout(1_s),
-      frc2::cmd::Run([this] { m_drivetrain.TankDrive(0.25, 0.25, false); },
+      frc2::cmd::Run([this] { m_drivetrain.TankDrive(2_fps, 2_fps); },
                      {&m_drivetrain})
           .WithTimeout(0.05_s),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }),
@@ -134,8 +134,9 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       frc2::cmd::RunOnce([this] { m_arm.SetLegOut(false); }, {&m_arm}),
       frc2::cmd::Parallel(
           m_arm.IntakeCommand().WithTimeout(1_s),
-          frc2::cmd::Run([this] { m_drivetrain.TankDrive(-0.8, -0.8, false); },
+          frc2::cmd::Run([this] { m_drivetrain.TankDrive(-6.4_fps, -6.4_fps); },
                          {&m_drivetrain})
               .WithTimeout(1.75_s)));
 
   return placeHighCommand;
+}
