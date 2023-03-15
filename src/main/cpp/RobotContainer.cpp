@@ -77,9 +77,15 @@ void RobotContainer::ConfigureBindings() {
   m_driverController.Y().WhileTrue(m_arm.HighAngleCommand());
   // When the left bumper is clicked, it will open all the pistons
   // toggle for intake
-  m_driverController.A().ToggleOnTrue(frc2::cmd::StartEnd(
-      [this] { m_intake.SetIntakeOn(true); },
-      [this] { m_intake.SetIntakeOn(false); }, {&m_intake}));
+  m_driverController.A().WhileTrue(
+      frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); }, {&m_intake}));
+  m_driverController.A().OnFalse(
+      frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
+
+  m_driverController.X().WhileTrue(
+      frc2::cmd::Run([this] { m_intake.ReverseIntakeMotors(); }, {&m_intake}));
+  m_driverController.X().OnFalse(
+      frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
   // toggle claw
   m_driverController.RightBumper().ToggleOnTrue(
       frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
@@ -120,9 +126,9 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       m_arm.HighAngleCommand().WithTimeout(3_s),
       frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}),
       m_arm.HighAngleCommand().WithTimeout(1_s),
-      frc2::cmd::Run([this] { m_drivetrain.TankDrive(2_fps, 2_fps); },
+      frc2::cmd::Run([this] { m_drivetrain.TankDrive(1.2_fps, 1.2_fps); },
                      {&m_drivetrain})
-          .WithTimeout(0.05_s),
+          .WithTimeout(0.2_s),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }),
       // Get arm back into intake.
       m_arm.IntakeCommand().WithTimeout(1_s), frc2::cmd::Run([this] {

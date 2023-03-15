@@ -19,15 +19,25 @@ Intake::Intake()
 void Intake::Log() {
   frc::SmartDashboard::PutBoolean("Intake Pistons", m_intakePiston.Get());
   frc::SmartDashboard::PutNumber("RangeFinder", this->GetRangefinder());
-  frc::SmartDashboard::PutBoolean("Pistion Disabled",
+  frc::SmartDashboard::PutBoolean("Piston Disabled",
                                   m_intakePiston.IsDisabled());
 }
 
 void Intake::SetIntakeOn(bool SetPiston) { m_intakePiston.Set(SetPiston); }
 
 void Intake::SetIntakeMotors() {
-  m_leftIntakeMotor.Set(IntakeConstants::kIntakeMotorSpeed);
+  m_leftIntakeMotor.Set(IntakeConstants::kIntakeMotorSpeedReversed);
   m_rightIntakeMotor.Set(IntakeConstants::kIntakeMotorSpeed);
+}
+
+void Intake::ReverseIntakeMotors() {
+  m_leftIntakeMotor.Set(-IntakeConstants::kIntakeMotorSpeedReversed);
+  m_rightIntakeMotor.Set(-IntakeConstants::kIntakeMotorSpeed);
+}
+
+void Intake::StopIntakeMotors() {
+  m_leftIntakeMotor.Set(0);
+  m_rightIntakeMotor.Set(0);
 }
 
 bool Intake::ReadyToPickUp() {
@@ -37,12 +47,6 @@ bool Intake::ReadyToPickUp() {
   }
   return false;
   // implications needed after testing
-}
-
-void Intake::DetectionIntake() {
-  if(ReadyToPickUp()) {
-    SetIntakeMotors();
-  }
 }
 
 double Intake::GetRangefinder() { return m_rangefinder.GetVoltage(); }

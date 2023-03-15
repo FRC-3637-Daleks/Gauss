@@ -157,11 +157,12 @@ constexpr auto kSubstationShelf = 100_deg;
 namespace IntakeConstants {
 constexpr int kPCMPort = 5;
 constexpr int kPistonPort = 0;
-constexpr int kLeftMotorPort = 15;
-constexpr int kRightMotorPort = 16;
+constexpr int kLeftMotorPort = 10;
+constexpr int kRightMotorPort = 9;
 constexpr int kRangefinderPort = 0;
 
 constexpr double kIntakeMotorSpeed = 0.5;
+constexpr double kIntakeMotorSpeedReversed = -0.5;
 constexpr int pickUpRangeCone = 0;
 constexpr int pickUpRangeCube = 0;
 } // namespace IntakeConstants
