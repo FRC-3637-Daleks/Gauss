@@ -2,7 +2,7 @@
 
 #include <frc/AnalogInput.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/Command.h>
+#include <frc2/command/Commands.h>
 
 using namespace ArmConstants;
 
@@ -37,10 +37,17 @@ void Arm::SetNeckVoltage(units::volt_t output) {
 }
 
 frc2::CommandPtr Arm::ResetSwitchCommand() {
-  return frc2::Subsystem::Run([this] { SetNeckVoltage(-1_V); })
-      .Until([this]() -> bool { return m_limitSwitch.Get(); })
-      .WithTimeout(1_s)
-      .AndThen([this] { ZeroNeck(); });
+  return frc2::cmd::Sequence(
+      frc2::cmd::Run(
+          [this] {
+            m_motor.SetVoltage(1.5_V);
+            frc::SmartDashboard::PutNumber("neck voltage", -69);
+          },
+          {this})
+          .Until([this]() -> bool { return m_limitSwitch.Get(); })
+          .WithTimeout(3_s),
+      frc2::cmd::RunOnce([this] { SetNeckVoltage(0_V); }, {this}),
+      frc2::cmd::RunOnce([this] { ZeroNeck(); }, {this}));
 }
 
 frc2::CommandPtr Arm::LowAngleCommand() {

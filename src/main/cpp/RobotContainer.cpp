@@ -73,6 +73,10 @@ void RobotContainer::ConfigureBindings() {
   m_rightJoystick.Button(3).WhileTrue(
       m_drivetrain.DriveToDistanceCommand(3_ft));
 
+  m_rightJoystick.Button(4).WhileTrue(m_drivetrain.TurnToAngleCommand(90_deg));
+
+  m_rightJoystick.Button(5).OnTrue(m_arm.ResetSwitchCommand());
+
   m_driverController.B().WhileTrue(m_arm.LowAngleCommand());
   m_driverController.Y().WhileTrue(m_arm.HighAngleCommand());
   // When the left bumper is clicked, it will open all the pistons
@@ -99,7 +103,7 @@ void RobotContainer::ConfigureBindings() {
   // Reset the arm if the limit switch gets accidentally tripped. (or if Arm
   // angle returns less than Physical Lower Bound or greater than Physical Upper
   // Bound)
-  m_armResetTrigger.Debounce(100_ms).WhileTrue(m_arm.ResetSwitchCommand());
+  //   m_armResetTrigger.Debounce(100_ms).WhileTrue(m_arm.ResetSwitchCommand());
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
@@ -123,23 +127,20 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   frc2::CommandPtr placeHighCommand = frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { m_intake.SetIntakeOn(false); }),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
-      m_arm.HighAngleCommand().WithTimeout(3_s),
+      m_arm.HighAngleCommand().WithTimeout(1.5_s),
       frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}),
-      m_arm.HighAngleCommand().WithTimeout(1_s),
-      frc2::cmd::Run([this] { m_drivetrain.TankDrive(1.2_fps, 1.2_fps); },
-                     {&m_drivetrain})
-          .WithTimeout(0.2_s),
+      m_arm.HighAngleCommand().WithTimeout(2.5_s),
+      frc2::cmd::Race(
+          frc2::cmd::Run([this] { m_drivetrain.TankDrive(1_fps, 1_fps); },
+                         {&m_drivetrain})
+              .WithTimeout(0.5_s),
+          m_arm.HighAngleCommand()),
+      frc2::cmd::Wait(1_s),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }),
-      // Get arm back into intake.
-      m_arm.IntakeCommand().WithTimeout(1_s), frc2::cmd::Run([this] {
-                                                m_arm.SetNeckVoltage(-0.2_V);
-                                              }).WithTimeout(0.8_s),
-      frc2::cmd::RunOnce([this] {
-        m_intake.SetIntakeOn(true);
-      }).WithTimeout(0.1_s),
-      frc2::cmd::RunOnce([this] { m_arm.SetLegOut(false); }, {&m_arm}),
-      frc2::cmd::Parallel(
-          m_arm.IntakeCommand().WithTimeout(1_s),
+      frc2::cmd::Wait(0.1_s),
+      frc2::cmd::RunOnce([this] { m_arm.SetLegOut(false); }),
+      frc2::cmd::Race(
+          m_arm.IntakeCommand(),
           frc2::cmd::Run([this] { m_drivetrain.TankDrive(-6.4_fps, -6.4_fps); },
                          {&m_drivetrain})
               .WithTimeout(1.75_s)));

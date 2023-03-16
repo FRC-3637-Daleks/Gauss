@@ -55,6 +55,15 @@ void DalekDrive::Log() {
                                  m_rightFront.GetMotorOutputVoltage());
   frc::SmartDashboard::PutNumber("Left Voltage",
                                  m_leftFront.GetMotorOutputVoltage());
+
+  frc::SmartDashboard::PutNumber("Left Front Temperature",
+                                 m_leftFront.GetTemperature());
+  frc::SmartDashboard::PutNumber("Left FollowerTemperature",
+                                 m_leftFollower.GetTemperature());
+  frc::SmartDashboard::PutNumber("Right Front Temperature",
+                                 m_rightFront.GetTemperature());
+  frc::SmartDashboard::PutNumber("Right Follower Temperature",
+                                 m_rightFollower.GetTemperature());
 }
 
 void DalekDrive::InitDriveMotors() {
@@ -157,12 +166,15 @@ frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
              // Set controller input to current heading.
              [this, &target] {
                Reset();
-               m_turnController.SetGoal(target);
+               m_turnController.SetGoal(180_deg);
                m_turnController.Reset(GetHeading());
              },
              // Use output from PID controller to turn robot.
              [this] {
                double output = m_turnController.Calculate(GetHeading());
+               frc::SmartDashboard::PutNumber(
+                   "TurnToAngle Measurement",
+                   m_turnController.GetPositionError().value());
                frc::SmartDashboard::PutNumber("TurnToAngle Output", output);
                frc::SmartDashboard::PutNumber(
                    "TurnToAngle Setpoint",

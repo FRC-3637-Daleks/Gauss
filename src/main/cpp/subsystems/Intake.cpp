@@ -8,9 +8,9 @@ Intake::Intake()
       m_leftIntakeMotor{IntakeConstants::kLeftMotorPort},
       m_rightIntakeMotor{IntakeConstants::kRightMotorPort} {
 
-  cs::UsbCamera intakeCamera = frc::CameraServer::StartAutomaticCapture();
-  intakeCamera.SetResolution(240, 160);
-  intakeCamera.SetFPS(10);
+  // cs::UsbCamera intakeCamera = frc::CameraServer::StartAutomaticCapture();
+  // intakeCamera.SetResolution(240, 160);
+  // intakeCamera.SetFPS(10);
   // intakeCamera.SetCompression(50);
   m_intakePiston.Set(false);
   this->Periodic();

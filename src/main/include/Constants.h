@@ -102,8 +102,8 @@ constexpr double kPRightStraight = 0.2;
 constexpr auto kTurnTolerance = 5_deg;
 constexpr auto kTurnRateTolerance = 5_deg_per_s;
 
-constexpr auto kMaxTurnRate = std::numbers::pi * 1_rad_per_s;
-constexpr auto kMaxTurnAcceleration = std::numbers::pi * 1_rad_per_s_sq;
+constexpr auto kMaxTurnRate = 1 * std::numbers::pi * 1_rad_per_s;
+constexpr auto kMaxTurnAcceleration = 1 * std::numbers::pi * 1_rad_per_s_sq;
 } // namespace DriveConstants
 
 namespace ClawConstants {
