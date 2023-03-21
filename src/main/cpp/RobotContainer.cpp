@@ -124,7 +124,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
                      {&m_drivetrain})
           .WithTimeout(4.5_s));
 
-  frc2::CommandPtr placeHighCommand = frc2::cmd::Sequence(
+  frc2::CommandPtr placeHighCubeCommand = frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { m_intake.SetIntakeOn(false); }),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
       m_arm.HighAngleCommand().WithTimeout(1.5_s),
@@ -143,7 +143,34 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           m_arm.IntakeCommand(),
           frc2::cmd::Run([this] { m_drivetrain.TankDrive(-6.4_fps, -6.4_fps); },
                          {&m_drivetrain})
+              .WithTimeout(1.75_s))
+      //   frc2::cmd::Run([this] { m_drivetrain.TurnToAngleCommand(180_deg); },
+      //                  {&m_drivetrain})
+      //       .WithTimeout(2.5_s)
+  );
+
+  frc2::CommandPtr placeHighConeCommand = frc2::cmd::Sequence(
+      frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
+      frc2::cmd::Race(
+          frc2::cmd::Run([this] { m_intake.ReverseIntakeMotors(); }),
+          m_arm.HighAngleCommand().WithTimeout(3_s)),
+      frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }),
+      frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}),
+      m_arm.HighAngleCommand().WithTimeout(2.5_s),
+      frc2::cmd::Race(
+          frc2::cmd::Run([this] { m_drivetrain.TankDrive(1_fps, 1_fps); },
+                         {&m_drivetrain})
+              .WithTimeout(0.8_s),
+          m_arm.HighAngleCommand()),
+      frc2::cmd::Wait(1_s), frc2::cmd::RunOnce([this] {
+                              m_claw.SetPosition(true);
+                            }).WithTimeout(0.1_s),
+      frc2::cmd::RunOnce([this] { m_arm.SetLegOut(false); }),
+      frc2::cmd::Race(
+          m_arm.IntakeCommand(),
+          frc2::cmd::Run([this] { m_drivetrain.TankDrive(-6.4_fps, -6.4_fps); },
+                         {&m_drivetrain})
               .WithTimeout(1.75_s)));
 
-  return placeHighCommand;
+  return placeHighConeCommand;
 }

@@ -76,7 +76,7 @@ frc2::CommandPtr Arm::LowAngleCommand() {
 frc2::CommandPtr Arm::MidAngleCommand() {
   return frc2::Subsystem::RunOnce([this]() {
            m_neckController.Reset(GetNeckAngle());
-           m_neckController.SetGoal(101_deg);
+           m_neckController.SetGoal(65_deg);
          })
       .AndThen(frc2::Subsystem::RunEnd(
           // Sets motor output.
@@ -99,7 +99,7 @@ frc2::CommandPtr Arm::MidAngleCommand() {
 frc2::CommandPtr Arm::HighAngleCommand() {
   return frc2::Subsystem::RunOnce([this]() {
            m_neckController.Reset(GetNeckAngle());
-           m_neckController.SetGoal(95_deg);
+           m_neckController.SetGoal(110_deg);
          })
       .AndThen(frc2::Subsystem::RunEnd(
           // Sets motor output.
