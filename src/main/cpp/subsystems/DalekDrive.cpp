@@ -198,7 +198,7 @@ frc2::CommandPtr DalekDrive::HalfTurnCommand() {
              // Use output from PID controller to turn robot.
              [this] {
                double output =
-                   m_turnController.Calculate(GetHeading(), 180_deg);
+                   m_turnController.Calculate(GetHeading(), 170_deg);
                ArcadeDrive(0, output, false);
              },
              // Stop robot.

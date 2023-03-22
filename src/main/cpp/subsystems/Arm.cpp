@@ -9,10 +9,10 @@ using namespace ArmConstants;
 Arm::Arm()
     : m_solenoid{kPCMId, frc::PneumaticsModuleType::CTREPCM, kPistonChannel},
       m_motor{kMotorId},
-      m_neckController{kP, 0.0, 0.0, {kMaxTurnVelocity, kMaxTurnAcceleration}},
+      m_neckController{kP, kI, 0.0, {kMaxTurnVelocity, kMaxTurnAcceleration}},
       m_limitSwitch{kLimitSwitchChannel} {
   m_neckController.SetTolerance(1_deg, 3_deg_per_s);
-  m_neckController.SetIntegratorRange(0, 1);
+  m_neckController.SetIntegratorRange(0, 3);
   m_motor.ConfigOpenloopRamp(0.5);
   // m_compressor.EnableDigital();
 }
@@ -61,6 +61,8 @@ frc2::CommandPtr Arm::LowAngleCommand() {
             auto output = 1_V * m_neckController.Calculate(GetNeckAngle());
             SetNeckVoltage(output);
             frc::SmartDashboard::PutNumber("Arm PID output", output.value());
+            frc::SmartDashboard::PutNumber("Arm PID measurement",
+                                           GetNeckAngle().value());
             frc::SmartDashboard::PutNumber(
                 "Arm PID setpoint",
                 m_neckController.GetSetpoint().position.value());
@@ -70,7 +72,10 @@ frc2::CommandPtr Arm::LowAngleCommand() {
                 "Arm PID error", m_neckController.GetPositionError().value());
           },
           // Set output to zero when done.
-          [this]() { SetNeckVoltage(0_V); }));
+          [this]() {
+            fmt::print("hii");
+            SetNeckVoltage(0_V);
+          }));
 }
 
 frc2::CommandPtr Arm::MidAngleCommand() {
@@ -99,13 +104,15 @@ frc2::CommandPtr Arm::MidAngleCommand() {
 frc2::CommandPtr Arm::HighAngleCommand() {
   return frc2::Subsystem::RunOnce([this]() {
            m_neckController.Reset(GetNeckAngle());
-           m_neckController.SetGoal(110_deg);
+           m_neckController.SetGoal(120_deg);
          })
       .AndThen(frc2::Subsystem::RunEnd(
           // Sets motor output.
           [this]() {
             auto output = 1_V * m_neckController.Calculate(GetNeckAngle());
             SetNeckVoltage(output);
+            frc::SmartDashboard::PutNumber("Arm PID measurement",
+                                           GetNeckAngle().value());
             frc::SmartDashboard::PutNumber("Arm PID output", output.value());
             frc::SmartDashboard::PutNumber(
                 "Arm PID setpoint",

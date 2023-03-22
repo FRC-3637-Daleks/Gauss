@@ -73,7 +73,8 @@ void RobotContainer::ConfigureBindings() {
   m_rightJoystick.Button(3).WhileTrue(
       m_drivetrain.DriveToDistanceCommand(3_ft));
 
-  m_rightJoystick.Button(4).WhileTrue(m_drivetrain.TurnToAngleCommand(90_deg));
+  m_rightJoystick.Button(4).OnTrue(
+      m_drivetrain.HalfTurnCommand().WithTimeout(5_s));
 
   m_rightJoystick.Button(5).OnTrue(m_arm.ResetSwitchCommand());
 
@@ -153,7 +154,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
       frc2::cmd::Race(
           frc2::cmd::Run([this] { m_intake.ReverseIntakeMotors(); }),
-          m_arm.HighAngleCommand().WithTimeout(3_s)),
+          m_arm.HighAngleCommand().WithTimeout(2_s)),
       frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }),
       frc2::cmd::RunOnce([this] { m_arm.SetLegOut(true); }, {&m_arm}),
       m_arm.HighAngleCommand().WithTimeout(2.5_s),
@@ -170,7 +171,18 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           m_arm.IntakeCommand(),
           frc2::cmd::Run([this] { m_drivetrain.TankDrive(-6.4_fps, -6.4_fps); },
                          {&m_drivetrain})
-              .WithTimeout(1.75_s)));
+              .WithTimeout(1.75_s)),
+      m_drivetrain.HalfTurnCommand().WithTimeout(2_s),
+      frc2::cmd::Race(m_arm.LowAngleCommand(),
+                      frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); }),
+                      frc2::cmd::Run([this] {
+                        m_drivetrain.TankDrive(3_fps, 3_fps);
+                      }).WithTimeout(2_s)),
+      frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }),
+      m_arm.IntakeCommand().WithTimeout(1.5_s),
+      frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); })
+
+  );
 
   return placeHighConeCommand;
 }

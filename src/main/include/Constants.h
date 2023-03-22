@@ -32,13 +32,13 @@ constexpr auto kNeckPhysicalUpperBound = 120_deg;
 // constexpr double kVoltToLengthConversionFactor = 6.41;
 
 // PID Loop
-constexpr double kP = 10;
-constexpr double kI = 1;
+constexpr double kP = 8;
+constexpr double kI = 2;
 constexpr double kD = 0;
 constexpr double kIz = 5;
 
-constexpr auto kMaxTurnVelocity = 0.2 * std::numbers::pi * 1_rad_per_s;
-constexpr auto kMaxTurnAcceleration = 0.5 * std::numbers::pi * 1_rad_per_s_sq;
+constexpr auto kMaxTurnVelocity = 0.5 * std::numbers::pi * 1_rad_per_s;
+constexpr auto kMaxTurnAcceleration = std::numbers::pi * 1_rad_per_s_sq;
 
 constexpr bool kEncoderReversed = true;
 constexpr int kEncoderCPR = 2048;
@@ -92,15 +92,15 @@ constexpr double kIzDriveSpeed = 1000;
 constexpr double kIBrake = 0.0001;
 
 // NOTE: Guess value!
-constexpr double kPTurn = 3;
+constexpr double kPTurn = 2;
 constexpr double kPDistance = 2;
 constexpr auto kDistanceTolerance = 7_cm;
 
 constexpr double kPLeftStraight = 0.2;
 constexpr double kPRightStraight = 0.2;
 
-constexpr auto kTurnTolerance = 5_deg;
-constexpr auto kTurnRateTolerance = 5_deg_per_s;
+constexpr auto kTurnTolerance = 3_deg;
+constexpr auto kTurnRateTolerance = 1_deg_per_s;
 
 constexpr auto kMaxTurnRate = 1 * std::numbers::pi * 1_rad_per_s;
 constexpr auto kMaxTurnAcceleration = 1 * std::numbers::pi * 1_rad_per_s_sq;
