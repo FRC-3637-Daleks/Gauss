@@ -196,7 +196,7 @@ frc2::CommandPtr DalekDrive::BrakeCommand() {
 //       .ToPtr();
 // }
 
-frc2::CommandPtr DalekDrive::HalfTurnCommand() {
+frc2::CommandPtr DalekDrive::TurnTo170Command() {
   return frc2::FunctionalCommand(
              // Set controller input to current heading.
              [this] {
@@ -215,7 +215,26 @@ frc2::CommandPtr DalekDrive::HalfTurnCommand() {
       .ToPtr();
 }
 
-frc2::CommandPtr DalekDrive::TurnToZeroCommand() {
+frc2::CommandPtr DalekDrive::TurnTo180Command() {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this] {
+               Reset();
+               m_turnController.Reset(GetHeading());
+             },
+             // Use output from PID controller to turn robot.
+             [this] {
+               double output =
+                   m_turnController.Calculate(GetHeading(), 185_deg);
+               ArcadeDrive(0, output, false);
+             },
+             // Stop robot.
+             [this](bool) -> void { ArcadeDrive(0, 0, false); },
+             [this]() -> bool { return m_turnController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
+frc2::CommandPtr DalekDrive::TurnTo185Command() {
   return frc2::FunctionalCommand(
              // Set controller input to current heading.
              [this] {

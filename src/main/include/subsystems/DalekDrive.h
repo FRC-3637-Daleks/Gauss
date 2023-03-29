@@ -40,9 +40,11 @@ public:
 
   // frc2::CommandPtr TurnToAngleCommand(units::degree_t target);
 
-  frc2::CommandPtr HalfTurnCommand();
+  frc2::CommandPtr TurnTo170Command();
 
-  frc2::CommandPtr TurnToZeroCommand();
+  frc2::CommandPtr TurnTo180Command();
+
+  frc2::CommandPtr TurnTo185Command();
 
   frc2::CommandPtr TestTurnToAngleCommand(units::degree_t target);
 
