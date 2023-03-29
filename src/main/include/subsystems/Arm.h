@@ -41,6 +41,8 @@ public:
 
   frc2::CommandPtr SubstationCommand();
 
+  frc2::CommandPtr IntakeCommand(frc::Rotation2d target);
+
   void Log();
 
   void Periodic();
