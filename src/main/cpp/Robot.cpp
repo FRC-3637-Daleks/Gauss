@@ -4,6 +4,7 @@
 
 #include "Robot.h"
 
+#include <frc2/command/CommandBase.h>
 #include <frc2/command/CommandScheduler.h>
 
 void Robot::RobotInit() {}
@@ -33,7 +34,6 @@ void Robot::DisabledPeriodic() {}
  */
 void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
-
   if (m_autonomousCommand) {
     m_autonomousCommand->Schedule();
   }

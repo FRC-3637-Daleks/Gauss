@@ -37,6 +37,10 @@ public:
 
   frc2::CommandPtr HighAngleCommand();
 
+  frc2::CommandPtr AlternateHighAngleCommand();
+
+  frc2::CommandPtr HigherAngleCommand();
+
   frc2::CommandPtr IntakeCommand();
 
   frc2::CommandPtr SubstationCommand();

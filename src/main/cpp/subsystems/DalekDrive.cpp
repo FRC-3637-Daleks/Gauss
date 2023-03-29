@@ -169,32 +169,32 @@ frc2::CommandPtr DalekDrive::BrakeCommand() {
           {this}));
 }
 
-frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
-  return frc2::FunctionalCommand(
-             // Set controller input to current heading.
-             [this, &target] {
-               Reset();
-               m_turnController.SetGoal(180_deg);
-               m_turnController.Reset(GetHeading());
-             },
-             // Use output from PID controller to turn robot.
-             [this] {
-               double output = m_turnController.Calculate(GetHeading());
-               frc::SmartDashboard::PutNumber(
-                   "TurnToAngle Measurement",
-                   m_turnController.GetPositionError().value());
-               frc::SmartDashboard::PutNumber("TurnToAngle Output", output);
-               frc::SmartDashboard::PutNumber(
-                   "TurnToAngle Setpoint",
-                   m_turnController.GetSetpoint().position.value());
-               fmt::print("output: {}\n", output);
-               ArcadeDrive(0, output, false);
-             },
-             // Stop robot.
-             [this](bool) -> void { ArcadeDrive(0, 0, false); },
-             [this]() -> bool { return m_turnController.AtGoal(); }, {this})
-      .ToPtr();
-}
+// frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
+//   return frc2::FunctionalCommand(
+//              // Set controller input to current heading.
+//              [this, &target] {
+//                Reset();
+//                m_turnController.SetGoal(target);
+//                m_turnController.Reset(GetHeading());
+//              },
+//              // Use output from PID controller to turn robot.
+//              [this] {
+//                double output = m_turnController.Calculate(GetHeading());
+//                frc::SmartDashboard::PutNumber(
+//                    "TurnToAngle Measurement",
+//                    m_turnController.GetPositionError().value());
+//                frc::SmartDashboard::PutNumber("TurnToAngle Output", output);
+//                frc::SmartDashboard::PutNumber(
+//                    "TurnToAngle Setpoint",
+//                    m_turnController.GetSetpoint().position.value());
+//                fmt::print("output: {}\n", output);
+//                ArcadeDrive(0, output, false);
+//              },
+//              // Stop robot.
+//              [this](bool) -> void { ArcadeDrive(0, 0, false); },
+//              [this]() -> bool { return m_turnController.AtGoal(); }, {this})
+//       .ToPtr();
+// }
 
 frc2::CommandPtr DalekDrive::HalfTurnCommand() {
   return frc2::FunctionalCommand(
@@ -213,6 +213,57 @@ frc2::CommandPtr DalekDrive::HalfTurnCommand() {
              [this](bool) -> void { ArcadeDrive(0, 0, false); },
              [this]() -> bool { return m_turnController.AtGoal(); }, {this})
       .ToPtr();
+}
+
+frc2::CommandPtr DalekDrive::TurnToZeroCommand() {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this] {
+               Reset();
+               m_turnController.Reset(GetHeading());
+             },
+             // Use output from PID controller to turn robot.
+             [this] {
+               double output =
+                   m_turnController.Calculate(GetHeading(), 185_deg);
+               ArcadeDrive(0, output, false);
+             },
+             // Stop robot.
+             [this](bool) -> void { ArcadeDrive(0, 0, false); },
+             [this]() -> bool { return m_turnController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
+frc2::CommandPtr DalekDrive::TestTurnToAngleCommand(units::degree_t target) {
+  return this
+      ->RunOnce(
+          // Set controller input to current heading.
+          [this] {
+            Reset();
+            m_turnController.Reset(GetHeading());
+          })
+      .AndThen(this->RunEnd(
+          // Use output from PID controller to turn robot.
+          [&] {
+            double output = m_turnController.Calculate(GetHeading(), target);
+            frc::SmartDashboard::PutNumber(
+                "TurnToAngle Measurement",
+                m_turnController.GetPositionError().value());
+            frc::SmartDashboard::PutNumber("TurnToAngle Output", output);
+            frc::SmartDashboard::PutNumber(
+                "TurnToAngle Setpoint",
+                m_turnController.GetSetpoint().position.value());
+            fmt::print("goal:{},{}\n",
+                       m_turnController.GetGoal().position.value(),
+                       target.value());
+            frc::SmartDashboard::PutNumber(
+                "TurnToAngle Goal",
+                m_turnController.GetGoal().position.value());
+            fmt::print("output: {}\n", output);
+            ArcadeDrive(0, output, false);
+          },
+          // Stop robot.
+          [this] { ArcadeDrive(0, 0, false); }));
 }
 
 frc2::CommandPtr
@@ -288,7 +339,8 @@ frc2::CommandPtr DalekDrive::BalanceCommand() {
                m_balanceController.SetSetpoint(0);
                m_balanceController.EnableContinuousInput(-180, 180);
              },
-             // Use output from PID controller to keep the robot balanced.
+             // Use output from PID controller to keep the robot
+             // balanced.
              [this]() {
                auto output = std::clamp<units::meters_per_second_t>(
                    units::meters_per_second_t{
