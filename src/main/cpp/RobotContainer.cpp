@@ -123,7 +123,7 @@ void RobotContainer::ConfigureBindings() {
   //   m_armResetTrigger.Debounce(100_ms).WhileTrue(m_arm.ResetSwitchCommand());
 }
 
-frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
+frc2::Command *RobotContainer::GetAutonomousCommand() {
   // XXX: Not tested!
   frc2::CommandPtr placeMidCubeCommand = frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
@@ -184,9 +184,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       frc2::cmd::Run([this] {
         m_intake.ReverseIntakeMotors();
       }).WithTimeout(0.5_s),
-      frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); })
-
-  );
+      frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }));
 
   frc2::CommandPtr placeHighConeCommandLeft = frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
@@ -232,9 +230,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       frc2::cmd::Run([this] {
         m_intake.ReverseIntakeMotors();
       }).WithTimeout(0.5_s),
-      frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); })
-
-  );
+      frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }));
 
   frc2::CommandPtr placeHighConeCommandRight = frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
@@ -280,9 +276,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       frc2::cmd::Run([this] {
         m_intake.ReverseIntakeMotors();
       }).WithTimeout(0.5_s),
-      frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); })
-
-  );
+      frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }));
 
   m_chooser.SetDefaultOption("Place High Cone Left",
                              placeHighConeCommandLeft.get());
@@ -290,6 +284,5 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   m_chooser.AddOption("Place High Cube", placeHighCubeCommand.get());
   m_chooser.AddOption("Place Low Cube", placeMidCubeCommand.get());
 
-  //   return m_chooser.GetSelected();
-  return placeHighConeCommandLeft;
+  return m_chooser.GetSelected();
 }

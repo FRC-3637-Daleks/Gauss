@@ -24,7 +24,7 @@ public:
   RobotContainer();
 
   // frc2::Command *GetAutonomousCommand();
-  frc2::CommandPtr GetAutonomousCommand();
+  frc2::Command *GetAutonomousCommand();
 
   frc::SendableChooser<frc2::Command *> m_chooser;
 

@@ -4,10 +4,19 @@
 
 #include "Robot.h"
 
+#include <frc/DataLogManager.h>
+#include <frc/DriverStation.h>
 #include <frc2/command/CommandBase.h>
 #include <frc2/command/CommandScheduler.h>
 
-void Robot::RobotInit() {}
+void Robot::RobotInit() {
+  // Start recording to data log
+  frc::DataLogManager::Start();
+
+  // Record DS control and joystick data.
+  // Change to `false` to not record joystick data.
+  frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog(), true);
+}
 
 /**
  * This function is called every 20 ms, no matter the mode. Use
@@ -34,7 +43,7 @@ void Robot::DisabledPeriodic() {}
  */
 void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
-  if (m_autonomousCommand) {
+  if (m_autonomousCommand != nullptr) {
     m_autonomousCommand->Schedule();
   }
 }
