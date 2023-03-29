@@ -76,10 +76,7 @@ constexpr double kTalonRampRate =
     0.5; // 0.5 seconds from neutral to full throttle.
 constexpr int kTalonTimeoutMs = 30;
 
-// NOTE: Temporary, for open loop drive command.
-constexpr double kMaxOutput = 0.5;
-
-constexpr auto kMaxSpeed = 8_fps;
+constexpr auto kMaxSpeed = 12_fps;
 constexpr auto kPreciseSpeed = 2_fps;
 
 // PID coefficients for closed-loop control of velocity.

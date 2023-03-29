@@ -28,11 +28,13 @@ public:
   void TankDrive(units::meters_per_second_t left,
                  units::meters_per_second_t right);
 
-  void PreciseDrive(double leftSpeed, double rightSpeed, bool squareInputs);
-
   void TankDrive(double leftSpeed, double rightSpeed, bool squareInputs);
 
+  void PreciseDrive(double leftSpeed, double rightSpeed, bool squareInputs);
+
   void ArcadeDrive(double forward, double rotation, bool squareInputs);
+
+  void PreciseArcadeDrive(double forward, double rotation, bool squareInputs);
 
   frc2::CommandPtr BrakeCommand();
 

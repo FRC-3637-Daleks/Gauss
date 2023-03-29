@@ -30,7 +30,15 @@ void RobotContainer::ConfigureBindings() {
       {&m_arm}));
 
   // Arcade controls.
-  m_rightJoystick.Button(1).OnTrue(frc2::cmd::Run(
+  m_rightJoystick.Button(1).WhileTrue(frc2::cmd::Run(
+      [this] {
+        m_drivetrain.ArcadeDrive(-m_leftJoystick.GetY(),
+                                 -m_rightJoystick.GetX(), true);
+      },
+      {&m_drivetrain}));
+
+  // Precise arcade controls when both triggers held.
+  (m_rightJoystick.Button(1) && m_leftJoystick.Button(1)).WhileTrue(frc2::cmd::Run(
       [this] {
         m_drivetrain.ArcadeDrive(-m_leftJoystick.GetY(),
                                  -m_rightJoystick.GetX(), true);
@@ -80,6 +88,12 @@ void RobotContainer::ConfigureBindings() {
 
   m_driverController.B().WhileTrue(m_arm.LowAngleCommand());
   m_driverController.Y().WhileTrue(m_arm.HighAngleCommand());
+  // D-pad up
+  frc2::Trigger{[&]() { return m_driverController.GetPOV() == 0; }}.WhileTrue(
+      m_arm.SubstationCommand());
+  // D-pad down
+  frc2::Trigger{[&]() { return m_driverController.GetPOV() == 180; }}.WhileTrue(
+      m_arm.IntakeCommand());
   // When the left bumper is clicked, it will open all the pistons
   // toggle for intake
   m_driverController.A().WhileTrue(

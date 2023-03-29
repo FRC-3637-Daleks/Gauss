@@ -51,11 +51,12 @@ frc2::CommandPtr Arm::ResetSwitchCommand() {
 }
 
 frc2::CommandPtr Arm::LowAngleCommand() {
-  return frc2::Subsystem::RunOnce([this]() {
-           m_neckController.Reset(GetNeckAngle());
-           m_neckController.SetGoal(50_deg);
-         })
-      .AndThen(frc2::Subsystem::RunEnd(
+  return this
+      ->RunOnce([this]() {
+        m_neckController.Reset(GetNeckAngle());
+        m_neckController.SetGoal(50_deg);
+      })
+      .AndThen(this->RunEnd(
           // Sets motor output.
           [this]() {
             auto output = 1_V * m_neckController.Calculate(GetNeckAngle());
@@ -79,11 +80,12 @@ frc2::CommandPtr Arm::LowAngleCommand() {
 }
 
 frc2::CommandPtr Arm::MidAngleCommand() {
-  return frc2::Subsystem::RunOnce([this]() {
-           m_neckController.Reset(GetNeckAngle());
-           m_neckController.SetGoal(65_deg);
-         })
-      .AndThen(frc2::Subsystem::RunEnd(
+  return this
+      ->RunOnce([this]() {
+        m_neckController.Reset(GetNeckAngle());
+        m_neckController.SetGoal(65_deg);
+      })
+      .AndThen(this->RunEnd(
           // Sets motor output.
           [this]() {
             auto output = 1_V * m_neckController.Calculate(GetNeckAngle());
@@ -102,11 +104,12 @@ frc2::CommandPtr Arm::MidAngleCommand() {
 }
 
 frc2::CommandPtr Arm::HighAngleCommand() {
-  return frc2::Subsystem::RunOnce([this]() {
-           m_neckController.Reset(GetNeckAngle());
-           m_neckController.SetGoal(120_deg);
-         })
-      .AndThen(frc2::Subsystem::RunEnd(
+  return this
+      ->RunOnce([this]() {
+        m_neckController.Reset(GetNeckAngle());
+        m_neckController.SetGoal(120_deg);
+      })
+      .AndThen(this->RunEnd(
           // Sets motor output.
           [this]() {
             auto output = 1_V * m_neckController.Calculate(GetNeckAngle());
@@ -127,15 +130,42 @@ frc2::CommandPtr Arm::HighAngleCommand() {
 }
 
 frc2::CommandPtr Arm::IntakeCommand() {
-  return frc2::Subsystem::RunOnce([this]() {
-           m_neckController.Reset(GetNeckAngle());
-           m_neckController.SetGoal(10_deg);
-         })
-      .AndThen(frc2::Subsystem::RunEnd(
+  return this
+      ->RunOnce([this]() {
+        m_neckController.Reset(GetNeckAngle());
+        m_neckController.SetGoal(10_deg);
+      })
+      .AndThen(this->RunEnd(
           // Sets motor output.
           [this]() {
             auto output = 1_V * m_neckController.Calculate(GetNeckAngle());
             SetNeckVoltage(output);
+            frc::SmartDashboard::PutNumber("Arm PID output", output.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID setpoint",
+                m_neckController.GetSetpoint().position.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID goal", m_neckController.GetGoal().position.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID error", m_neckController.GetPositionError().value());
+          },
+          // Set output to zero when done.
+          [this]() { SetNeckVoltage(0_V); }));
+}
+
+frc2::CommandPtr Arm::SubstationCommand() {
+  return this
+      ->RunOnce([this]() {
+        m_neckController.Reset(GetNeckAngle());
+        m_neckController.SetGoal(90_deg);
+      })
+      .AndThen(this->RunEnd(
+          // Sets motor output.
+          [this]() {
+            auto output = 1_V * m_neckController.Calculate(GetNeckAngle());
+            SetNeckVoltage(output);
+            frc::SmartDashboard::PutNumber("Arm PID measurement",
+                                           GetNeckAngle().value());
             frc::SmartDashboard::PutNumber("Arm PID output", output.value());
             frc::SmartDashboard::PutNumber(
                 "Arm PID setpoint",

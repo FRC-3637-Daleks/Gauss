@@ -28,7 +28,7 @@ DalekDrive::DalekDrive()
   m_turnController.EnableContinuousInput(-180_deg, 180_deg);
   m_turnController.SetTolerance(kTurnTolerance, kTurnRateTolerance);
 
-  m_drive.SetMaxOutput(kMaxOutput);
+  // m_drive.SetMaxOutput(kMaxOutput);
 
   InitDriveMotors();
 
@@ -138,6 +138,14 @@ void DalekDrive::ArcadeDrive(double forward, double rotation,
   auto [left, right] = m_drive.ArcadeDriveIK(forward, rotation, squareInputs);
 
   SetWheelSpeeds(left * kMaxSpeed, right * kMaxSpeed);
+  m_drive.Feed();
+}
+
+void DalekDrive::PreciseArcadeDrive(double forward, double rotation,
+                                    bool squareInputs) {
+  auto [left, right] = m_drive.ArcadeDriveIK(forward, rotation, squareInputs);
+
+  SetWheelSpeeds(left * kPreciseSpeed, right * kPreciseSpeed);
   m_drive.Feed();
 }
 

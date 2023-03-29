@@ -39,6 +39,8 @@ public:
 
   frc2::CommandPtr IntakeCommand();
 
+  frc2::CommandPtr SubstationCommand();
+
   void Log();
 
   void Periodic();
