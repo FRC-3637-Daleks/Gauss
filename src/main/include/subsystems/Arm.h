@@ -39,9 +39,15 @@ public:
 
   frc2::CommandPtr AlternateHighAngleCommand();
 
+  frc2::CommandPtr AlternateHighCubeAngleCommand();
+
   frc2::CommandPtr HigherAngleCommand();
 
   frc2::CommandPtr IntakeCommand();
+
+  frc2::CommandPtr SubstationCommand();
+
+  frc2::CommandPtr IntakeCommand(frc::Rotation2d target);
 
   void Log();
 

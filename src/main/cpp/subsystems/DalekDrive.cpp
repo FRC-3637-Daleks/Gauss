@@ -28,7 +28,7 @@ DalekDrive::DalekDrive()
   m_turnController.EnableContinuousInput(-180_deg, 180_deg);
   m_turnController.SetTolerance(kTurnTolerance, kTurnRateTolerance);
 
-  m_drive.SetMaxOutput(kMaxOutput);
+  // m_drive.SetMaxOutput(kMaxOutput);
 
   InitDriveMotors();
 
@@ -137,7 +137,15 @@ void DalekDrive::ArcadeDrive(double forward, double rotation,
                              bool squareInputs) {
   auto [left, right] = m_drive.ArcadeDriveIK(forward, rotation, squareInputs);
 
-  SetWheelSpeeds(left * kMaxSpeed, right * kMaxSpeed);
+  SetWheelSpeeds(left * kArcadeMaxSpeed, right * kArcadeMaxSpeed);
+  m_drive.Feed();
+}
+
+void DalekDrive::PreciseArcadeDrive(double forward, double rotation,
+                                    bool squareInputs) {
+  auto [left, right] = m_drive.ArcadeDriveIK(forward, rotation, squareInputs);
+
+  SetWheelSpeeds(left * kPreciseSpeed, right * kPreciseSpeed);
   m_drive.Feed();
 }
 
@@ -161,34 +169,53 @@ frc2::CommandPtr DalekDrive::BrakeCommand() {
           {this}));
 }
 
-// frc2::CommandPtr DalekDrive::TurnToAngleCommand(units::degree_t target) {
-//   return frc2::FunctionalCommand(
-//              // Set controller input to current heading.
-//              [this, &target] {
-//                Reset();
-//                m_turnController.SetGoal(target);
-//                m_turnController.Reset(GetHeading());
-//              },
-//              // Use output from PID controller to turn robot.
-//              [this] {
-//                double output = m_turnController.Calculate(GetHeading());
-//                frc::SmartDashboard::PutNumber(
-//                    "TurnToAngle Measurement",
-//                    m_turnController.GetPositionError().value());
-//                frc::SmartDashboard::PutNumber("TurnToAngle Output", output);
-//                frc::SmartDashboard::PutNumber(
-//                    "TurnToAngle Setpoint",
-//                    m_turnController.GetSetpoint().position.value());
-//                fmt::print("output: {}\n", output);
-//                ArcadeDrive(0, output, false);
-//              },
-//              // Stop robot.
-//              [this](bool) -> void { ArcadeDrive(0, 0, false); },
-//              [this]() -> bool { return m_turnController.AtGoal(); }, {this})
-//       .ToPtr();
-// }
+void DalekDrive::HackyArcadeDrive(double forward, double rotation,
+                                  bool squareInputs) {
+  auto [left, right] = m_drive.ArcadeDriveIK(forward, rotation, squareInputs);
 
-frc2::CommandPtr DalekDrive::HalfTurnCommand() {
+  SetWheelSpeeds(left * 8_fps, right * 8_fps);
+  m_drive.Feed();
+}
+
+frc2::CommandPtr DalekDrive::TurnTo175CWCommand() {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this] {
+               Reset();
+               m_turnController.Reset(GetHeading());
+             },
+             // Use output from PID controller to turn robot.
+             [this] {
+               double output =
+                   m_turnController.Calculate(GetHeading(), -175_deg);
+               HackyArcadeDrive(0, output, false);
+             },
+             // Stop robot.
+             [this](bool) -> void { HackyArcadeDrive(0, 0, false); },
+             [this]() -> bool { return m_turnController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
+frc2::CommandPtr DalekDrive::TurnTo185CWCommand() {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this] {
+               Reset();
+               m_turnController.Reset(GetHeading());
+             },
+             // Use output from PID controller to turn robot.
+             [this] {
+               double output =
+                   m_turnController.Calculate(GetHeading(), -185_deg);
+               HackyArcadeDrive(0, output, false);
+             },
+             // Stop robot.
+             [this](bool) -> void { HackyArcadeDrive(0, 0, false); },
+             [this]() -> bool { return m_turnController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
+frc2::CommandPtr DalekDrive::TurnTo170CCWCommand() {
   return frc2::FunctionalCommand(
              // Set controller input to current heading.
              [this] {
@@ -199,15 +226,15 @@ frc2::CommandPtr DalekDrive::HalfTurnCommand() {
              [this] {
                double output =
                    m_turnController.Calculate(GetHeading(), 170_deg);
-               ArcadeDrive(0, output, false);
+               HackyArcadeDrive(0, output, false);
              },
              // Stop robot.
-             [this](bool) -> void { ArcadeDrive(0, 0, false); },
+             [this](bool) -> void { HackyArcadeDrive(0, 0, false); },
              [this]() -> bool { return m_turnController.AtGoal(); }, {this})
       .ToPtr();
 }
 
-frc2::CommandPtr DalekDrive::TurnToZeroCommand() {
+frc2::CommandPtr DalekDrive::TurnTo180CCWCommand() {
   return frc2::FunctionalCommand(
              // Set controller input to current heading.
              [this] {
@@ -218,65 +245,29 @@ frc2::CommandPtr DalekDrive::TurnToZeroCommand() {
              [this] {
                double output =
                    m_turnController.Calculate(GetHeading(), 185_deg);
-               ArcadeDrive(0, output, false);
+               HackyArcadeDrive(0, output, false);
              },
              // Stop robot.
-             [this](bool) -> void { ArcadeDrive(0, 0, false); },
+             [this](bool) -> void { HackyArcadeDrive(0, 0, false); },
              [this]() -> bool { return m_turnController.AtGoal(); }, {this})
       .ToPtr();
 }
 
-frc2::CommandPtr DalekDrive::TestTurnToAngleCommand(units::degree_t target) {
-  return this
-      ->RunOnce(
-          // Set controller input to current heading.
-          [this] {
-            Reset();
-            m_turnController.Reset(GetHeading());
-          })
-      .AndThen(this->RunEnd(
-          // Use output from PID controller to turn robot.
-          [&] {
-            double output = m_turnController.Calculate(GetHeading(), target);
-            frc::SmartDashboard::PutNumber(
-                "TurnToAngle Measurement",
-                m_turnController.GetPositionError().value());
-            frc::SmartDashboard::PutNumber("TurnToAngle Output", output);
-            frc::SmartDashboard::PutNumber(
-                "TurnToAngle Setpoint",
-                m_turnController.GetSetpoint().position.value());
-            fmt::print("goal:{},{}\n",
-                       m_turnController.GetGoal().position.value(),
-                       target.value());
-            frc::SmartDashboard::PutNumber(
-                "TurnToAngle Goal",
-                m_turnController.GetGoal().position.value());
-            fmt::print("output: {}\n", output);
-            ArcadeDrive(0, output, false);
-          },
-          // Stop robot.
-          [this] { ArcadeDrive(0, 0, false); }));
-}
-
-frc2::CommandPtr
-DalekDrive::TurnToPoseCommand(std::function<double()> getForward,
-                              std::function<frc::Pose2d()> getTarget) {
+frc2::CommandPtr DalekDrive::TurnTo185CCWCommand() {
   return frc2::FunctionalCommand(
              // Set controller input to current heading.
-             [this] { m_turnController.Reset(GetHeading()); },
-             // Use output from PID controller to turn robot.
-             [this, &getForward, &getTarget] {
-               auto target = getTarget();
-               auto relativePose = target.RelativeTo(GetPose());
-               fmt::print("{} {}", relativePose.Rotation().Degrees().value(),
-                          target.Rotation().Degrees().value());
-               double output =
-                   m_turnController.Calculate(relativePose.Rotation().Radians(),
-                                              target.Rotation().Radians());
-               ArcadeDrive(getForward(), output, false);
+             [this] {
+               Reset();
+               m_turnController.Reset(GetHeading());
              },
-             // Stop robot
-             [this](bool) -> void { ArcadeDrive(0, 0, false); },
+             // Use output from PID controller to turn robot.
+             [this] {
+               double output =
+                   m_turnController.Calculate(GetHeading(), 185_deg);
+               HackyArcadeDrive(0, output, false);
+             },
+             // Stop robot.
+             [this](bool) -> void { HackyArcadeDrive(0, 0, false); },
              [this]() -> bool { return m_turnController.AtGoal(); }, {this})
       .ToPtr();
 }
