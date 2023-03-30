@@ -38,18 +38,17 @@ public:
 
   frc2::CommandPtr BrakeCommand();
 
-  // frc2::CommandPtr TurnToAngleCommand(units::degree_t target);
+  void HackyArcadeDrive(double forward, double rotation, bool squareInputs);
 
-  frc2::CommandPtr TurnTo170Command();
+  frc2::CommandPtr TurnTo175CWCommand();
 
-  frc2::CommandPtr TurnTo180Command();
+  frc2::CommandPtr TurnTo185CWCommand();
 
-  frc2::CommandPtr TurnTo185Command();
+  frc2::CommandPtr TurnTo170CCWCommand();
 
-  frc2::CommandPtr TestTurnToAngleCommand(units::degree_t target);
+  frc2::CommandPtr TurnTo180CCWCommand();
 
-  frc2::CommandPtr TurnToPoseCommand(std::function<double()> getForward,
-                                     std::function<frc::Pose2d()> getTarget);
+  frc2::CommandPtr TurnTo185CCWCommand();
 
   frc2::CommandPtr DriveToDistanceCommand(units::meter_t distance);
 

@@ -77,6 +77,7 @@ constexpr double kTalonRampRate =
 constexpr int kTalonTimeoutMs = 30;
 
 constexpr auto kMaxSpeed = 12_fps;
+constexpr auto kArcadeMaxSpeed = 10_fps;
 constexpr auto kPreciseSpeed = 2_fps;
 
 // PID coefficients for closed-loop control of velocity.

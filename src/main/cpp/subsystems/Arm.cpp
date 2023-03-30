@@ -159,6 +159,36 @@ frc2::CommandPtr Arm::AlternateHighAngleCommand() {
           [this]() { SetNeckVoltage(0_V); }));
 }
 
+frc2::CommandPtr Arm::AlternateHighCubeAngleCommand() {
+  return frc2::Subsystem::RunOnce([this]() {
+           m_neckController.Reset(GetNeckAngle());
+           m_neckController.SetGoal(110_deg);
+         })
+      .AndThen(frc2::Subsystem::RunEnd(
+          // Sets motor output.
+          [this]() {
+            auto rawAngle =
+                (kEncoderReversed ? -1.0 : 1.0) *
+                    units::radian_t{m_motor.GetSelectedSensorPosition() *
+                                    kEncoderRotationPerPulse} +
+                kOffset + kLegOffset;
+            auto output = 1_V * m_neckController.Calculate(rawAngle);
+            SetNeckVoltage(output);
+            frc::SmartDashboard::PutNumber("Arm PID measurement",
+                                           GetNeckAngle().value());
+            frc::SmartDashboard::PutNumber("Arm PID output", output.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID setpoint",
+                m_neckController.GetSetpoint().position.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID goal", m_neckController.GetGoal().position.value());
+            frc::SmartDashboard::PutNumber(
+                "Arm PID error", m_neckController.GetPositionError().value());
+          },
+          // Set output to zero when done.
+          [this]() { SetNeckVoltage(0_V); }));
+}
+
 frc2::CommandPtr Arm::HigherAngleCommand() {
   return frc2::Subsystem::RunOnce([this]() {
            m_neckController.Reset(GetNeckAngle());
@@ -247,16 +277,7 @@ frc2::CommandPtr Arm::SubstationCommand() {
 // }
 
 void Arm::Log() {
-  frc::SmartDashboard::PutBoolean("arm safe?", GetNeckAngle() > 5_deg);
-  frc::SmartDashboard::PutNumber(
-      "PID goal", units::degree_t{m_neckController.GetGoal().position}.value());
-  frc::SmartDashboard::PutNumber(
-      "PID error",
-      units::degree_t{m_neckController.GetPositionError()}.value());
-  frc::SmartDashboard::PutNumber(
-      "PID setpoint",
-      units::degree_t{m_neckController.GetSetpoint().position}.value());
-
+  frc::SmartDashboard::PutBoolean("ARM ZEROED?!", m_stopped);
   frc::SmartDashboard::PutBoolean("Switch tripped?", m_limitSwitch.Get());
   frc::SmartDashboard::PutBoolean("Legs Out?", IsLegOut());
   frc::SmartDashboard::PutNumber("Angle",
