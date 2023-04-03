@@ -8,7 +8,7 @@
 
 RobotContainer::RobotContainer() {
   frc::SmartDashboard::PutBoolean("Running SetNeckAngle", false);
-  frc::SmartDashboard::PutData(&m_chooser);
+  // frc::SmartDashboard::PutData(&m_chooser);
   frc::SmartDashboard::PutBoolean("CONE HIGH LEFT", false);
   frc::SmartDashboard::PutBoolean("CONE HIGH RIGHT", false);
   frc::SmartDashboard::PutBoolean("CUBE HIGH", false);
@@ -72,7 +72,10 @@ void RobotContainer::ConfigureBindings() {
       [this] { m_drivetrain.UpdatePIDValues(); }, {&m_drivetrain}));
 
   m_leftJoystick.Button(6).WhileTrue(frc2::cmd::Run(
-      [this] { m_drivetrain.TankDrive(1_mps, 1_mps); }, {&m_drivetrain}));
+      [this] { m_drivetrain.TankDrive(6.4_fps, 6.4_fps); }, {&m_drivetrain}));
+
+  m_leftJoystick.Button(7).WhileTrue(frc2::cmd::Run(
+      [this] { m_drivetrain.TankDrive(-6.4_fps, -6.4_fps); }, {&m_drivetrain}));
 
   // Slow drive
   (m_leftJoystick.Button(1) && !m_rightJoystick.Button(1))
@@ -89,8 +92,8 @@ void RobotContainer::ConfigureBindings() {
   m_rightJoystick.Button(3).WhileTrue(
       m_drivetrain.DriveToDistanceCommand(3_ft));
 
-  //   m_rightJoystick.Button(4).WhileTrue(
-  //       m_drivetrain.TestTurnToAngleCommand(180_deg).WithTimeout(5_s));
+  m_rightJoystick.Button(4).OnTrue(
+      m_drivetrain.TurnTo155CCWCommand().WithTimeout(2_s));
 
   m_rightJoystick.Button(5).OnTrue(m_arm.ResetSwitchCommand());
 
@@ -183,16 +186,9 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }),
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
       frc2::cmd::Race(m_drivetrain.TurnTo180CCWCommand().WithTimeout(2_s),
-                      frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); })),
-      frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }),
-      frc2::cmd::Race(m_arm.LowAngleCommand().WithTimeout(0.75_s),
-                      frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); })),
-      frc2::cmd::Run([this] {
-        m_intake.ReverseIntakeMotors();
-      }).WithTimeout(0.5_s),
-      frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }));
+                      frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); })));
 
-  frc2::CommandPtr placeHighConeCommandLeft = frc2::cmd::Sequence(
+  frc2::CommandPtr placeBlueLeftHighConeCommand = frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
       frc2::cmd::Race(
           m_arm.AlternateHighAngleCommand(),
@@ -209,7 +205,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
                   .WithTimeout(0.8_s),
               frc2::cmd::Run([this] {
                 m_arm.SetLegOut(true);
-              }).WithTimeout(0.5_s))),
+              }).WithTimeout(1.5_s))),
       frc2::cmd::Wait(1_s), frc2::cmd::RunOnce([this] {
                               m_claw.SetPosition(true);
                             }).WithTimeout(0.1_s),
@@ -219,7 +215,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           frc2::cmd::Run([this] { m_drivetrain.TankDrive(-6.4_fps, -6.4_fps); },
                          {&m_drivetrain})
               .WithTimeout(1.75_s)),
-      m_drivetrain.TurnTo170CCWCommand().WithTimeout(2_s),
+      m_drivetrain.TurnTo155CCWCommand().WithTimeout(2_s),
       frc2::cmd::Race(m_arm.LowAngleCommand(),
                       frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); }),
                       frc2::cmd::Run([this] {
@@ -231,17 +227,9 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       //   frc2::cmd::Race(m_drivetrain.TurnTo185Command().WithTimeout(2_s),
       //                   frc2::cmd::Run([this] { m_intake.SetIntakeMotors();
       //                   })),
-      m_drivetrain.TurnTo185CCWCommand().WithTimeout(2_s),
-      frc2::cmd::RunOnce([this] { m_claw.SetPosition(true); }),
-      frc2::cmd::Wait(0.5_s),
-      frc2::cmd::Race(m_arm.LowAngleCommand().WithTimeout(0.75_s),
-                      frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); })),
-      frc2::cmd::Run([this] {
-        m_intake.ReverseIntakeMotors();
-      }).WithTimeout(0.5_s),
-      frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }));
+      m_drivetrain.TurnTo185CCWCommand().WithTimeout(2_s));
 
-  frc2::CommandPtr placeHighConeCommandRight = frc2::cmd::Sequence(
+  frc2::CommandPtr placeHighConeCommandNoSpin = frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
       frc2::cmd::Race(
           m_arm.AlternateHighAngleCommand(),
@@ -258,7 +246,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
                   .WithTimeout(0.8_s),
               frc2::cmd::Run([this] {
                 m_arm.SetLegOut(true);
-              }).WithTimeout(0.5_s))),
+              }).WithTimeout(1.5_s))),
       frc2::cmd::Wait(1_s), frc2::cmd::RunOnce([this] {
                               m_claw.SetPosition(true);
                             }).WithTimeout(0.1_s),
@@ -290,15 +278,64 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       //   }).WithTimeout(0.5_s),
       //   frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); })
   );
+
+  frc2::CommandPtr placeRedRightHighConeCommand = frc2::cmd::Sequence(
+      frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
+      frc2::cmd::Race(
+          m_arm.AlternateHighAngleCommand(),
+          frc2::cmd::Sequence(
+              frc2::cmd::Run([this] {
+                m_intake.ReverseIntakeMotors();
+              }).WithTimeout(1_s),
+              frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }),
+              frc2::cmd::Run([this] {
+                m_arm.SetLegOut(true);
+              }).WithTimeout(0.5_s),
+              frc2::cmd::Run([this] { m_drivetrain.TankDrive(1_fps, 1_fps); },
+                             {&m_drivetrain})
+                  .WithTimeout(0.8_s),
+              frc2::cmd::Run([this] {
+                m_arm.SetLegOut(true);
+              }).WithTimeout(1.5_s))),
+      frc2::cmd::Wait(1_s), frc2::cmd::RunOnce([this] {
+                              m_claw.SetPosition(true);
+                            }).WithTimeout(0.1_s),
+      frc2::cmd::RunOnce([this] { m_arm.SetLegOut(false); }),
+      frc2::cmd::Race(
+          m_arm.IntakeCommand(),
+          frc2::cmd::Run([this] { m_drivetrain.TankDrive(-6.4_fps, -6.4_fps); },
+                         {&m_drivetrain})
+              .WithTimeout(1.75_s)),
+      m_drivetrain.TurnTo155CWCommand().WithTimeout(2_s),
+      frc2::cmd::Race(m_arm.LowAngleCommand(),
+                      frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); }),
+                      frc2::cmd::Run([this] {
+                        m_drivetrain.TankDrive(3_fps, 3_fps);
+                      }).WithTimeout(1.5_s)),
+      m_arm.IntakeCommand().WithTimeout(1_s),
+      //   frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }),
+      frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
+      //   frc2::cmd::Race(m_drivetrain.TurnTo185Command().WithTimeout(2_s),
+      //                   frc2::cmd::Run([this] { m_intake.SetIntakeMotors();
+      //                   })),
+      m_drivetrain.TurnTo185CWCommand().WithTimeout(2_s));
+
+  // return placeBlueLeftHighConeCommand;
+
   if (frc::SmartDashboard::GetBoolean("CONE HIGH LEFT", false)) {
-    return placeHighConeCommandLeft;
+    fmt::print("CONE HIGH LEFT");
+    // return placeBlueLeftHighConeCommand;
   } else if (frc::SmartDashboard::GetBoolean("CONE HIGH RIGHT", false)) {
-    return placeHighConeCommandRight;
+    fmt::print("CONE HIGH RIGHT");
+    // return placeHighConeCommandNoSpin;
   } else if (frc::SmartDashboard::GetBoolean("CUBE HIGH", false)) {
-    return placeHighCubeCommand;
+    fmt::print("CUBE HIGH");
+    // return placeHighCubeCommand;
   } else if (frc::SmartDashboard::GetBoolean("CUBE LOW", false)) {
-    return placeLowCubeCommand;
+    fmt::print("CUBE LOW");
+    // return placeLowCubeCommand;
   }
 
-  return frc2::CommandPtr{nullptr};
+  // return frc2::CommandPtr{nullptr};
+  return placeHighConeCommandNoSpin;
 }

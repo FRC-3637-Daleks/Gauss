@@ -44,7 +44,9 @@ public:
 
   frc2::CommandPtr TurnTo185CWCommand();
 
-  frc2::CommandPtr TurnTo170CCWCommand();
+  frc2::CommandPtr TurnTo155CCWCommand();
+
+  frc2::CommandPtr TurnTo155CWCommand();
 
   frc2::CommandPtr TurnTo180CCWCommand();
 

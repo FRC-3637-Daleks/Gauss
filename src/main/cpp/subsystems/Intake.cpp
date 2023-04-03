@@ -4,7 +4,6 @@ Intake::Intake()
     : m_intakePiston{IntakeConstants::kPCMPort,
                      frc::PneumaticsModuleType::CTREPCM,
                      IntakeConstants::kPistonPort},
-      m_rangefinder{IntakeConstants::kRangefinderPort},
       m_leftIntakeMotor{IntakeConstants::kLeftMotorPort},
       m_rightIntakeMotor{IntakeConstants::kRightMotorPort} {
 
@@ -18,7 +17,6 @@ Intake::Intake()
 
 void Intake::Log() {
   frc::SmartDashboard::PutBoolean("Intake Pistons", m_intakePiston.Get());
-  frc::SmartDashboard::PutNumber("RangeFinder", this->GetRangefinder());
   frc::SmartDashboard::PutBoolean("Piston Disabled",
                                   m_intakePiston.IsDisabled());
 }
@@ -40,15 +38,15 @@ void Intake::StopIntakeMotors() {
   m_rightIntakeMotor.Set(0);
 }
 
-bool Intake::ReadyToPickUp() {
-  if ((this->GetRangefinder() <= IntakeConstants::pickUpRangeCone) ||
-      (this->GetRangefinder() <= IntakeConstants::pickUpRangeCube)) {
-    return true;
-  }
-  return false;
-  // implications needed after testing
-}
+// bool Intake::ReadyToPickUp() {
+//   if ((this->GetRangefinder() <= IntakeConstants::pickUpRangeCone) ||
+//       (this->GetRangefinder() <= IntakeConstants::pickUpRangeCube)) {
+//     return true;
+//   }
+//   return false;
+//   // implications needed after testing
+// }
 
-double Intake::GetRangefinder() { return m_rangefinder.GetVoltage(); }
+// double Intake::GetRangefinder() { return m_rangefinder.GetVoltage(); }
 
 void Intake::Periodic() { this->Log(); }

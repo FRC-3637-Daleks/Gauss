@@ -9,9 +9,9 @@ using namespace ArmConstants;
 Arm::Arm()
     : m_solenoid{kPCMId, frc::PneumaticsModuleType::CTREPCM, kPistonChannel},
       m_motor{kMotorId},
-      m_neckController{kP, kI, 0.0, {kMaxTurnVelocity, kMaxTurnAcceleration}},
+      m_neckController{kP, kI, kD, {kMaxTurnVelocity, kMaxTurnAcceleration}},
       m_limitSwitch{kLimitSwitchChannel} {
-  m_neckController.SetTolerance(1_deg, 3_deg_per_s);
+  m_neckController.SetTolerance(1_deg, 10_deg_per_s);
   m_neckController.SetIntegratorRange(0, 3);
   m_motor.ConfigOpenloopRamp(0.5);
   // m_compressor.EnableDigital();

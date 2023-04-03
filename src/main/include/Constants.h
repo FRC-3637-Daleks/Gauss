@@ -32,13 +32,13 @@ constexpr auto kNeckPhysicalUpperBound = 120_deg;
 // constexpr double kVoltToLengthConversionFactor = 6.41;
 
 // PID Loop
-constexpr double kP = 8;
+constexpr double kP = 10;
 constexpr double kI = 2;
 constexpr double kD = 0;
 constexpr double kIz = 5;
 
-constexpr auto kMaxTurnVelocity = 0.5 * std::numbers::pi * 1_rad_per_s;
-constexpr auto kMaxTurnAcceleration = std::numbers::pi * 1_rad_per_s_sq;
+constexpr auto kMaxTurnVelocity = 1 * std::numbers::pi * 1_rad_per_s;
+constexpr auto kMaxTurnAcceleration = 0.6 * std::numbers::pi * 1_rad_per_s_sq;
 
 constexpr bool kEncoderReversed = true;
 constexpr int kEncoderCPR = 2048;
@@ -76,7 +76,7 @@ constexpr double kTalonRampRate =
     0.5; // 0.5 seconds from neutral to full throttle.
 constexpr int kTalonTimeoutMs = 30;
 
-constexpr auto kMaxSpeed = 12_fps;
+constexpr auto kMaxSpeed = 10_fps;
 constexpr auto kArcadeMaxSpeed = 10_fps;
 constexpr auto kPreciseSpeed = 2_fps;
 
@@ -90,7 +90,7 @@ constexpr double kIzDriveSpeed = 1000;
 constexpr double kIBrake = 0.0001;
 
 // NOTE: Guess value!
-constexpr double kPTurn = 2;
+constexpr double kPTurn = 2.2;
 constexpr double kPDistance = 2;
 constexpr auto kDistanceTolerance = 7_cm;
 

@@ -215,7 +215,7 @@ frc2::CommandPtr DalekDrive::TurnTo185CWCommand() {
       .ToPtr();
 }
 
-frc2::CommandPtr DalekDrive::TurnTo170CCWCommand() {
+frc2::CommandPtr DalekDrive::TurnTo155CCWCommand() {
   return frc2::FunctionalCommand(
              // Set controller input to current heading.
              [this] {
@@ -225,7 +225,26 @@ frc2::CommandPtr DalekDrive::TurnTo170CCWCommand() {
              // Use output from PID controller to turn robot.
              [this] {
                double output =
-                   m_turnController.Calculate(GetHeading(), 170_deg);
+                   m_turnController.Calculate(GetHeading(), 155_deg);
+               HackyArcadeDrive(0, output, false);
+             },
+             // Stop robot.
+             [this](bool) -> void { HackyArcadeDrive(0, 0, false); },
+             [this]() -> bool { return m_turnController.AtGoal(); }, {this})
+      .ToPtr();
+}
+
+frc2::CommandPtr DalekDrive::TurnTo155CWCommand() {
+  return frc2::FunctionalCommand(
+             // Set controller input to current heading.
+             [this] {
+               Reset();
+               m_turnController.Reset(GetHeading());
+             },
+             // Use output from PID controller to turn robot.
+             [this] {
+               double output =
+                   m_turnController.Calculate(GetHeading(), -150_deg);
                HackyArcadeDrive(0, output, false);
              },
              // Stop robot.

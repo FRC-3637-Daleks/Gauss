@@ -37,7 +37,6 @@ public:
 
 private:
   frc::Solenoid m_intakePiston;
-  frc::AnalogInput m_rangefinder;
   WPI_TalonSRX m_leftIntakeMotor;
   WPI_TalonSRX m_rightIntakeMotor;
 };
