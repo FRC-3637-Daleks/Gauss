@@ -1,5 +1,7 @@
 #include "RobotContainer.h"
 
+#include <frc/DataLogManager.h>
+#include <frc/DriverStation.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/WaitCommand.h>
@@ -13,6 +15,11 @@ RobotContainer::RobotContainer() {
   frc::SmartDashboard::PutBoolean("CONE HIGH RIGHT", false);
   frc::SmartDashboard::PutBoolean("CUBE HIGH", false);
   frc::SmartDashboard::PutBoolean("CUBE LOW", false);
+
+  frc::DataLogManager::Start();
+  frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
+  frc::DataLogManager::LogNetworkTables(true);
+
   ConfigureBindings();
 }
 
