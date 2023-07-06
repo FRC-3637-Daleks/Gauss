@@ -18,6 +18,7 @@
 #include "subsystems/DalekDrive.h"
 #include "subsystems/Intake.h"
 #include "subsystems/Vision.h"
+#include "subsystems/Drivetrain.h"
 
 class RobotContainer {
 public:
@@ -33,6 +34,8 @@ private:
   frc2::CommandJoystick m_rightJoystick{OperatorConstants::kRightJoystickPort};
   frc2::CommandXboxController m_driverController{
       OperatorConstants::kXboxControllerPort};
+  frc2::CommandXboxController m_swerveController{
+      OIConstants::kDriverControllerPort};
 
   frc2::Trigger m_armResetTrigger{[this]() -> bool {
     return m_arm.GetNeckAngle() < ArmConstants::kNeckPhysicalLowerBound ||
@@ -48,6 +51,8 @@ private:
                   [this] { return m_drivetrain.GetPose(); }};
 
   Intake m_intake;
+
+  Drivetrain m_swerve;
 
   frc2::CommandPtr m_chargeStationAuto{Autos::ChargeStationAuto(&m_drivetrain)};
 

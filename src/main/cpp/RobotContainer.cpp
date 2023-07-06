@@ -59,6 +59,36 @@ void RobotContainer::ConfigureBindings() {
           },
           {&m_drivetrain}));
 
+  // Set up the default drive command.
+  m_swerve.SetDefaultCommand(frc2::cmd::Run(
+      [this]() {
+        m_swerve.Drive(
+            AutoConstants::kMaxSpeed *
+                frc::ApplyDeadband(
+                    m_swerveController.GetRawAxis(OIConstants::kForwardAxis),
+                    OIConstants::kDeadband),
+            AutoConstants::kMaxSpeed *
+                frc::ApplyDeadband(
+                    m_swerveController.GetRawAxis(OIConstants::kStrafeAxis),
+                    OIConstants::kDeadband),
+            AutoConstants::kMaxAngularSpeed *
+                frc::ApplyDeadband(
+                    -m_swerveController.GetRawAxis(OIConstants::kRotationAxis),
+                    OIConstants::kDeadband),
+            m_swerveController.GetRawButton(OIConstants::kFieldRelativeButton));
+      },
+      {&m_swerve}));
+
+  // Swerve Button Configs
+  // Configure button bindings.
+  m_swerveController.Button(OIConstants::kZeroHeadingButton)
+      .OnTrue(m_swerve.ZeroHeadingCommand());
+  m_swerveController.Button(OIConstants::kResetModulesButton)
+      .OnTrue(m_swerve.ResetModulesCommand());
+  // Runs a command that does nothing on the Drivetrain subsytem.
+  m_swerveController.Button(OIConstants::kFreeModulesButton)
+      .ToggleOnTrue(frc2::cmd::Run([this] {}, {&m_drivetrain}));
+
   // Reset neck.
   //   m_leftJoystick.Button(2).OnTrue(
   //       frc2::cmd::RunOnce([this] { m_arm.ZeroNeck(); }, {&m_arm}));

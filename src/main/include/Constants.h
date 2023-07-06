@@ -5,6 +5,8 @@
 #include <frc/apriltag/AprilTagFields.h>
 #include <frc/controller/ArmFeedforward.h>
 #include <frc/geometry/Rotation2d.h>
+#include <frc/trajectory/TrapezoidProfile.h>
+#include <frc/XboxController.h>
 #include <frc/geometry/Transform3d.h>
 #include <photonlib/PhotonPoseEstimator.h>
 #include <units/acceleration.h>
@@ -14,6 +16,10 @@
 #include <units/length.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
+
+struct PIDCoefficients {
+  double kP, kI, kD, kFF, kIz;
+};
 
 namespace ArmConstants {
 constexpr int kPCMId = 5;
@@ -102,7 +108,99 @@ constexpr auto kTurnRateTolerance = 1_deg_per_s;
 
 constexpr auto kMaxTurnRate = 1 * std::numbers::pi * 1_rad_per_s;
 constexpr auto kMaxTurnAcceleration = 1 * std::numbers::pi * 1_rad_per_s_sq;
+
+// Swerve Constants (NEED TO INTEGRATE)
+
+// left out as this variable are repeated above
+//constexpr auto kTrackWidth =
+//    20.25_in; // Distance between centers of right and left wheels.
+constexpr auto kWheelBase =
+    20_in; // Distance between centers of front and back wheels.
+
+constexpr int kFrontLeftDriveMotorId = 1;
+constexpr int kRearLeftDriveMotorId = 3;
+constexpr int kFrontRightDriveMotorId = 5;
+constexpr int kRearRightDriveMotorId = 7;
+
+constexpr int kFrontLeftSteerMotorId = 2;
+constexpr int kRearLeftSteerMotorId = 4;
+constexpr int kFrontRightSteerMotorId = 6;
+constexpr int kRearRightSteerMotorId = 8;
+
+constexpr int kFrontLeftAbsoluteEncoderChannel = 0;
+constexpr int kRearLeftAbsoluteEncoderChannel = 1;
+constexpr int kFrontRightAbsoluteEncoderChannel = 2;
+constexpr int kRearRightAbsoluteEncoderChannel = 3;
+
+// Absolute encoder reading when modules are facing forward.
+constexpr double kFrontLeftAbsoluteEncoderOffset = -2.058;
+constexpr double kRearLeftAbsoluteEncoderOffset = -0.066;
+constexpr double kFrontRightAbsoluteEncoderOffset = -1.76;
+constexpr double kRearRightAbsoluteEncoderOffset = -2.27;
+// constexpr double kFrontLeftAbsoluteEncoderOffset = -2.033;
+// constexpr double kRearLeftAbsoluteEncoderOffset = -1.766;
+// constexpr double kFrontRightAbsoluteEncoderOffset = -0.063;
+// constexpr double kRearRightAbsoluteEncoderOffset = -2.246;
+
+// XXX Roughly estimated values, needs to be properly tuned.
+constexpr struct PIDCoefficients kFrontLeftDriveMotorPIDCoefficients {
+  1e-4, 0, 0, 1.6e-4, 0  //1e-5, 1e-6, 0, 1e-4, 0 ,0.25e-7, 1e-6, 1e-2, 1e-5, 0
+};
+constexpr struct PIDCoefficients kRearLeftDriveMotorPIDCoefficients {
+  1e-4, 0, 0, 1.6e-4, 0  
+};
+constexpr struct PIDCoefficients kFrontRightDriveMotorPIDCoefficients {
+  1e-4, 0, 0, 1.6e-4, 0  
+};
+constexpr struct PIDCoefficients kRearRightDriveMotorPIDCoefficients {
+  1e-4, 0, 0, 1.6e-4, 0  
+};
+
+constexpr struct PIDCoefficients kFrontLeftSteerMotorPIDCoefficients {
+  3.3, 0, 0, 0, 0
+};
+constexpr struct PIDCoefficients kRearLeftSteerMotorPIDCoefficients {
+  3, 0, 0, 0, 0
+};
+constexpr struct PIDCoefficients kFrontRightSteerMotorPIDCoefficients {
+  3.2, 0, 0, 0, 0
+};
+constexpr struct PIDCoefficients kRearRightSteerMotorPIDCoefficients {
+  3.5, 0, 0, 0, 0
+};
+
+constexpr auto kMaxTeleopSpeed = 5_fps;
+//constexpr auto kPreciseSpeed = 2_fps; // left out because it already exists above
+
 } // namespace DriveConstants
+
+namespace ModuleConstants {
+constexpr double kDriveMotorCurrentLimit = 50; // Up to 80 A is okay.
+constexpr double kSteerMotorCurrentLimit = 20; // An educated guess.
+
+constexpr double kMotorRampRate = 0.5; // Seconds from neutral to full output.
+
+constexpr auto kWheelDiameter = 4_in;
+constexpr double kDriveEncoderReduction =
+    (double)20 / 3; // Reduction in the swerve module gearing.
+constexpr double kDriveEncoderCPR = 42;
+constexpr auto kDriveEncoderDistancePerRevolution =
+    kWheelDiameter * std::numbers::pi / kDriveEncoderReduction;
+
+constexpr double kSteerEncoderReduction =
+    // Gearmotor reduction
+    ((double)226233 / 3179) *
+    // Module redution
+    ((double)40 / 48);
+constexpr double kSteerEncoderCPR =
+    kSteerEncoderReduction * 28; // CPR is 4 counts/cycle * 7 cycles/revolution.
+constexpr auto kSteerEncoderDistancePerCount =
+    2_rad * std::numbers::pi / kSteerEncoderCPR; // Radians per encoder count.
+
+// Values measured with the drivetrain suspended.
+constexpr auto kPhysicalMaxSpeed = 14_fps;
+constexpr auto kPhysicalMaxAngularSpeed = 180_rpm;
+} // namespace ModuleConstants
 
 namespace ClawConstants {
 constexpr int kPCMPort = 5;
@@ -151,6 +249,21 @@ constexpr auto kMidCube = 45_deg;
 constexpr auto kHighCube = 90_deg;
 constexpr auto kSubstationShelf = 100_deg;
 
+// Swerve Constants (NEED TO BE INTEGRATED)
+//constexpr auto kMaxSpeed = ModuleConstants::kPhysicalMaxSpeed / 3; // left out as these are repeat values
+//constexpr auto kMaxAcceleration = 10_fps_sq;
+constexpr auto kMaxAngularSpeed = 90_rpm;
+constexpr auto kMaxAngularAcceleration = std::numbers::pi * 1_rad_per_s_sq;
+
+// XXX Very untrustworthy placeholder values.
+constexpr double kPXController = 0.5;
+constexpr double kPYController = 0.5;
+constexpr double kPThetaController = 0.5;
+
+// Trapezoidal motion profile for the robot heading.
+const frc::TrapezoidProfile<units::radians>::Constraints
+    kThetaControllerConstraints{kMaxAngularSpeed, kMaxAngularAcceleration};
+
 } // namespace AutoConstants
 namespace IntakeConstants {
 constexpr int kPCMPort = 5;
@@ -171,3 +284,17 @@ constexpr int kLeftJoystickPort = 1;
 constexpr int kRightJoystickPort = 2;
 constexpr int kXboxControllerPort = 0;
 } // namespace OperatorConstants
+
+namespace OIConstants {
+constexpr int kDriverControllerPort = 0;
+constexpr double kDeadband = 0.08;
+
+constexpr int kStrafeAxis = frc::XboxController::Axis::kLeftX;
+constexpr int kForwardAxis = frc::XboxController::Axis::kLeftY;
+constexpr int kRotationAxis = frc::XboxController::Axis::kRightX;
+constexpr int kFieldRelativeButton = frc::XboxController::Button::kRightBumper;
+
+constexpr int kZeroHeadingButton = frc::XboxController::Button::kX;
+constexpr int kResetModulesButton = frc::XboxController::Button::kY;
+constexpr int kFreeModulesButton = frc::XboxController::Button::kA;
+} // namespace OIConstants
