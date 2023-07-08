@@ -280,13 +280,9 @@ constexpr int pickUpRangeCube = 0;
 
 namespace OperatorConstants {
 constexpr bool kTesting = true;
-constexpr int kLeftJoystickPort = 1;
-constexpr int kRightJoystickPort = 2;
-constexpr int kXboxControllerPort = 0;
-} // namespace OperatorConstants
-
-namespace OIConstants {
+constexpr int kXboxControllerPort = 1;
 constexpr int kDriverControllerPort = 0;
+
 constexpr double kDeadband = 0.08;
 
 constexpr int kStrafeAxis = frc::XboxController::Axis::kLeftX;
@@ -297,4 +293,4 @@ constexpr int kFieldRelativeButton = frc::XboxController::Button::kRightBumper;
 constexpr int kZeroHeadingButton = frc::XboxController::Button::kX;
 constexpr int kResetModulesButton = frc::XboxController::Button::kY;
 constexpr int kFreeModulesButton = frc::XboxController::Button::kA;
-} // namespace OIConstants
+} // namespace OperatorConstants

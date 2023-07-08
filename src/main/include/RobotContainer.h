@@ -30,12 +30,10 @@ public:
   // frc::SendableChooser<frc2::Command *> m_chooser;
 
 private:
-  frc2::CommandJoystick m_leftJoystick{OperatorConstants::kLeftJoystickPort};
-  frc2::CommandJoystick m_rightJoystick{OperatorConstants::kRightJoystickPort};
   frc2::CommandXboxController m_driverController{
       OperatorConstants::kXboxControllerPort};
   frc2::CommandXboxController m_swerveController{
-      OIConstants::kDriverControllerPort};
+      OperatorConstants::kDriverControllerPort};
 
   frc2::Trigger m_armResetTrigger{[this]() -> bool {
     return m_arm.GetNeckAngle() < ArmConstants::kNeckPhysicalLowerBound ||
@@ -43,20 +41,15 @@ private:
   }};
 
   Arm m_arm;
-  DalekDrive m_drivetrain;
   Claw m_claw;
   Vision m_vision{[this](frc::Pose2d pose, units::second_t timestamp) {
-                    m_drivetrain.AddVisionPoseEstimate(pose, timestamp);
+                    m_swerve.AddVisionPoseEstimate(pose, timestamp);
                   },
-                  [this] { return m_drivetrain.GetPose(); }};
+                  [this] { return m_swerve.GetPose(); }};
 
   Intake m_intake;
 
   Drivetrain m_swerve;
-
-  frc2::CommandPtr m_chargeStationAuto{Autos::ChargeStationAuto(&m_drivetrain)};
-
-  frc2::CommandPtr m_communityRunAuto{Autos::CommunityRunAuto(&m_drivetrain)};
 
   void ConfigureBindings();
 };

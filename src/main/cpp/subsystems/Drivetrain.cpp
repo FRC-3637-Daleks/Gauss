@@ -44,7 +44,12 @@ Drivetrain::Drivetrain()
                                                 m_frontRight.GetPosition(),
                                                 m_rearLeft.GetPosition(),
                                                 m_rearRight.GetPosition()},
-                                               frc::Pose2d()} {}
+                                               frc::Pose2d()},
+      m_poseEstimator{kDriveKinematics, m_gyro.GetRotation2d(),
+                      wpi::array<frc::SwerveModulePosition, 4U>{
+                          m_frontLeft.GetPosition(), m_rearLeft.GetPosition(),
+                          m_frontRight.GetPosition(),
+                          m_rearRight.GetPosition()}, frc::Pose2d()} {}
 
 void Drivetrain::Periodic() {
   // Update the odometry with the current gyro angle and module states.
@@ -130,11 +135,19 @@ void Drivetrain::UpdateDashboard() {
                            m_frontRight.GetState().speed.value(),
                            m_rearRight.GetState().angle.Radians().value(),
                            m_rearRight.GetState().speed.value()};
-  frc::SmartDashboard::PutNumberArray("Swerve Module States", swerveStates); // Have to initialize array separately due as an error occurs when an array attempts to initialize as a parameter.
+  frc::SmartDashboard::PutNumberArray(
+      "Swerve Module States",
+      swerveStates); // Have to initialize array separately due as an error
+                     // occurs when an array attempts to initialize as a
+                     // parameter.
   m_frontLeft.UpdateDashboard();
   m_rearLeft.UpdateDashboard();
   m_frontRight.UpdateDashboard();
   m_rearRight.UpdateDashboard();
+
+  frc::SmartDashboard::PutNumber("Gyro", m_gyro.GetAngle());
+
+  frc::SmartDashboard::PutData("Field", &m_field);
 }
 
 frc2::CommandPtr Drivetrain::SwerveCommand(
@@ -152,4 +165,9 @@ frc2::CommandPtr Drivetrain::ZeroHeadingCommand() {
 
 frc2::CommandPtr Drivetrain::ResetModulesCommand() {
   return this->RunOnce([&] { ResetModules(); });
+}
+
+void Drivetrain::AddVisionPoseEstimate(frc::Pose2d pose,
+                                       units::second_t timestamp) {
+  m_poseEstimator.AddVisionMeasurement(pose, timestamp);
 }

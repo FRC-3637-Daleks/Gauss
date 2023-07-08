@@ -4,6 +4,7 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
+#include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/smartdashboard/Field2d.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
@@ -87,6 +88,12 @@ public:
   // Returns a command that resets the module encoders.
   frc2::CommandPtr ResetModulesCommand();
 
+  // Returns a command that stops the robot.
+  frc2::CommandPtr BrakeCommand();
+
+  // Add Vision Pose to SwerveDrivePoseEstimator.
+  void AddVisionPoseEstimate(frc::Pose2d pose, units::second_t timestamp);
+
 private:
   SwerveModule m_frontLeft;
   SwerveModule m_rearLeft;
@@ -97,6 +104,8 @@ private:
 
   // Odometer for tracking the robot's position on the field.
   frc::SwerveDriveOdometry<4> m_odometry;
+
+  frc::SwerveDrivePoseEstimator<4> m_poseEstimator;
 
   // Field widget for Shuffleboard.
   frc::Field2d m_field;
