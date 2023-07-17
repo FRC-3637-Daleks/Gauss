@@ -152,11 +152,25 @@ void Drivetrain::UpdateDashboard() {
 
 frc2::CommandPtr Drivetrain::SwerveCommand(
     std::function<double()> forward, std::function<double()> strafe,
-    std::function<double()> rot, std::function<bool()> fieldRelative) {
+    std::function<double()> rot) {
   return this->Run([&] {
     Drive(kMaxTeleopSpeed * forward(), kMaxTeleopSpeed * strafe(),
-          AutoConstants::kMaxAngularSpeed * rot(), fieldRelative());
+          AutoConstants::kMaxAngularSpeed * rot(), false);
   });
+}
+
+frc2::CommandPtr Drivetrain::SwerveCommandFieldRelative(
+    std::function<double()> forward, std::function<double()> strafe,
+    std::function<double()> rot) {
+  return this->Run([&] {
+    Drive(kMaxTeleopSpeed * forward(), kMaxTeleopSpeed * strafe(),
+          AutoConstants::kMaxAngularSpeed * rot(), true);
+  });
+}
+
+frc2::CommandPtr Drivetrain::DriveToPoseCommand(frc::Pose2d targetPose) 
+{
+  //TODO
 }
 
 frc2::CommandPtr Drivetrain::ZeroHeadingCommand() {

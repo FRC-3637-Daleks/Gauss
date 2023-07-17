@@ -79,8 +79,15 @@ public:
   // Drive the robot with swerve controls.
   frc2::CommandPtr SwerveCommand(std::function<double()> forward,
                                  std::function<double()> strafe,
-                                 std::function<double()> rot,
-                                 std::function<bool()> fieldRelative);
+                                 std::function<double()> rot);
+  
+  // Drive the robot with field-relative swerve controls.
+  frc2::CommandPtr SwerveCommandFieldRelative(std::function<double()> forward,
+                                 std::function<double()> strafe,
+                                 std::function<double()> rot);
+
+  // Drive the robot to pose.
+  frc2::CommandPtr DriveToPoseCommand(frc::Pose2d targetPose);
 
   // Returns a command that zeroes the robot heading.
   frc2::CommandPtr ZeroHeadingCommand();
@@ -105,6 +112,7 @@ private:
   // Odometer for tracking the robot's position on the field.
   frc::SwerveDriveOdometry<4> m_odometry;
 
+  // Pose Estimator for estimating the robot's position on the field.
   frc::SwerveDrivePoseEstimator<4> m_poseEstimator;
 
   // Field widget for Shuffleboard.
