@@ -49,7 +49,8 @@ Drivetrain::Drivetrain()
                       wpi::array<frc::SwerveModulePosition, 4U>{
                           m_frontLeft.GetPosition(), m_rearLeft.GetPosition(),
                           m_frontRight.GetPosition(),
-                          m_rearRight.GetPosition()}, frc::Pose2d()} {}
+                          m_rearRight.GetPosition()},
+                      frc::Pose2d()} {}
 
 void Drivetrain::Periodic() {
   // Update the odometry with the current gyro angle and module states.
@@ -150,27 +151,53 @@ void Drivetrain::UpdateDashboard() {
   frc::SmartDashboard::PutData("Field", &m_field);
 }
 
-frc2::CommandPtr Drivetrain::SwerveCommand(
-    std::function<double()> forward, std::function<double()> strafe,
-    std::function<double()> rot) {
+frc2::CommandPtr Drivetrain::SwerveCommand(std::function<double()> forward,
+                                           std::function<double()> strafe,
+                                           std::function<double()> rot) {
   return this->Run([&] {
     Drive(kMaxTeleopSpeed * forward(), kMaxTeleopSpeed * strafe(),
           AutoConstants::kMaxAngularSpeed * rot(), false);
   });
 }
 
-frc2::CommandPtr Drivetrain::SwerveCommandFieldRelative(
-    std::function<double()> forward, std::function<double()> strafe,
-    std::function<double()> rot) {
+frc2::CommandPtr
+Drivetrain::SwerveCommandFieldRelative(std::function<double()> forward,
+                                       std::function<double()> strafe,
+                                       std::function<double()> rot) {
   return this->Run([&] {
     Drive(kMaxTeleopSpeed * forward(), kMaxTeleopSpeed * strafe(),
           AutoConstants::kMaxAngularSpeed * rot(), true);
   });
 }
 
-frc2::CommandPtr Drivetrain::DriveToPoseCommand(frc::Pose2d targetPose) 
-{
-  //TODO
+// needs work
+frc2::CommandPtr Drivetrain::DriveToPoseCommand(frc::Pose2d targetPose) {
+  // TODO
+  frc::Pose2d startPose = m_odometry.GetPose();
+  const double kDistanceTolerance =
+      0.1; // Tolerance for position error in meters
+
+  units::meter_t hypotenuse =
+      hypot(targetPose.X() - startPose.X(), targetPose.Y() - startPose.Y());
+
+  while (std::hypot(targetPose.X() - startPose.X(),
+                    targetPose.Y() - startPose.Y()) > kDistanceTolerance) {
+    // todo
+  }
+}
+
+// Check if the robot has reached the target pose
+// need to fix
+bool IsFinished(frc::Pose2d targetPose) {
+
+  frc::Pose2d startPose = m_odometry.GetPose();
+
+  auto distanceError =
+      targetPose.Translation().Distance(startPose.Translation());
+  auto angleError =
+      targetPose.Rotation().Radians() - startPose.Rotation().Radians();
+  return distanceError < kDistanceTolerance &&
+         std::fabs((double)angleError) < 0.05;
 }
 
 frc2::CommandPtr Drivetrain::ZeroHeadingCommand() {

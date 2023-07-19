@@ -2,12 +2,12 @@
 
 #include <numbers>
 
+#include <frc/XboxController.h>
 #include <frc/apriltag/AprilTagFields.h>
 #include <frc/controller/ArmFeedforward.h>
 #include <frc/geometry/Rotation2d.h>
-#include <frc/trajectory/TrapezoidProfile.h>
-#include <frc/XboxController.h>
 #include <frc/geometry/Transform3d.h>
+#include <frc/trajectory/TrapezoidProfile.h>
 #include <photonlib/PhotonPoseEstimator.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
@@ -112,7 +112,7 @@ constexpr auto kMaxTurnAcceleration = 1 * std::numbers::pi * 1_rad_per_s_sq;
 // Swerve Constants (NEED TO INTEGRATE)
 
 // left out as this variable are repeated above
-//constexpr auto kTrackWidth =
+// constexpr auto kTrackWidth =
 //    20.25_in; // Distance between centers of right and left wheels.
 constexpr auto kWheelBase =
     20_in; // Distance between centers of front and back wheels.
@@ -144,16 +144,16 @@ constexpr double kRearRightAbsoluteEncoderOffset = -2.27;
 
 // XXX Roughly estimated values, needs to be properly tuned.
 constexpr struct PIDCoefficients kFrontLeftDriveMotorPIDCoefficients {
-  1e-4, 0, 0, 1.6e-4, 0  //1e-5, 1e-6, 0, 1e-4, 0 ,0.25e-7, 1e-6, 1e-2, 1e-5, 0
+  1e-4, 0, 0, 1.6e-4, 0 // 1e-5, 1e-6, 0, 1e-4, 0 ,0.25e-7, 1e-6, 1e-2, 1e-5, 0
 };
 constexpr struct PIDCoefficients kRearLeftDriveMotorPIDCoefficients {
-  1e-4, 0, 0, 1.6e-4, 0  
+  1e-4, 0, 0, 1.6e-4, 0
 };
 constexpr struct PIDCoefficients kFrontRightDriveMotorPIDCoefficients {
-  1e-4, 0, 0, 1.6e-4, 0  
+  1e-4, 0, 0, 1.6e-4, 0
 };
 constexpr struct PIDCoefficients kRearRightDriveMotorPIDCoefficients {
-  1e-4, 0, 0, 1.6e-4, 0  
+  1e-4, 0, 0, 1.6e-4, 0
 };
 
 constexpr struct PIDCoefficients kFrontLeftSteerMotorPIDCoefficients {
@@ -170,7 +170,8 @@ constexpr struct PIDCoefficients kRearRightSteerMotorPIDCoefficients {
 };
 
 constexpr auto kMaxTeleopSpeed = 5_fps;
-//constexpr auto kPreciseSpeed = 2_fps; // left out because it already exists above
+// constexpr auto kPreciseSpeed = 2_fps; // left out because it already exists
+// above
 
 } // namespace DriveConstants
 
@@ -250,8 +251,8 @@ constexpr auto kHighCube = 90_deg;
 constexpr auto kSubstationShelf = 100_deg;
 
 // Swerve Constants (NEED TO BE INTEGRATED)
-//constexpr auto kMaxSpeed = ModuleConstants::kPhysicalMaxSpeed / 3; // left out as these are repeat values
-//constexpr auto kMaxAcceleration = 10_fps_sq;
+// constexpr auto kMaxSpeed = ModuleConstants::kPhysicalMaxSpeed / 3; // left
+// out as these are repeat values constexpr auto kMaxAcceleration = 10_fps_sq;
 constexpr auto kMaxAngularSpeed = 90_rpm;
 constexpr auto kMaxAngularAcceleration = std::numbers::pi * 1_rad_per_s_sq;
 
@@ -294,3 +295,24 @@ constexpr int kZeroHeadingButton = frc::XboxController::Button::kX;
 constexpr int kResetModulesButton = frc::XboxController::Button::kY;
 constexpr int kFreeModulesButton = frc::XboxController::Button::kA;
 } // namespace OperatorConstants
+
+// Define your robot's characteristics (TESTING)
+// using for Trajectories
+namespace TrajectoryConstants {
+
+const double kS = 1.0;
+const double kV = 0.8;
+const double kA = 0.2;
+const double kP = 0.05;
+const double kI = 0.0;
+const double kD = 0.0;
+
+double kMaxSpeed = 3.0; // Maximum speed in meters per second
+double kMaxAcceleration =
+    2.0; // Maximum acceleration in meters per second squared
+
+double kRamseteB = 2.0;    // Ramsete controller's B coefficient
+double kRamseteZeta = 0.7; // Ramsete controller's Zeta coefficient
+
+// double kTrackWidth = 0.6;  // Width of your robot's drivetrain
+} // namespace TrajectoryConstants

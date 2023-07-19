@@ -1,10 +1,13 @@
 #pragma once
+// using namespace units::literals;
+// #include <units/units.h>
 
 #include <AHRS.h>
+#include <cmath>
+#include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
-#include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/smartdashboard/Field2d.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
@@ -80,11 +83,11 @@ public:
   frc2::CommandPtr SwerveCommand(std::function<double()> forward,
                                  std::function<double()> strafe,
                                  std::function<double()> rot);
-  
+
   // Drive the robot with field-relative swerve controls.
   frc2::CommandPtr SwerveCommandFieldRelative(std::function<double()> forward,
-                                 std::function<double()> strafe,
-                                 std::function<double()> rot);
+                                              std::function<double()> strafe,
+                                              std::function<double()> rot);
 
   // Drive the robot to pose.
   frc2::CommandPtr DriveToPoseCommand(frc::Pose2d targetPose);

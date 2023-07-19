@@ -413,3 +413,16 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // return frc2::CommandPtr{nullptr};
   // return placeHighConeCommandNoSpin;
 }
+
+void GenerateAndRunTrajectoryCommand() {
+  // Load trajectory from file
+  // can use PathWeaver/Pathplanner to generate/export json files
+  // https://docs.wpilib.org/en/stable/docs/software/pathplanning/pathweaver/introduction.html
+
+  std::string trajectoryPath = "trajectory.json";
+  frc::Trajectory trajectory =
+      frc::TrajectoryUtil::FromPathweaverJson(trajectoryPath);
+
+  // use our own controller once created
+  // frc::RamseteController ramseteController{kRamseteB, kRamseteZeta};
+}

@@ -16,9 +16,21 @@
 #include "subsystems/Arm.h"
 #include "subsystems/Claw.h"
 #include "subsystems/DalekDrive.h"
+#include "subsystems/Drivetrain.h"
 #include "subsystems/Intake.h"
 #include "subsystems/Vision.h"
-#include "subsystems/Drivetrain.h"
+
+// testing for Trajectories (need to organize after)
+
+#include <frc/controller/PIDController.h>
+#include <frc/controller/RamseteController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
+#include <frc/kinematics/SwerveDriveKinematics.h>
+#include <frc/kinematics/SwerveDriveOdometry.h>
+#include <frc/trajectory/Trajectory.h>
+#include <frc/trajectory/TrajectoryConfig.h>
+#include <frc/trajectory/TrajectoryUtil.h>
+#include <frc2/command/RamseteCommand.h>
 
 class RobotContainer {
 public:
@@ -28,6 +40,8 @@ public:
   frc2::CommandPtr GetAutonomousCommand();
 
   // frc::SendableChooser<frc2::Command *> m_chooser;
+
+  void GenerateAndRunTrajectoryCommand();
 
 private:
   frc2::CommandXboxController m_driverController{
@@ -52,4 +66,11 @@ private:
   Drivetrain m_swerve;
 
   void ConfigureBindings();
+
+  const double kMaxSpeed = 3.0; // Maximum speed in meters per second
+  const double kMaxAcceleration =
+      2.0; // Maximum acceleration in meters per second squared
+  const double kRamseteB = 2.0;    // Ramsete controller's B coefficient
+  const double kRamseteZeta = 0.7; // Ramsete controller's Zeta coefficient
+  // const double kTrackWidth = 0.6;  // Width of your robot's drivetrain
 };

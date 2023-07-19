@@ -1,0 +1,29 @@
+{
+    "trajectory": {
+      "waypoints": [
+        {
+          "position": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "velocity": 0.0,
+          "acceleration": 0.0,
+          "heading": 0.0,
+          "radius": 0.0
+        },
+        {
+          "position": {
+            "x": 5.0,
+            "y": 2.0
+          },
+          "velocity": 0.0,
+          "acceleration": 0.0,
+          "heading": 0.0,
+          "radius": 0.0
+        }
+      ],
+      "name": "example_trajectory",
+      "duration": 2.0
+    }
+  }
+  
