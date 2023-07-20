@@ -90,7 +90,10 @@ public:
                                               std::function<double()> rot);
 
   // Drive the robot to pose.
-  frc2::CommandPtr DriveToPoseCommand(frc::Pose2d targetPose);
+ // frc2::CommandPtr DriveToPoseCommand(frc::Pose2d targetPose);
+
+  // Check if the robot has reached a pose.
+  bool IsFinished(frc::Pose2d targetPose);
 
   // Returns a command that zeroes the robot heading.
   frc2::CommandPtr ZeroHeadingCommand();

@@ -170,25 +170,30 @@ Drivetrain::SwerveCommandFieldRelative(std::function<double()> forward,
   });
 }
 
-// needs work
-frc2::CommandPtr Drivetrain::DriveToPoseCommand(frc::Pose2d targetPose) {
-  // TODO
-  frc::Pose2d startPose = m_odometry.GetPose();
-  const double kDistanceTolerance =
-      0.1; // Tolerance for position error in meters
+// // needs work
+// frc2::CommandPtr Drivetrain::DriveToPoseCommand(frc::Pose2d targetPose) {
+//   // TODO
+//   frc::Pose2d startPose = m_odometry.GetPose();
+//   const double kDistanceTolerance =
+//       0.1; // Tolerance for position error in meters
 
-  units::meter_t hypotenuse =
-      hypot(targetPose.X() - startPose.X(), targetPose.Y() - startPose.Y());
+//   units::meter_t hypotenuse =
+//       units::meter_t{std::hypot((targetPose.X() - startPose.X()).value(),
+//                            (targetPose.Y() - startPose.Y()).value())};
 
-  while (std::hypot(targetPose.X() - startPose.X(),
-                    targetPose.Y() - startPose.Y()) > kDistanceTolerance) {
-    // todo
-  }
-}
+//   while (std::hypot((targetPose.X() - startPose.X()).value(),
+//                     (targetPose.Y() - startPose.Y()).value()) >
+//          kDistanceTolerance) {
+//     // todo
+//     break;
+//   }
+
+//   return {nullptr};
+// }
 
 // Check if the robot has reached the target pose
 // need to fix
-bool IsFinished(frc::Pose2d targetPose) {
+bool Drivetrain::IsFinished(frc::Pose2d targetPose) {
 
   frc::Pose2d startPose = m_odometry.GetPose();
 

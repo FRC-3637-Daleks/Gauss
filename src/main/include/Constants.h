@@ -22,9 +22,9 @@ struct PIDCoefficients {
 };
 
 namespace ArmConstants {
-constexpr int kPCMId = 5;
-constexpr int kPistonChannel = 1;
-constexpr int kClawChannel = 2;
+constexpr int kPCMId = 9;
+constexpr int kPistonChannel = 7;
+constexpr int kClawChannel = 6;
 
 constexpr int kMotorId = 8;
 
@@ -300,19 +300,18 @@ constexpr int kFreeModulesButton = frc::XboxController::Button::kA;
 // using for Trajectories
 namespace TrajectoryConstants {
 
-const double kS = 1.0;
-const double kV = 0.8;
-const double kA = 0.2;
-const double kP = 0.05;
-const double kI = 0.0;
-const double kD = 0.0;
+constexpr double kS = 1.0;
+constexpr double kV = 0.8;
+constexpr double kA = 0.2;
+constexpr double kP = 0.05;
+constexpr double kI = 0.0;
+constexpr double kD = 0.0;
 
-double kMaxSpeed = 3.0; // Maximum speed in meters per second
-double kMaxAcceleration =
+constexpr double kMaxSpeed = 3.0; // Maximum speed in meters per second
+constexpr double kMaxAcceleration =
     2.0; // Maximum acceleration in meters per second squared
+constexpr double kRamseteB = 2.0;    // Ramsete controller's B coefficient
+constexpr double kRamseteZeta = 0.7; // Ramsete controller's Zeta coefficient
 
-double kRamseteB = 2.0;    // Ramsete controller's B coefficient
-double kRamseteZeta = 0.7; // Ramsete controller's Zeta coefficient
-
-// double kTrackWidth = 0.6;  // Width of your robot's drivetrain
+constexpr double kTrackWidth = 0.6;  // Width of your robot's drivetrain
 } // namespace TrajectoryConstants
