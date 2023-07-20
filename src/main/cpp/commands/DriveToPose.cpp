@@ -11,13 +11,14 @@ void DriveToPose::Initialize() { m_startPose = {m_drivetrain->GetPose()}; }
 void DriveToPose::Execute() {
   units::meter_t x = (m_targetPose.X() - m_startPose.X());
   units::meter_t y = (m_targetPose.Y() - m_startPose.Y());
-  
-  units::meters_per_second_t fwd =
-      y / units::math::sqrt(units::math::pow<2>(x) + units::math::pow<2>(y)) *
-      AutoConstants::kMaxSpeed;
-  units::meters_per_second_t strafe =
-      x / units::math::sqrt(units::math::pow<2>(x) + units::math::pow<2>(y)) *
-      AutoConstants::kMaxSpeed;
+
+  auto y_mps =
+      (y / units::math::sqrt(units::math::pow<2>(x) + units::math::pow<2>(y)));
+  auto x_mps =
+      (x / units::math::sqrt(units::math::pow<2>(x) + units::math::pow<2>(y)));
+
+  auto fwd = y_mps * AutoConstants::kMaxSpeed;
+  auto strafe = x_mps * AutoConstants::kMaxSpeed;
 
   m_drivetrain->Drive(fwd, strafe, 0_rad_per_s, true);
 

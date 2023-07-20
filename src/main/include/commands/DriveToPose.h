@@ -30,8 +30,8 @@ private:
 
   double kDistanceTolerance = 0.1;
 
-  std::function<units::meters_per_second_t()> getDistance = [this]() -> units::meters_per_second_t {
+  std::function<units::meter_t()> getDistance = [this]() -> units::meter_t {
     return units::math::hypot((m_targetPose.X() - m_startPose.X()),
-                      (m_targetPose.Y() - m_startPose.Y()));
+                              (m_targetPose.Y() - m_startPose.Y()));
   };
 };

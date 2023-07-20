@@ -33,14 +33,14 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureBindings() {
 
-  // Move neck with xbox joystick.
-  m_arm.SetDefaultCommand(frc2::cmd::Run(
-      [this] {
-        double output = m_driverController.GetLeftY();
-        m_arm.SetNeckVoltage(-2.0 * std::copysign(output * output, output) *
-                             1_V);
-      },
-      {&m_arm}));
+//   // Move neck with xbox joystick.
+//   m_arm.SetDefaultCommand(frc2::cmd::Run(
+//       [this] {
+//         double output = m_driverController.GetLeftY();
+//         m_arm.SetNeckVoltage(-2.0 * std::copysign(output * output, output) *
+//                              1_V);
+//       },
+//       {&m_arm}));
 
   // Set up the default drive command.
 
@@ -97,37 +97,37 @@ void RobotContainer::ConfigureBindings() {
   //         40);
   //       }));
 
-  m_driverController.Start().OnTrue(m_arm.ResetSwitchCommand());
+//   m_driverController.Start().OnTrue(m_arm.ResetSwitchCommand());
 
-  m_driverController.B().WhileTrue(m_arm.LowAngleCommand());
-  m_driverController.Y().WhileTrue(m_arm.HighAngleCommand());
-  // D-pad up
-  frc2::Trigger{[&]() { return m_driverController.GetPOV() == 0; }}.WhileTrue(
-      m_arm.SubstationCommand());
-  // D-pad down
-  frc2::Trigger{[&]() { return m_driverController.GetPOV() == 180; }}.WhileTrue(
-      m_arm.IntakeCommand());
-  // When the left bumper is clicked, it will open all the pistons
-  // toggle for intake
-  m_driverController.A().WhileTrue(
-      frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); }, {&m_intake}));
-  m_driverController.A().OnFalse(
-      frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
+//   m_driverController.B().WhileTrue(m_arm.LowAngleCommand());
+//   m_driverController.Y().WhileTrue(m_arm.HighAngleCommand());
+//   // D-pad up
+//   frc2::Trigger{[&]() { return m_driverController.GetPOV() == 0; }}.WhileTrue(
+//       m_arm.SubstationCommand());
+//   // D-pad down
+//   frc2::Trigger{[&]() { return m_driverController.GetPOV() == 180; }}.WhileTrue(
+//       m_arm.IntakeCommand());
+//   // When the left bumper is clicked, it will open all the pistons
+//   // toggle for intake
+//   m_driverController.A().WhileTrue(
+//       frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); }, {&m_intake}));
+//   m_driverController.A().OnFalse(
+//       frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
 
-  m_driverController.X().WhileTrue(
-      frc2::cmd::Run([this] { m_intake.ReverseIntakeMotors(); }, {&m_intake}));
-  m_driverController.X().OnFalse(
-      frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
-  // toggle claw
-  m_driverController.RightBumper().ToggleOnTrue(
-      frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
-                          [&] { m_claw.SetPosition(false); }, {&m_claw}));
-  // toggle arm piston
-  m_driverController.LeftBumper().ToggleOnTrue(frc2::cmd::Either(
-      frc2::cmd::RunOnce([&] { m_arm.SetLegOut(false); }, {&m_arm}),
-      frc2::cmd::RunOnce([&] { m_arm.SetLegOut(true); }, {&m_arm}),
-      [&]() -> bool { return m_arm.IsLegOut(); }));
-
+//   m_driverController.X().WhileTrue(
+//       frc2::cmd::Run([this] { m_intake.ReverseIntakeMotors(); }, {&m_intake}));
+//   m_driverController.X().OnFalse(
+//       frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
+//   // toggle claw
+//   m_driverController.RightBumper().ToggleOnTrue(
+//       frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
+//                           [&] { m_claw.SetPosition(false); }, {&m_claw}));
+//   // toggle arm piston
+//   m_driverController.LeftBumper().ToggleOnTrue(frc2::cmd::Either(
+//       frc2::cmd::RunOnce([&] { m_arm.SetLegOut(false); }, {&m_arm}),
+//       frc2::cmd::RunOnce([&] { m_arm.SetLegOut(true); }, {&m_arm}),
+//       [&]() -> bool { return m_arm.IsLegOut(); }));
+// End of big comment
   // Reset the arm if the limit switch gets accidentally tripped. (or if Arm
   // angle returns less than Physical Lower Bound or greater than Physical Upper
   // Bound)

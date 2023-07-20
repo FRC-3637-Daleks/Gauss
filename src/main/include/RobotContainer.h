@@ -49,28 +49,28 @@ private:
   frc2::CommandXboxController m_swerveController{
       OperatorConstants::kDriverControllerPort};
 
-  frc2::Trigger m_armResetTrigger{[this]() -> bool {
-    return m_arm.GetNeckAngle() < ArmConstants::kNeckPhysicalLowerBound ||
-           m_arm.GetNeckAngle() > ArmConstants::kNeckPhysicalUpperBound;
-  }};
+  // frc2::Trigger m_armResetTrigger{[this]() -> bool {
+  //   return m_arm.GetNeckAngle() < ArmConstants::kNeckPhysicalLowerBound ||
+  //          m_arm.GetNeckAngle() > ArmConstants::kNeckPhysicalUpperBound;
+  // }};
 
-  Arm m_arm;
-  Claw m_claw;
-  Vision m_vision{[this](frc::Pose2d pose, units::second_t timestamp) {
-                    m_swerve.AddVisionPoseEstimate(pose, timestamp);
-                  },
-                  [this] { return m_swerve.GetPose(); }};
+  // Arm m_arm;
+  // Claw m_claw;
+  // Vision m_vision{[this](frc::Pose2d pose, units::second_t timestamp) {
+  //                   m_swerve.AddVisionPoseEstimate(pose, timestamp);
+  //                 },
+  //                 [this] { return m_swerve.GetPose(); }};
 
-  Intake m_intake;
+  // Intake m_intake;
 
   Drivetrain m_swerve;
 
   void ConfigureBindings();
 
-  const double kMaxSpeed = 3.0; // Maximum speed in meters per second
-  const double kMaxAcceleration =
-      2.0; // Maximum acceleration in meters per second squared
-  const double kRamseteB = 2.0;    // Ramsete controller's B coefficient
-  const double kRamseteZeta = 0.7; // Ramsete controller's Zeta coefficient
+  // const double kMaxSpeed = 3.0; // Maximum speed in meters per second
+  // const double kMaxAcceleration =
+  //     2.0; // Maximum acceleration in meters per second squared
+  // const double kRamseteB = 2.0;    // Ramsete controller's B coefficient
+  // const double kRamseteZeta = 0.7; // Ramsete controller's Zeta coefficient
   // const double kTrackWidth = 0.6;  // Width of your robot's drivetrain
 };
