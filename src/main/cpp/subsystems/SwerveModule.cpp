@@ -52,7 +52,7 @@ SwerveModule::SwerveModule(const std::string name, const int driveMotorId,
   // Since the steer encoders are mounted on the back of their gearmotor, they
   // count opposite the axle's rotation.
   m_steerMotor.SetSensorPhase(true);
-  m_driveMotor.BurnFlash();
+  // m_driveMotor.BurnFlash();
 }
 
 units::meter_t SwerveModule::GetModuleDistance() {

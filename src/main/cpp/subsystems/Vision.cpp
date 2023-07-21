@@ -11,23 +11,24 @@
 Vision::Vision(
     std::function<void(frc::Pose2d, units::second_t)> addVisionMeasurement,
     std::function<frc::Pose2d()> getRobotPose)
-    : m_estimator{
-          frc::LoadAprilTagLayoutField(frc::AprilTagField::k2023ChargedUp),
-          photonlib::AVERAGE_BEST_TARGETS, std::move(m_camera),
-          VisionConstants::kCameraToRobot} {
+    // : m_estimator{
+    //       frc::LoadAprilTagLayoutField(frc::AprilTagField::k2023ChargedUp),
+    //       photonlib::AVERAGE_BEST_TARGETS, std::move(m_camera),
+    //       VisionConstants::kCameraToRobot} 
+    {
   m_addVisionMeasurement = addVisionMeasurement;
   m_getRobotPose = getRobotPose;
 }
 
 bool Vision::HasTargets() {
-  photonlib::PhotonPipelineResult result = m_camera.GetLatestResult();
+  //photonlib::PhotonPipelineResult result = m_camera.GetLatestResult();
 
-  return result.HasTargets();
+  return false;//result.HasTargets();
 }
 
 void Vision::CalculateRobotPoseEstimate() {
   // m_estimator.setReferencePose(m_getRobotPose());
-  m_apriltagEstimate = m_estimator.Update();
+  //m_apriltagEstimate = m_estimator.Update();
 }
 
 // AddVisionPoseEstimate takes in Pose2d and a timestamp, thus the conversion of

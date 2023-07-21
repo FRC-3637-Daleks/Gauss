@@ -11,11 +11,11 @@
 
 void Robot::RobotInit() {
   // Start recording to data log
-  frc::DataLogManager::Start();
+  //frc::DataLogManager::Start();
 
   // Record DS control and joystick data.
   // Change to `false` to not record joystick data.
-  frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog(), true);
+  //frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog(), true);
 }
 
 /**

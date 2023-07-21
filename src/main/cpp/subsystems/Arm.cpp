@@ -7,14 +7,14 @@
 using namespace ArmConstants;
 
 Arm::Arm()
-    : m_solenoid{kPCMId, frc::PneumaticsModuleType::CTREPCM, kPistonChannel},
+    : m_solenoid{kPCMId, frc::PneumaticsModuleType::REVPH, kPistonChannel},
       m_motor{kMotorId},
       m_neckController{kP, kI, kD, {kMaxTurnVelocity, kMaxTurnAcceleration}},
       m_limitSwitch{kLimitSwitchChannel} {
   m_neckController.SetTolerance(1_deg, 10_deg_per_s);
   m_neckController.SetIntegratorRange(0, 3);
   m_motor.ConfigOpenloopRamp(0.5);
-  // m_compressor.EnableDigital();
+  //m_compressor.EnableDigital();
 }
 
 units::radian_t Arm::GetNeckAngle() {
@@ -26,6 +26,7 @@ units::radian_t Arm::GetNeckAngle() {
              units::radian_t{m_motor.GetSelectedSensorPosition() *
                              kEncoderRotationPerPulse} +
          offset;
+  // return 0_rad;
 }
 
 void Arm::SetNeckVoltage(units::volt_t output) {
@@ -74,7 +75,7 @@ frc2::CommandPtr Arm::LowAngleCommand() {
           },
           // Set output to zero when done.
           [this]() {
-            fmt::print("hii");
+            //fmt::print("hii");
             SetNeckVoltage(0_V);
           }));
 }
@@ -137,7 +138,7 @@ frc2::CommandPtr Arm::AlternateHighAngleCommand() {
       .AndThen(frc2::Subsystem::RunEnd(
           // Sets motor output.
           [this]() {
-            auto rawAngle =
+            auto rawAngle = 0_rad;
                 (kEncoderReversed ? -1.0 : 1.0) *
                     units::radian_t{m_motor.GetSelectedSensorPosition() *
                                     kEncoderRotationPerPulse} +
@@ -167,7 +168,7 @@ frc2::CommandPtr Arm::AlternateHighCubeAngleCommand() {
       .AndThen(frc2::Subsystem::RunEnd(
           // Sets motor output.
           [this]() {
-            auto rawAngle =
+            auto rawAngle = 0_rad;
                 (kEncoderReversed ? -1.0 : 1.0) *
                     units::radian_t{m_motor.GetSelectedSensorPosition() *
                                     kEncoderRotationPerPulse} +

@@ -1,10 +1,9 @@
 #include "subsystems/Claw.h"
 
 Claw::Claw()
-    : m_claw{
-          ClawConstants::kPCMPort, frc::PneumaticsModuleType::CTREPCM,
-          ClawConstants::
-              kPistonPort} /*m_limitSwitch{ClawConstants::kLimitSwitchPort}*/ {
+    : m_claw{ClawConstants::kPCMPort, frc::PneumaticsModuleType::REVPH,
+             ClawConstants::kPistonPort},
+      m_limitSwitch{ClawConstants::kLimitSwitchPort} {
   m_claw.Set(true);
   Periodic();
 }

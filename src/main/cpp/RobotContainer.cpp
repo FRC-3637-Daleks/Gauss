@@ -23,10 +23,10 @@ RobotContainer::RobotContainer() {
   frc::SmartDashboard::PutBoolean("CONE HIGH RIGHT", false);
   frc::SmartDashboard::PutBoolean("CUBE HIGH", false);
   frc::SmartDashboard::PutBoolean("CUBE LOW", false);
-
-  frc::DataLogManager::Start();
-  frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
-  frc::DataLogManager::LogNetworkTables(true);
+  
+  // frc::DataLogManager::Start();
+  // frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
+  // frc::DataLogManager::LogNetworkTables(true);
 
   ConfigureBindings();
 }
@@ -44,27 +44,24 @@ void RobotContainer::ConfigureBindings() {
 
   // Set up the default drive command.
 
-  auto fwd = [this]() -> double {
+  auto fwd = [this]() -> units::meters_per_second_t {
     return (AutoConstants::kMaxSpeed *
             frc::ApplyDeadband(
                 m_swerveController.GetRawAxis(OperatorConstants::kForwardAxis),
-                OperatorConstants::kDeadband))
-        .value();
+                OperatorConstants::kDeadband));
   };
-  auto strafe = [this]() -> double {
+  auto strafe = [this]() -> units::meters_per_second_t {
     return (AutoConstants::kMaxSpeed *
             frc::ApplyDeadband(
                 m_swerveController.GetRawAxis(OperatorConstants::kStrafeAxis),
-                OperatorConstants::kDeadband))
-        .value();
+                OperatorConstants::kDeadband));
   };
 
-  auto rot = [this]() -> double {
+  auto rot = [this]() -> units::revolutions_per_minute_t {
     return (AutoConstants::kMaxAngularSpeed *
             frc::ApplyDeadband(-m_swerveController.GetRawAxis(
                                    OperatorConstants::kRotationAxis),
-                               OperatorConstants::kDeadband))
-        .value();
+                               OperatorConstants::kDeadband));
   };
 
   m_swerve.SetDefaultCommand(frc2::ConditionalCommand(
@@ -80,7 +77,7 @@ void RobotContainer::ConfigureBindings() {
       .OnTrue(m_swerve.ZeroHeadingCommand());
   m_swerveController.Button(OperatorConstants::kResetModulesButton)
       .OnTrue(m_swerve.ResetModulesCommand());
-  // Runs a command that does nothing on the Drivetrain subsytem.
+  // Runs a command that does nothing on the Drivetrain subsystem.
   m_swerveController.Button(OperatorConstants::kFreeModulesButton)
       .ToggleOnTrue(frc2::cmd::Run([this] {}, {&m_swerve}));
 
@@ -97,36 +94,36 @@ void RobotContainer::ConfigureBindings() {
   //         40);
   //       }));
 
-//   m_driverController.Start().OnTrue(m_arm.ResetSwitchCommand());
+  m_driverController.Start().OnTrue(m_arm.ResetSwitchCommand());
 
-//   m_driverController.B().WhileTrue(m_arm.LowAngleCommand());
-//   m_driverController.Y().WhileTrue(m_arm.HighAngleCommand());
-//   // D-pad up
-//   frc2::Trigger{[&]() { return m_driverController.GetPOV() == 0; }}.WhileTrue(
-//       m_arm.SubstationCommand());
-//   // D-pad down
-//   frc2::Trigger{[&]() { return m_driverController.GetPOV() == 180; }}.WhileTrue(
-//       m_arm.IntakeCommand());
-//   // When the left bumper is clicked, it will open all the pistons
-//   // toggle for intake
-//   m_driverController.A().WhileTrue(
-//       frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); }, {&m_intake}));
-//   m_driverController.A().OnFalse(
-//       frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
+  m_driverController.B().WhileTrue(m_arm.LowAngleCommand());
+  m_driverController.Y().WhileTrue(m_arm.HighAngleCommand());
+  // D-pad up
+  frc2::Trigger{[&]() { return m_driverController.GetPOV() == 0; }}.WhileTrue(
+      m_arm.SubstationCommand());
+  // D-pad down
+  frc2::Trigger{[&]() { return m_driverController.GetPOV() == 180; }}.WhileTrue(
+      m_arm.IntakeCommand());
+  // When the left bumper is clicked, it will open all the pistons
+  // toggle for intake
+  m_driverController.A().WhileTrue(
+      frc2::cmd::Run([this] { m_intake.SetIntakeMotors(); }, {&m_intake}));
+  m_driverController.A().OnFalse(
+      frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
 
-//   m_driverController.X().WhileTrue(
-//       frc2::cmd::Run([this] { m_intake.ReverseIntakeMotors(); }, {&m_intake}));
-//   m_driverController.X().OnFalse(
-//       frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
-//   // toggle claw
-//   m_driverController.RightBumper().ToggleOnTrue(
-//       frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
-//                           [&] { m_claw.SetPosition(false); }, {&m_claw}));
-//   // toggle arm piston
-//   m_driverController.LeftBumper().ToggleOnTrue(frc2::cmd::Either(
-//       frc2::cmd::RunOnce([&] { m_arm.SetLegOut(false); }, {&m_arm}),
-//       frc2::cmd::RunOnce([&] { m_arm.SetLegOut(true); }, {&m_arm}),
-//       [&]() -> bool { return m_arm.IsLegOut(); }));
+  m_driverController.X().WhileTrue(
+      frc2::cmd::Run([this] { m_intake.ReverseIntakeMotors(); }, {&m_intake}));
+  m_driverController.X().OnFalse(
+      frc2::cmd::Run([this] { m_intake.StopIntakeMotors(); }, {&m_intake}));
+  // toggle claw
+  m_driverController.RightBumper().ToggleOnTrue(
+      frc2::cmd::StartEnd([&] { m_claw.SetPosition(true); },
+                          [&] { m_claw.SetPosition(false); }, {&m_claw}));
+  // toggle arm piston
+  m_driverController.LeftBumper().ToggleOnTrue(frc2::cmd::Either(
+      frc2::cmd::RunOnce([&] { m_arm.SetLegOut(false); }, {&m_arm}),
+      frc2::cmd::RunOnce([&] { m_arm.SetLegOut(true); }, {&m_arm}),
+      [&]() -> bool { return m_arm.IsLegOut(); }));
 // End of big comment
   // Reset the arm if the limit switch gets accidentally tripped. (or if Arm
   // angle returns less than Physical Lower Bound or greater than Physical Upper

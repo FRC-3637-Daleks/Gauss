@@ -19,7 +19,7 @@ public:
 
   void Log();
 
-  void SetIntakeOn(bool SetPiston);
+  // void SetIntakeOn(bool SetPiston);
 
   void SetIntakeMotors();
 
@@ -36,7 +36,7 @@ public:
   void Periodic() override;
 
 private:
-  frc::Solenoid m_intakePiston;
+  // frc::Solenoid m_intakePiston;
   WPI_TalonSRX m_leftIntakeMotor;
   WPI_TalonSRX m_rightIntakeMotor;
 };

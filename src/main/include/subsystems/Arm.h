@@ -25,7 +25,7 @@ public:
 
   void SetLegOut(bool isOut) { m_solenoid.Set(isOut); }
 
-  bool IsLegOut() { return m_solenoid.Get(); }
+  bool IsLegOut() { return false; m_solenoid.Get(); }
 
   void SwitchLegPosition() { m_solenoid.Set(IsLegOut()); }
 
@@ -73,5 +73,5 @@ private:
   bool m_stopped{false};
 
   // frc::Compressor m_compressor{ArmConstants::kPCMId,
-  //                              frc::PneumaticsModuleType::CTREPCM};
+  //                               frc::PneumaticsModuleType::REVPH};
 };

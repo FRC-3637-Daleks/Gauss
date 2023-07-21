@@ -22,11 +22,11 @@ struct PIDCoefficients {
 };
 
 namespace ArmConstants {
-constexpr int kPCMId = 9;
+constexpr int kPCMId = 13;
 constexpr int kPistonChannel = 7;
 constexpr int kClawChannel = 6;
 
-constexpr int kMotorId = 8;
+constexpr int kMotorId = 12;
 
 constexpr int kLimitSwitchChannel = 0;
 
@@ -133,10 +133,10 @@ constexpr int kFrontRightAbsoluteEncoderChannel = 2;
 constexpr int kRearRightAbsoluteEncoderChannel = 3;
 
 // Absolute encoder reading when modules are facing forward.
-constexpr double kFrontLeftAbsoluteEncoderOffset = -2.058;
-constexpr double kRearLeftAbsoluteEncoderOffset = -0.066;
-constexpr double kFrontRightAbsoluteEncoderOffset = -1.76;
-constexpr double kRearRightAbsoluteEncoderOffset = -2.27;
+constexpr double kFrontLeftAbsoluteEncoderOffset = 3.15246;
+constexpr double kRearLeftAbsoluteEncoderOffset = -2.25482; //3.9595;
+constexpr double kFrontRightAbsoluteEncoderOffset = -2.03871;//4.28316;
+constexpr double kRearRightAbsoluteEncoderOffset = 1.377484;
 // constexpr double kFrontLeftAbsoluteEncoderOffset = -2.033;
 // constexpr double kRearLeftAbsoluteEncoderOffset = -1.766;
 // constexpr double kFrontRightAbsoluteEncoderOffset = -0.063;
@@ -204,9 +204,9 @@ constexpr auto kPhysicalMaxAngularSpeed = 180_rpm;
 } // namespace ModuleConstants
 
 namespace ClawConstants {
-constexpr int kPCMPort = 5;
-constexpr int kPistonPort = 2;
-constexpr int kLimitSwitchPort = 1;
+constexpr int kPCMPort = 13;
+constexpr int kPistonPort = 6;
+constexpr int kLimitSwitchPort = 4;
 } // namespace ClawConstants
 
 namespace VisionConstants {
@@ -235,7 +235,7 @@ namespace AutoConstants {
 constexpr auto kTargetAngle = frc::Rotation2d{105_deg};
 constexpr auto kPlacementAngle = frc::Rotation2d{90_deg};
 
-constexpr auto kMaxSpeed = 3_fps;
+constexpr auto kMaxSpeed = 1_mps;
 constexpr auto kMaxAcceleration = units::feet_per_second_squared_t{10};
 
 constexpr double kPBalance = 0.025;
@@ -267,10 +267,10 @@ const frc::TrapezoidProfile<units::radians>::Constraints
 
 } // namespace AutoConstants
 namespace IntakeConstants {
-constexpr int kPCMPort = 5;
+constexpr int kPCMPort = 13;
 constexpr int kPistonPort = 0;
 constexpr int kLeftMotorPort = 10;
-constexpr int kRightMotorPort = 9;
+constexpr int kRightMotorPort = 11;
 constexpr int kRangefinderPort = 0;
 
 constexpr double kIntakeMotorSpeed = 0.5;
@@ -313,5 +313,5 @@ constexpr double kMaxAcceleration =
 constexpr double kRamseteB = 2.0;    // Ramsete controller's B coefficient
 constexpr double kRamseteZeta = 0.7; // Ramsete controller's Zeta coefficient
 
-constexpr double kTrackWidth = 0.6;  // Width of your robot's drivetrain
+constexpr double kTrackWidth = 0.6; // Width of your robot's drivetrain
 } // namespace TrajectoryConstants

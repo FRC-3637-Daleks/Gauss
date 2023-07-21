@@ -80,17 +80,19 @@ public:
   void UpdateDashboard();
 
   // Drive the robot with swerve controls.
-  frc2::CommandPtr SwerveCommand(std::function<double()> forward,
-                                 std::function<double()> strafe,
-                                 std::function<double()> rot);
+  frc2::CommandPtr
+  SwerveCommand(std::function<units::meters_per_second_t()> forward,
+                std::function<units::meters_per_second_t()> strafe,
+                std::function<units::revolutions_per_minute_t()> rot);
 
   // Drive the robot with field-relative swerve controls.
-  frc2::CommandPtr SwerveCommandFieldRelative(std::function<double()> forward,
-                                              std::function<double()> strafe,
-                                              std::function<double()> rot);
+  frc2::CommandPtr SwerveCommandFieldRelative(
+      std::function<units::meters_per_second_t()> forward,
+      std::function<units::meters_per_second_t()> strafe,
+      std::function<units::revolutions_per_minute_t()> rot);
 
   // Drive the robot to pose.
- // frc2::CommandPtr DriveToPoseCommand(frc::Pose2d targetPose);
+  // frc2::CommandPtr DriveToPoseCommand(frc::Pose2d targetPose);
 
   // Check if the robot has reached a pose.
   bool IsFinished(frc::Pose2d targetPose);

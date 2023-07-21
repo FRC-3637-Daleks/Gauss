@@ -15,10 +15,9 @@
 #include "commands/Autos.h"
 #include "subsystems/Arm.h"
 #include "subsystems/Claw.h"
-#include "subsystems/DalekDrive.h"
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Intake.h"
-#include "subsystems/Vision.h"
+//#include "subsystems/Vision.h"
 
 // testing for Trajectories (need to organize after)
 
@@ -49,19 +48,19 @@ private:
   frc2::CommandXboxController m_swerveController{
       OperatorConstants::kDriverControllerPort};
 
-  // frc2::Trigger m_armResetTrigger{[this]() -> bool {
-  //   return m_arm.GetNeckAngle() < ArmConstants::kNeckPhysicalLowerBound ||
-  //          m_arm.GetNeckAngle() > ArmConstants::kNeckPhysicalUpperBound;
-  // }};
+  frc2::Trigger m_armResetTrigger{[this]() -> bool {
+    return m_arm.GetNeckAngle() < ArmConstants::kNeckPhysicalLowerBound ||
+           m_arm.GetNeckAngle() > ArmConstants::kNeckPhysicalUpperBound;
+  }};
 
-  // Arm m_arm;
-  // Claw m_claw;
+  Arm m_arm;
+  Claw m_claw;
   // Vision m_vision{[this](frc::Pose2d pose, units::second_t timestamp) {
   //                   m_swerve.AddVisionPoseEstimate(pose, timestamp);
   //                 },
   //                 [this] { return m_swerve.GetPose(); }};
 
-  // Intake m_intake;
+  Intake m_intake;
 
   Drivetrain m_swerve;
 

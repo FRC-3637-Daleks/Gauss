@@ -66,21 +66,34 @@ void Drivetrain::Drive(units::meters_per_second_t forwardSpeed,
                        units::meters_per_second_t strafeSpeed,
                        units::radians_per_second_t angularSpeed,
                        bool fieldRelative) {
-  // Use the kinematics model to get from the set of commanded speeds to a set
-  // of states that can be commanded to each module.
+
+  // fmt::print("{}, {}, {}, inside drive method", forwardSpeed, strafeSpeed,
+  //            angularSpeed);
+  //  Use the kinematics model to get from the set of commanded speeds to a set
+  //  of states that can be commanded to each module.
   auto states = kDriveKinematics.ToSwerveModuleStates(
       fieldRelative
           ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
                 forwardSpeed, strafeSpeed, angularSpeed, GetHeading())
           : frc::ChassisSpeeds{forwardSpeed, strafeSpeed, angularSpeed});
 
+  // fmt::print("calculated swerve module states\n");
+
   // Occasionally a drive motor is commanded to go faster than its maximum
   // output can sustain. Desaturation lowers the module speeds so that no motor
   // is driven above its maximum speed, while preserving the intended motion.
   kDriveKinematics.DesaturateWheelSpeeds(&states, AutoConstants::kMaxSpeed);
 
+  // fmt::print("desaturated wheel speeds\n");
+
   // Finally each of the desired states can be sent as commands to the modules.
   auto [fl, fr, rl, rr] = states;
+
+  // fmt::print("setting swerve module states\n");
+  // fmt::print("{} FL\n", fl.speed.value());
+  // fmt::print("{} FR\n", fr.speed.value());
+  // fmt::print("{} RL\n", rl.speed.value());
+  // fmt::print("{} RR\n", rr.speed.value());
 
   m_frontLeft.SetDesiredState(fl);
   m_frontRight.SetDesiredState(fr);
@@ -151,23 +164,23 @@ void Drivetrain::UpdateDashboard() {
   frc::SmartDashboard::PutData("Field", &m_field);
 }
 
-frc2::CommandPtr Drivetrain::SwerveCommand(std::function<double()> forward,
-                                           std::function<double()> strafe,
-                                           std::function<double()> rot) {
-  return this->Run([&] {
-    Drive(kMaxTeleopSpeed * forward(), kMaxTeleopSpeed * strafe(),
-          AutoConstants::kMaxAngularSpeed * rot(), false);
+frc2::CommandPtr Drivetrain::SwerveCommand(
+    std::function<units::meters_per_second_t()> forward,
+    std::function<units::meters_per_second_t()> strafe,
+    std::function<units::revolutions_per_minute_t()> rot) {
+  // fmt::print("making command\n");
+  return this->Run([=] {
+    // fmt::print("starting drive command\n");
+    Drive(forward(), strafe(), rot(), false);
+    // fmt::print("sent drive command\n");
   });
 }
 
-frc2::CommandPtr
-Drivetrain::SwerveCommandFieldRelative(std::function<double()> forward,
-                                       std::function<double()> strafe,
-                                       std::function<double()> rot) {
-  return this->Run([&] {
-    Drive(kMaxTeleopSpeed * forward(), kMaxTeleopSpeed * strafe(),
-          AutoConstants::kMaxAngularSpeed * rot(), true);
-  });
+frc2::CommandPtr Drivetrain::SwerveCommandFieldRelative(
+    std::function<units::meters_per_second_t()> forward,
+    std::function<units::meters_per_second_t()> strafe,
+    std::function<units::revolutions_per_minute_t()> rot) {
+  return this->Run([=] { Drive(forward(), strafe(), rot(), true); });
 }
 
 // // needs work

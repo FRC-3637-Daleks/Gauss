@@ -22,9 +22,9 @@ public:
   void CalculateRobotPoseEstimate();
 
 private:
-  photonlib::PhotonCamera m_camera{VisionConstants::kPhotonCameraName};
+  //photonlib::PhotonCamera m_camera{VisionConstants::kPhotonCameraName};
 
-  photonlib::PhotonPoseEstimator m_estimator;
+  //photonlib::PhotonPoseEstimator m_estimator;
 
   std::optional<photonlib::EstimatedRobotPose> m_apriltagEstimate{std::nullopt};
 
