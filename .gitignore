@@ -167,3 +167,6 @@ networktables.json
 
 # Telemetry Logs
 *.wpilog
+
+# Static Files
+src/main/deploy/gitInfo.txt

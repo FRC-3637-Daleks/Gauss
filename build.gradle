@@ -1,7 +1,7 @@
 plugins {
     id "cpp"
     id "google-test-test-suite"
-    id "edu.wpi.first.GradleRIO" version "2023.4.2"
+    id "edu.wpi.first.GradleRIO" version "2023.4.3"
 }
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
@@ -36,7 +36,7 @@ deploy {
 def deployArtifact = deploy.targets.roborio.artifacts.frcCpp
 
 // Set this to true to enable desktop support.
-def includeDesktopSupport = false
+def includeDesktopSupport = true
 
 // Set to true to run simulation in debug mode
 wpi.cpp.debugSimulation = false
@@ -97,3 +97,29 @@ model {
         }
     }
 }
+
+tasks.register("writeGitInfo") {
+   // Define an output stream to write to instead of terminal
+   def stdout = new ByteArrayOutputStream()
+
+   // Execute the git commands
+   exec {
+      commandLine "git", "rev-parse", "--abbrev-ref", "HEAD"
+
+      // Write to the output stream instead of terminal
+      standardOutput = stdout
+   }
+
+   // Parse the output into a string
+   def gitInfo = stdout.toString().trim()
+
+   // Create a new file
+   new File(
+      // Join project directory and deploy directory
+      projectDir.toString() + "/src/main/deploy",
+      // File name to write to
+      "gitInfo.txt"
+   ).text = gitInfo // Set the contents of the file to the variable gitInfo
+}
+
+deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn(writeGitInfo)

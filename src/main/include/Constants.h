@@ -206,7 +206,7 @@ constexpr auto kPhysicalMaxAngularSpeed = 180_rpm;
 namespace ClawConstants {
 constexpr int kPCMPort = 13;
 constexpr int kPistonPort = 6;
-constexpr int kLimitSwitchPort = 4;
+constexpr int kLimitSwitchPort = 0;
 } // namespace ClawConstants
 
 namespace VisionConstants {

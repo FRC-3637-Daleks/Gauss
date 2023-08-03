@@ -1,6 +1,8 @@
 #include "subsystems/Drivetrain.h"
 
+#include <frc/I2C.h>
 #include <frc/SPI.h>
+#include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <wpi/array.h>
@@ -38,14 +40,8 @@ Drivetrain::Drivetrain()
                   kRearRightAbsoluteEncoderOffset,
                   kRearRightDriveMotorPIDCoefficients,
                   kRearRightSteerMotorPIDCoefficients},
-      m_gyro{frc::SPI::Port::kMXP}, m_odometry{kDriveKinematics,
-                                               GetHeading(),
-                                               {m_frontLeft.GetPosition(),
-                                                m_frontRight.GetPosition(),
-                                                m_rearLeft.GetPosition(),
-                                                m_rearRight.GetPosition()},
-                                               frc::Pose2d()},
-      m_poseEstimator{kDriveKinematics, m_gyro.GetRotation2d(),
+      m_gyro{frc::SPI::Port::kMXP},
+      m_poseEstimator{kDriveKinematics, GetHeading(),
                       wpi::array<frc::SwerveModulePosition, 4U>{
                           m_frontLeft.GetPosition(), m_rearLeft.GetPosition(),
                           m_frontRight.GetPosition(),
@@ -54,10 +50,10 @@ Drivetrain::Drivetrain()
 
 void Drivetrain::Periodic() {
   // Update the odometry with the current gyro angle and module states.
-  m_odometry.Update(GetHeading(),
-                    {m_frontLeft.GetPosition(), m_rearLeft.GetPosition(),
+  m_poseEstimator.Update(
+      GetHeading(), {m_frontLeft.GetPosition(), m_rearLeft.GetPosition(),
                      m_frontRight.GetPosition(), m_rearRight.GetPosition()});
-  m_field.SetRobotPose(m_odometry.GetPose());
+  m_field.SetRobotPose(m_poseEstimator.GetEstimatedPosition());
 
   UpdateDashboard();
 }
@@ -126,10 +122,12 @@ units::degrees_per_second_t Drivetrain::GetTurnRate() {
   return m_gyro.GetRate() * 1_deg_per_s;
 }
 
-frc::Pose2d Drivetrain::GetPose() { return m_odometry.GetPose(); }
+frc::Pose2d Drivetrain::GetPose() {
+  return m_poseEstimator.GetEstimatedPosition();
+}
 
 void Drivetrain::ResetOdometry(const frc::Pose2d &pose) {
-  m_odometry.ResetPosition(
+  m_poseEstimator.ResetPosition(
       GetHeading(),
       {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
        m_rearLeft.GetPosition(), m_rearRight.GetPosition()},
@@ -138,8 +136,9 @@ void Drivetrain::ResetOdometry(const frc::Pose2d &pose) {
 
 void Drivetrain::UpdateDashboard() {
   frc::SmartDashboard::PutData("Field", &m_field);
-  frc::SmartDashboard::PutBoolean("Gyro calibrating?", m_gyro.IsCalibrating());
-  frc::SmartDashboard::PutNumber("Robot heading",
+  frc::SmartDashboard::PutBoolean("Swerve/Gyro calibrating?",
+                                  m_gyro.IsCalibrating());
+  frc::SmartDashboard::PutNumber("Swerve/Robot heading",
                                  GetHeading().Degrees().value());
   double swerveStates[] = {m_frontLeft.GetState().angle.Radians().value(),
                            m_frontLeft.GetState().speed.value(),
@@ -150,7 +149,7 @@ void Drivetrain::UpdateDashboard() {
                            m_rearRight.GetState().angle.Radians().value(),
                            m_rearRight.GetState().speed.value()};
   frc::SmartDashboard::PutNumberArray(
-      "Swerve Module States",
+      "Swerve/Swerve Module States",
       swerveStates); // Have to initialize array separately due as an error
                      // occurs when an array attempts to initialize as a
                      // parameter.
@@ -159,9 +158,7 @@ void Drivetrain::UpdateDashboard() {
   m_frontRight.UpdateDashboard();
   m_rearRight.UpdateDashboard();
 
-  frc::SmartDashboard::PutNumber("Gyro", m_gyro.GetAngle());
-
-  frc::SmartDashboard::PutData("Field", &m_field);
+  frc::SmartDashboard::PutNumber("Swerve/Gyro", m_gyro.GetAngle());
 }
 
 frc2::CommandPtr Drivetrain::SwerveCommand(
@@ -204,19 +201,19 @@ frc2::CommandPtr Drivetrain::SwerveCommandFieldRelative(
 //   return {nullptr};
 // }
 
-// Check if the robot has reached the target pose
-// need to fix
-bool Drivetrain::IsFinished(frc::Pose2d targetPose) {
+// // Check if the robot has reached the target pose
+// // need to fix
+// bool Drivetrain::IsFinished(frc::Pose2d targetPose) {
 
-  frc::Pose2d startPose = m_odometry.GetPose();
+//   frc::Pose2d startPose = m_odometry.GetPose();
 
-  auto distanceError =
-      targetPose.Translation().Distance(startPose.Translation());
-  auto angleError =
-      targetPose.Rotation().Radians() - startPose.Rotation().Radians();
-  return distanceError < kDistanceTolerance &&
-         std::fabs((double)angleError) < 0.05;
-}
+//   auto distanceError =
+//       targetPose.Translation().Distance(startPose.Translation());
+//   auto angleError =
+//       targetPose.Rotation().Radians() - startPose.Rotation().Radians();
+//   return distanceError < kDistanceTolerance &&
+//          std::fabs((double)angleError) < 0.05;
+// }
 
 frc2::CommandPtr Drivetrain::ZeroHeadingCommand() {
   return this->RunOnce([&] { ZeroHeading(); });

@@ -2,8 +2,7 @@
 
 Claw::Claw()
     : m_claw{ClawConstants::kPCMPort, frc::PneumaticsModuleType::REVPH,
-             ClawConstants::kPistonPort},
-      m_limitSwitch{ClawConstants::kLimitSwitchPort} {
+             ClawConstants::kPistonPort} {
   m_claw.Set(true);
   Periodic();
 }

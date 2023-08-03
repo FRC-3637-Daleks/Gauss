@@ -4,12 +4,15 @@
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/filesystem.h>
+#include <frc/geometry/Pose2d.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/button/CommandJoystick.h>
 #include <frc2/command/button/CommandXboxController.h>
+#include <fstream>
 
 #include "Constants.h"
 #include "commands/Autos.h"
@@ -17,7 +20,7 @@
 #include "subsystems/Claw.h"
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Intake.h"
-//#include "subsystems/Vision.h"
+#include "subsystems/Vision.h"
 
 // testing for Trajectories (need to organize after)
 
@@ -55,10 +58,10 @@ private:
 
   Arm m_arm;
   Claw m_claw;
-  // Vision m_vision{[this](frc::Pose2d pose, units::second_t timestamp) {
-  //                   m_swerve.AddVisionPoseEstimate(pose, timestamp);
-  //                 },
-  //                 [this] { return m_swerve.GetPose(); }};
+  Vision m_vision{[this](frc::Pose2d pose, units::second_t timestamp) -> void {
+                    m_swerve.AddVisionPoseEstimate(pose, timestamp);
+                  },
+                  [this] () -> frc::Pose2d { return m_swerve.GetPose(); }};
 
   Intake m_intake;
 
@@ -72,4 +75,10 @@ private:
   // const double kRamseteB = 2.0;    // Ramsete controller's B coefficient
   // const double kRamseteZeta = 0.7; // Ramsete controller's Zeta coefficient
   // const double kTrackWidth = 0.6;  // Width of your robot's drivetrain
+
+  std::string deployDir = frc::filesystem::GetDeployDirectory();
+  std::ifstream infoFile{deployDir + "/gitInfo.txt"};
+  std::string gitInfo;
+  
+  
 };

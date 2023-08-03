@@ -114,6 +114,7 @@ void SwerveModule::UpdateDashboard() {
   frc::SmartDashboard::PutNumber(fmt::format("{} absolute position", m_name),
                                  GetAbsoluteEncoderPosition().value());
   frc::SmartDashboard::PutNumber(fmt::format("{} velocity state (mps)", m_name), state.speed.value());
+  frc::SmartDashboard::PutNumber(fmt::format("{} voltage", m_name), m_driveMotor.GetBusVoltage());
   // frc::SmartDashboard::PutNumber(fmt::format("{} drive raw", m_name),
   //                                m_driveEncoder.GetVelocity());
   // frc::SmartDashboard::PutNumber(fmt::format("{} steer raw", m_name),

@@ -23,35 +23,64 @@ RobotContainer::RobotContainer() {
   frc::SmartDashboard::PutBoolean("CONE HIGH RIGHT", false);
   frc::SmartDashboard::PutBoolean("CUBE HIGH", false);
   frc::SmartDashboard::PutBoolean("CUBE LOW", false);
-  
-  // frc::DataLogManager::Start();
-  // frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
-  // frc::DataLogManager::LogNetworkTables(true);
+
+  frc::DataLogManager::Start();
+  frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
+  frc::DataLogManager::LogNetworkTables(true);
+
+  // Log Match Info
+  std::string matchType =
+      frc::DriverStation::GetMatchType() == frc::DriverStation::MatchType::kNone
+          ? ""
+          : (frc::DriverStation::GetMatchType() ==
+                     frc::DriverStation::MatchType::kElimination
+                 ? "Elimination"
+                 : (frc::DriverStation::GetMatchType() ==
+                            frc::DriverStation::MatchType::kQualification
+                        ? "Qualification"
+                        : "Practice"));
+
+  std::string alliance = frc::DriverStation::GetAlliance() ==
+                                 frc::DriverStation::Alliance::kInvalid
+                             ? "No"
+                             : (frc::DriverStation::GetAlliance() ==
+                                        frc::DriverStation::Alliance::kRed
+                                    ? "Red"
+                                    : "Blue");
+
+  frc::DataLogManager::Log(
+      fmt::format("Playing {} Match {} at {} as {} alliance\n", matchType,
+                  frc::DriverStation::GetMatchNumber(),
+                  frc::DriverStation::GetEventName(), alliance));
+
+  // Print out Git Information
+  std::getline(infoFile, gitInfo);
+  frc::DataLogManager::Log(fmt::format("Git Branch: {}\n", gitInfo));
 
   ConfigureBindings();
 }
 
 void RobotContainer::ConfigureBindings() {
 
-//   // Move neck with xbox joystick.
-//   m_arm.SetDefaultCommand(frc2::cmd::Run(
-//       [this] {
-//         double output = m_driverController.GetLeftY();
-//         m_arm.SetNeckVoltage(-2.0 * std::copysign(output * output, output) *
-//                              1_V);
-//       },
-//       {&m_arm}));
+  // Move neck with xbox joystick.
+  m_arm.SetDefaultCommand(frc2::cmd::Run(
+      [this] {
+        double output = frc::ApplyDeadband(m_driverController.GetLeftY(), OperatorConstants::kDeadband);
+        m_arm.SetNeckVoltage(-2.0 * std::copysign(output * output, output) *
+                             1_V);
+      },
+      {&m_arm}));
 
   // Set up the default drive command.
 
   auto fwd = [this]() -> units::meters_per_second_t {
-    return (AutoConstants::kMaxSpeed *
+    return (DriveConstants::kMaxTeleopSpeed *
             frc::ApplyDeadband(
                 m_swerveController.GetRawAxis(OperatorConstants::kForwardAxis),
                 OperatorConstants::kDeadband));
   };
   auto strafe = [this]() -> units::meters_per_second_t {
-    return (AutoConstants::kMaxSpeed *
+    return (DriveConstants::kMaxTeleopSpeed *
             frc::ApplyDeadband(
                 m_swerveController.GetRawAxis(OperatorConstants::kStrafeAxis),
                 OperatorConstants::kDeadband));
@@ -59,17 +88,20 @@ void RobotContainer::ConfigureBindings() {
 
   auto rot = [this]() -> units::revolutions_per_minute_t {
     return (AutoConstants::kMaxAngularSpeed *
-            frc::ApplyDeadband(-m_swerveController.GetRawAxis(
-                                   OperatorConstants::kRotationAxis),
-                               OperatorConstants::kDeadband));
+            frc::ApplyDeadband(
+                m_swerveController.GetRawAxis(OperatorConstants::kRotationAxis),
+                OperatorConstants::kDeadband));
   };
 
-  m_swerve.SetDefaultCommand(frc2::ConditionalCommand(
-      m_swerve.SwerveCommandFieldRelative(fwd, strafe, rot).Unwrap(),
-      m_swerve.SwerveCommand(fwd, strafe, rot).Unwrap(), [this]() -> bool {
-        return m_swerveController.GetRawButton(
-            OperatorConstants::kFieldRelativeButton);
-      }));
+  // m_swerve.SetDefaultCommand(frc2::ConditionalCommand(
+  //     m_swerve.SwerveCommandFieldRelative(fwd, strafe, rot).Unwrap(),
+  //     m_swerve.SwerveCommand(fwd, strafe, rot).Unwrap(), [this]() -> bool {
+  //       return m_swerveController.GetRawButton(
+  //           OperatorConstants::kFieldRelativeButton);
+  //     }));
+  m_swerve.SetDefaultCommand(m_swerve.SwerveCommand(fwd, strafe, rot));
+  m_swerveController.Button(OperatorConstants::kFieldRelativeButton)
+      .WhileTrue(m_swerve.SwerveCommandFieldRelative(fwd, strafe, rot));
 
   // Swerve Button Configs
   // Configure button bindings.
@@ -124,7 +156,7 @@ void RobotContainer::ConfigureBindings() {
       frc2::cmd::RunOnce([&] { m_arm.SetLegOut(false); }, {&m_arm}),
       frc2::cmd::RunOnce([&] { m_arm.SetLegOut(true); }, {&m_arm}),
       [&]() -> bool { return m_arm.IsLegOut(); }));
-// End of big comment
+  // End of big comment
   // Reset the arm if the limit switch gets accidentally tripped. (or if Arm
   // angle returns less than Physical Lower Bound or greater than Physical Upper
   // Bound)

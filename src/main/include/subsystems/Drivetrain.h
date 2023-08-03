@@ -118,7 +118,7 @@ private:
   AHRS m_gyro;
 
   // Odometer for tracking the robot's position on the field.
-  frc::SwerveDriveOdometry<4> m_odometry;
+  // frc::SwerveDriveOdometry<4> m_odometry;
 
   // Pose Estimator for estimating the robot's position on the field.
   frc::SwerveDrivePoseEstimator<4> m_poseEstimator;

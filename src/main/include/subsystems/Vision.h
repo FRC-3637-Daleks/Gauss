@@ -5,6 +5,7 @@
 #include <frc2/command/SubsystemBase.h>
 #include <photonlib/PhotonCamera.h>
 #include <photonlib/PhotonPoseEstimator.h>
+#include <frc/geometry/Pose2d.h>
 
 #include "Constants.h"
 
@@ -22,9 +23,9 @@ public:
   void CalculateRobotPoseEstimate();
 
 private:
-  //photonlib::PhotonCamera m_camera{VisionConstants::kPhotonCameraName};
+  photonlib::PhotonCamera m_camera{VisionConstants::kPhotonCameraName};
 
-  //photonlib::PhotonPoseEstimator m_estimator;
+  photonlib::PhotonPoseEstimator m_estimator;
 
   std::optional<photonlib::EstimatedRobotPose> m_apriltagEstimate{std::nullopt};
 

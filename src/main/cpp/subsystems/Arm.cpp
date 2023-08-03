@@ -22,6 +22,9 @@ units::radian_t Arm::GetNeckAngle() {
   if (IsLegOut()) {
     offset += kLegOffset;
   }
+
+  //fmt::print("motor encoder: {}\n", m_motor.GetSelectedSensorPosition());
+
   return (kEncoderReversed ? -1.0 : 1.0) *
              units::radian_t{m_motor.GetSelectedSensorPosition() *
                              kEncoderRotationPerPulse} +
@@ -108,7 +111,7 @@ frc2::CommandPtr Arm::HighAngleCommand() {
   return this
       ->RunOnce([this]() {
         m_neckController.Reset(GetNeckAngle());
-        m_neckController.SetGoal(120_deg);
+        m_neckController.SetGoal(100_deg);
       })
       .AndThen(this->RunEnd(
           // Sets motor output.
@@ -284,6 +287,7 @@ void Arm::Log() {
   frc::SmartDashboard::PutNumber("Angle",
                                  units::degree_t{GetNeckAngle()}.value());
   frc::SmartDashboard::PutBoolean("at goal?", m_neckController.AtGoal());
+  frc::SmartDashboard::PutNumber("arm motor encoder", m_motor.GetSelectedSensorPosition());
 }
 
 void Arm::ZeroNeck() { m_motor.SetSelectedSensorPosition(0); }
