@@ -65,7 +65,8 @@ void RobotContainer::ConfigureBindings() {
   // Move neck with xbox joystick.
   m_arm.SetDefaultCommand(frc2::cmd::Run(
       [this] {
-        double output = frc::ApplyDeadband(m_driverController.GetLeftY(), OperatorConstants::kDeadband);
+        double output = frc::ApplyDeadband(m_driverController.GetLeftY(),
+                                           OperatorConstants::kDeadband);
         m_arm.SetNeckVoltage(-2.0 * std::copysign(output * output, output) *
                              1_V);
       },
@@ -160,7 +161,9 @@ void RobotContainer::ConfigureBindings() {
   // Reset the arm if the limit switch gets accidentally tripped. (or if Arm
   // angle returns less than Physical Lower Bound or greater than Physical Upper
   // Bound)
-  //   m_armResetTrigger.Debounce(100_ms).WhileTrue(m_arm.ResetSwitchCommand());
+  m_armResetTrigger.Debounce(100_ms).WhileTrue(m_arm.ResetSwitchCommand());
+  m_odometryResetTrigger.WhileTrue(
+      frc2::cmd::Run([this] { m_vision.CalculateRobotPoseEstimate(); }));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

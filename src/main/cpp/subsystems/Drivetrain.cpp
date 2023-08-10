@@ -159,6 +159,15 @@ void Drivetrain::UpdateDashboard() {
   m_rearRight.UpdateDashboard();
 
   frc::SmartDashboard::PutNumber("Swerve/Gyro", m_gyro.GetAngle());
+
+  frc::SmartDashboard::PutNumber("PDH/Voltage", m_pdh.GetVoltage());
+
+  frc::SmartDashboard::PutNumber("PDH/Total Current", m_pdh.GetTotalCurrent());
+  // for (int channel = 0; channel < 24; channel++) {
+  //   frc::SmartDashboard::PutNumber(
+  //       ("PDH/Ch" + std::to_string(channel) + " Current"),
+  //       m_pdh.GetCurrent(channel));
+  // }
 }
 
 frc2::CommandPtr Drivetrain::SwerveCommand(

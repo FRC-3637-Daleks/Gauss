@@ -1,5 +1,5 @@
 #include "subsystems/Vision.h"
-#include "subsystems/DalekDrive.h"
+#include "subsystems/Drivetrain.h"
 
 #include <frc/apriltag/AprilTagFieldLayout.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -13,9 +13,8 @@ Vision::Vision(
     std::function<frc::Pose2d()> getRobotPose)
     : m_estimator{
           frc::LoadAprilTagLayoutField(frc::AprilTagField::k2023ChargedUp),
-          photonlib::AVERAGE_BEST_TARGETS, std::move(m_camera),
-          VisionConstants::kCameraToRobot} 
-    {
+          photonlib::CLOSEST_TO_REFERENCE_POSE, std::move(m_camera),
+          VisionConstants::kCameraToRobot} {
   m_addVisionMeasurement = addVisionMeasurement;
   m_getRobotPose = getRobotPose;
 }
@@ -27,8 +26,16 @@ bool Vision::HasTargets() {
 }
 
 void Vision::CalculateRobotPoseEstimate() {
-  m_estimator.SetReferencePose(frc::Pose3d{m_getRobotPose()});
-  m_apriltagEstimate = m_estimator.Update();
+
+    m_estimator.SetReferencePose(frc::Pose3d{m_getRobotPose()});
+    m_apriltagEstimate = m_estimator.Update();
+
+    if (m_apriltagEstimate.has_value()) {
+      m_addVisionMeasurement(
+          m_apriltagEstimate.value().estimatedPose.ToPose2d(),
+          m_apriltagEstimate.value().timestamp);
+
+  };
 }
 
 // AddVisionPoseEstimate takes in Pose2d and a timestamp, thus the conversion of
@@ -37,10 +44,4 @@ void Vision::CalculateRobotPoseEstimate() {
 // current time and subtracting it from the result.second
 // make sure to do above before calling AddVisionPoseEstimate
 
-void Vision::Periodic() {
-  CalculateRobotPoseEstimate();
-  if (m_apriltagEstimate.has_value()) {
-    m_addVisionMeasurement(m_apriltagEstimate.value().estimatedPose.ToPose2d(),
-                           m_apriltagEstimate.value().timestamp);
-  }
-}
+void Vision::Periodic() {}

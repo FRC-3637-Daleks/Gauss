@@ -11,6 +11,7 @@
 #include <frc/smartdashboard/Field2d.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
+#include <frc/PowerDistribution.h>
 
 #include "Constants.h"
 #include "SwerveModule.h"
@@ -125,4 +126,7 @@ private:
 
   // Field widget for Shuffleboard.
   frc::Field2d m_field;
+
+  frc::PowerDistribution m_pdh{14,
+                               frc::PowerDistribution::ModuleType::kRev};
 };

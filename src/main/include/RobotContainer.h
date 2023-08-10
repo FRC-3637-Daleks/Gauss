@@ -1,11 +1,11 @@
 #pragma once
 
 #include <frc/XboxController.h>
+#include <frc/filesystem.h>
 #include <frc/filter/SlewRateLimiter.h>
+#include <frc/geometry/Pose2d.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/filesystem.h>
-#include <frc/geometry/Pose2d.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/Commands.h>
@@ -56,16 +56,23 @@ private:
            m_arm.GetNeckAngle() > ArmConstants::kNeckPhysicalUpperBound;
   }};
 
+  frc2::Trigger m_odometryResetTrigger {
+    [this]() -> bool {
+      return m_swerve.GetPose().X() == 0_m && m_swerve.GetPose().Y() == 0_m;
+    }
+  };
+
   Arm m_arm;
   Claw m_claw;
-  Vision m_vision{[this](frc::Pose2d pose, units::second_t timestamp) -> void {
-                    m_swerve.AddVisionPoseEstimate(pose, timestamp);
-                  },
-                  [this] () -> frc::Pose2d { return m_swerve.GetPose(); }};
 
   Intake m_intake;
 
   Drivetrain m_swerve;
+
+  Vision m_vision{[this](frc::Pose2d pose, units::second_t timestamp) -> void {
+                    m_swerve.AddVisionPoseEstimate(pose, timestamp);
+                  },
+                  [this]() -> frc::Pose2d { return m_swerve.GetPose(); }};
 
   void ConfigureBindings();
 
@@ -79,6 +86,4 @@ private:
   std::string deployDir = frc::filesystem::GetDeployDirectory();
   std::ifstream infoFile{deployDir + "/gitInfo.txt"};
   std::string gitInfo;
-  
-  
 };

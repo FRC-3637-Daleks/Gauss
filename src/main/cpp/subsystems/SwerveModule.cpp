@@ -91,9 +91,9 @@ void SwerveModule::SetDesiredState(
       rev::SparkMaxPIDController::ArbFFUnits::kPercentOut);
   m_steerMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position,
                    ToTalonUnits(state.angle));
-  frc::SmartDashboard::PutNumber(fmt::format("{} angle", m_name),
+  frc::SmartDashboard::PutNumber(fmt::format("{}/angle", m_name),
                                  state.angle.Degrees().value());
-  frc::SmartDashboard::PutNumber(fmt::format("{} velocity output (mps)", m_name), state.speed.value());
+  frc::SmartDashboard::PutNumber(fmt::format("{}/velocity output (mps)", m_name), state.speed.value());
 }
 
 void SwerveModule::ResetEncoders() {
@@ -105,16 +105,19 @@ void SwerveModule::ResetEncoders() {
 // TODO Display things neater on the SmartDashboard.
 void SwerveModule::UpdateDashboard() {
   const auto state = GetState();
-  frc::SmartDashboard::PutString(fmt::format("{} module state", m_name),
+  frc::SmartDashboard::PutString(fmt::format("{}/module state", m_name),
                                  fmt::format("{:4f}@{:4f}°",
                                              state.speed.value(),
                                              state.angle.Degrees().value()));
-  frc::SmartDashboard::PutNumber(fmt::format("{} MA3 angle", m_name),
+  frc::SmartDashboard::PutNumber(fmt::format("{}/MA3 angle", m_name),
                                  m_absoluteEncoder.Get());
-  frc::SmartDashboard::PutNumber(fmt::format("{} absolute position", m_name),
+  frc::SmartDashboard::PutNumber(fmt::format("{}/absolute position", m_name),
                                  GetAbsoluteEncoderPosition().value());
-  frc::SmartDashboard::PutNumber(fmt::format("{} velocity state (mps)", m_name), state.speed.value());
-  frc::SmartDashboard::PutNumber(fmt::format("{} voltage", m_name), m_driveMotor.GetBusVoltage());
+  frc::SmartDashboard::PutNumber(fmt::format("{}/velocity state (mps)", m_name), state.speed.value());
+  frc::SmartDashboard::PutNumber(fmt::format("{}/drive voltage", m_name), m_driveMotor.GetBusVoltage());
+  frc::SmartDashboard::PutNumber(fmt::format("{}/turn voltage", m_name), m_steerMotor.GetBusVoltage());
+  frc::SmartDashboard::PutNumber(fmt::format("{}/drive current", m_name), m_driveMotor.GetOutputCurrent());
+  frc::SmartDashboard::PutNumber(fmt::format("{}/turn current", m_name), m_steerMotor.GetOutputCurrent());
   // frc::SmartDashboard::PutNumber(fmt::format("{} drive raw", m_name),
   //                                m_driveEncoder.GetVelocity());
   // frc::SmartDashboard::PutNumber(fmt::format("{} steer raw", m_name),
