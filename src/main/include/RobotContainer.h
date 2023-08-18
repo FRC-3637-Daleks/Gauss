@@ -74,6 +74,8 @@ private:
                   },
                   [this]() -> frc::Pose2d { return m_swerve.GetPose(); }};
 
+  frc2::CommandPtr m_pathPlannerTest;
+
   void ConfigureBindings();
 
   // const double kMaxSpeed = 3.0; // Maximum speed in meters per second
