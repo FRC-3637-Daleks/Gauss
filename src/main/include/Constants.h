@@ -169,7 +169,7 @@ constexpr struct PIDCoefficients kRearRightSteerMotorPIDCoefficients {
   3.5, 0, 0, 0, 0
 };
 
-constexpr auto kMaxTeleopSpeed = 20_fps;
+constexpr auto kMaxTeleopSpeed = 14_fps;
 // constexpr auto kPreciseSpeed = 2_fps; // left out because it already exists
 // above
 
@@ -199,8 +199,8 @@ constexpr auto kSteerEncoderDistancePerCount =
     2_rad * std::numbers::pi / kSteerEncoderCPR; // Radians per encoder count.
 
 // Values measured with the drivetrain suspended.
-constexpr auto kPhysicalMaxSpeed = 15_mps;
-constexpr auto kPhysicalMaxAngularSpeed = 270_rpm;
+constexpr auto kPhysicalMaxSpeed = 14_fps;
+constexpr auto kPhysicalMaxAngularSpeed = 180_rpm;
 } // namespace ModuleConstants
 
 namespace ClawConstants {
@@ -253,7 +253,7 @@ constexpr auto kSubstationShelf = 100_deg;
 // Swerve Constants (NEED TO BE INTEGRATED)
 // constexpr auto kMaxSpeed = ModuleConstants::kPhysicalMaxSpeed / 3; // left
 // out as these are repeat values constexpr auto kMaxAcceleration = 10_fps_sq;
-constexpr auto kMaxAngularSpeed = 180_rpm;
+constexpr auto kMaxAngularSpeed = 90_rpm;
 constexpr auto kMaxAngularAcceleration = std::numbers::pi * 1_rad_per_s_sq;
 
 // XXX Very untrustworthy placeholder values.

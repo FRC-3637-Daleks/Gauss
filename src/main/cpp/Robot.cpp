@@ -11,11 +11,11 @@
 
 void Robot::RobotInit() {
   // Start recording to data log
-  //frc::DataLogManager::Start();
+  // frc::DataLogManager::Start();
 
   // Record DS control and joystick data.
   // Change to `false` to not record joystick data.
-  //frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog(), true);
+  // frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog(), true);
 }
 
 /**
@@ -66,6 +66,14 @@ void Robot::TeleopInit() {
  */
 void Robot::TeleopPeriodic() {
   // m_container.ConfigureDashboard();
+  // rev::CANSparkMax drivemotor{1,
+  //                             rev::CANSparkMaxLowLevel::MotorType::kBrushless};
+  // ctre::phoenix::motorcontrol::can::WPI_TalonSRX m_steerMotor{0};
+  // drivemotor.Set(1.0);
+  // // m_steerMotor.Set(1.0);
+  // frc::SmartDashboard::PutNumber(
+  //     "spped",
+  //     drivemotor.Get() * DriveConstants::kEncoderDistancePerPulse.value());
 }
 
 /**
