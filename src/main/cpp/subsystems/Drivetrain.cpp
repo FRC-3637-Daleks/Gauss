@@ -46,7 +46,9 @@ Drivetrain::Drivetrain()
                           m_frontLeft.GetPosition(), m_rearLeft.GetPosition(),
                           m_frontRight.GetPosition(),
                           m_rearRight.GetPosition()},
-                      frc::Pose2d()} {}
+                      frc::Pose2d()} {
+  ResetModules();
+}
 
 void Drivetrain::Periodic() {
   // Update the odometry with the current gyro angle and module states.

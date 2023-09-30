@@ -14,7 +14,7 @@ Arm::Arm()
   m_neckController.SetTolerance(1_deg, 10_deg_per_s);
   m_neckController.SetIntegratorRange(0, 3);
   m_motor.ConfigOpenloopRamp(0.5);
-  //m_compressor.EnableDigital();
+  // m_compressor.EnableDigital();
 }
 
 units::radian_t Arm::GetNeckAngle() {
@@ -23,7 +23,7 @@ units::radian_t Arm::GetNeckAngle() {
     offset += kLegOffset;
   }
 
-  //fmt::print("motor encoder: {}\n", m_motor.GetSelectedSensorPosition());
+  // fmt::print("motor encoder: {}\n", m_motor.GetSelectedSensorPosition());
 
   return (kEncoderReversed ? -1.0 : 1.0) *
              units::radian_t{m_motor.GetSelectedSensorPosition() *
@@ -78,7 +78,7 @@ frc2::CommandPtr Arm::LowAngleCommand() {
           },
           // Set output to zero when done.
           [this]() {
-            //fmt::print("hii");
+            // fmt::print("hii");
             SetNeckVoltage(0_V);
           }));
 }
@@ -111,7 +111,7 @@ frc2::CommandPtr Arm::HighAngleCommand() {
   return this
       ->RunOnce([this]() {
         m_neckController.Reset(GetNeckAngle());
-        m_neckController.SetGoal(100_deg);
+        m_neckController.SetGoal(110_deg);
       })
       .AndThen(this->RunEnd(
           // Sets motor output.
@@ -142,7 +142,7 @@ frc2::CommandPtr Arm::AlternateHighAngleCommand() {
           // Sets motor output.
           [this]() {
             auto rawAngle = 0_rad;
-                (kEncoderReversed ? -1.0 : 1.0) *
+            (kEncoderReversed ? -1.0 : 1.0) *
                     units::radian_t{m_motor.GetSelectedSensorPosition() *
                                     kEncoderRotationPerPulse} +
                 kOffset + kLegOffset;
@@ -172,7 +172,7 @@ frc2::CommandPtr Arm::AlternateHighCubeAngleCommand() {
           // Sets motor output.
           [this]() {
             auto rawAngle = 0_rad;
-                (kEncoderReversed ? -1.0 : 1.0) *
+            (kEncoderReversed ? -1.0 : 1.0) *
                     units::radian_t{m_motor.GetSelectedSensorPosition() *
                                     kEncoderRotationPerPulse} +
                 kOffset + kLegOffset;
@@ -287,7 +287,8 @@ void Arm::Log() {
   frc::SmartDashboard::PutNumber("Angle",
                                  units::degree_t{GetNeckAngle()}.value());
   frc::SmartDashboard::PutBoolean("at goal?", m_neckController.AtGoal());
-  frc::SmartDashboard::PutNumber("arm motor encoder", m_motor.GetSelectedSensorPosition());
+  frc::SmartDashboard::PutNumber("arm motor encoder",
+                                 m_motor.GetSelectedSensorPosition());
 }
 
 void Arm::ZeroNeck() { m_motor.SetSelectedSensorPosition(0); }

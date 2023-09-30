@@ -41,7 +41,7 @@ constexpr auto kNeckPhysicalUpperBound = 120_deg;
 constexpr double kP = 10;
 constexpr double kI = 2;
 constexpr double kD = 0;
-constexpr double kIz = 5;
+constexpr double kIz = 3;
 
 constexpr auto kMaxTurnVelocity = 1 * std::numbers::pi * 1_rad_per_s;
 constexpr auto kMaxTurnAcceleration = 0.6 * std::numbers::pi * 1_rad_per_s_sq;
@@ -134,8 +134,8 @@ constexpr int kRearRightAbsoluteEncoderChannel = 3;
 
 // Absolute encoder reading when modules are facing forward.
 constexpr double kFrontLeftAbsoluteEncoderOffset = 3.15246;
-constexpr double kRearLeftAbsoluteEncoderOffset = -2.25482; //3.9595;
-constexpr double kFrontRightAbsoluteEncoderOffset = -2.03871;//4.28316;
+constexpr double kRearLeftAbsoluteEncoderOffset = -2.25482;   // 3.9595;
+constexpr double kFrontRightAbsoluteEncoderOffset = -2.03871; // 4.28316;
 constexpr double kRearRightAbsoluteEncoderOffset = 1.377484;
 // constexpr double kFrontLeftAbsoluteEncoderOffset = -2.033;
 // constexpr double kRearLeftAbsoluteEncoderOffset = -1.766;
@@ -199,8 +199,8 @@ constexpr auto kSteerEncoderDistancePerCount =
     2_rad * std::numbers::pi / kSteerEncoderCPR; // Radians per encoder count.
 
 // Values measured with the drivetrain suspended.
-constexpr auto kPhysicalMaxSpeed = 14_fps;
-constexpr auto kPhysicalMaxAngularSpeed = 180_rpm;
+constexpr auto kPhysicalMaxSpeed = 15_mps;
+constexpr auto kPhysicalMaxAngularSpeed = 270_rpm;
 } // namespace ModuleConstants
 
 namespace ClawConstants {
@@ -286,9 +286,9 @@ constexpr int kDriverControllerPort = 0;
 
 constexpr double kDeadband = 0.08;
 
-constexpr int kStrafeAxis = frc::XboxController::Axis::kLeftX;
-constexpr int kForwardAxis = frc::XboxController::Axis::kLeftY;
-constexpr int kRotationAxis = frc::XboxController::Axis::kRightX;
+constexpr int kStrafeAxis = frc::XboxController::Axis::kLeftX;    // left
+constexpr int kForwardAxis = frc::XboxController::Axis::kLeftY;   // left
+constexpr int kRotationAxis = frc::XboxController::Axis::kRightX; // right
 constexpr int kFieldRelativeButton = frc::XboxController::Button::kRightBumper;
 
 constexpr int kZeroHeadingButton = frc::XboxController::Button::kX;
