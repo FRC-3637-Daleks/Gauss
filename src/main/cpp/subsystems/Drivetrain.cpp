@@ -69,6 +69,11 @@ void Drivetrain::Drive(units::meters_per_second_t forwardSpeed,
   //            angularSpeed);
   //  Use the kinematics model to get from the set of commanded speeds to a set
   //  of states that can be commanded to each module.
+
+  frc::SmartDashboard::PutNumber("fwd speed (mps)", forwardSpeed.value());
+  frc::SmartDashboard::PutNumber("strafe speed (mps)", strafeSpeed.value());
+  frc::SmartDashboard::PutNumber("rot speed (mps)", angularSpeed.value());
+
   auto states = kDriveKinematics.ToSwerveModuleStates(
       fieldRelative
           ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
@@ -76,11 +81,15 @@ void Drivetrain::Drive(units::meters_per_second_t forwardSpeed,
           : frc::ChassisSpeeds{forwardSpeed, strafeSpeed, angularSpeed});
 
   // fmt::print("calculated swerve module states\n");
+  // frc::SmartDashboard::PutNumber("fr speed saturated",
+  // states[0].speed.value())
 
   // Occasionally a drive motor is commanded to go faster than its maximum
-  // output can sustain. Desaturation lowers the module speeds so that no motor
-  // is driven above its maximum speed, while preserving the intended motion.
-  kDriveKinematics.DesaturateWheelSpeeds(&states, AutoConstants::kMaxSpeed);
+  // output can sustain. Desaturation lowers the module speeds so that no
+  // motor is driven above its maximum speed, while preserving the intended
+  // motion.
+  kDriveKinematics.DesaturateWheelSpeeds(&states,
+                                         DriveConstants::kMaxTeleopSpeed);
 
   // fmt::print("desaturated wheel speeds\n");
 

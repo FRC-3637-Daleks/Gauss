@@ -32,4 +32,6 @@ private:
   std::optional<frc2::CommandPtr> m_autonomousCommand;
 
   RobotContainer m_container;
+  frc2::CommandXboxController m_swerveController{
+      OperatorConstants::kDriverControllerPort};
 };

@@ -74,6 +74,16 @@ void Robot::TeleopPeriodic() {
   // frc::SmartDashboard::PutNumber(
   //     "spped",
   //     drivemotor.Get() * DriveConstants::kEncoderDistancePerPulse.value());
+
+  frc::SmartDashboard::PutNumber(
+      "Forward Controller Output",
+      m_swerveController.GetRawAxis(OperatorConstants::kForwardAxis));
+  frc::SmartDashboard::PutNumber(
+      "Strafe Controller Output",
+      m_swerveController.GetRawAxis(OperatorConstants::kStrafeAxis));
+  frc::SmartDashboard::PutNumber(
+      "Rotation Controller Output",
+      m_swerveController.GetRawAxis(OperatorConstants::kRotationAxis));
 }
 
 /**
