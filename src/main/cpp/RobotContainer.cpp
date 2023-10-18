@@ -207,6 +207,12 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           .WithTimeout(4.5_s),
       frc2::cmd::RunOnce([this] { m_intake.StopIntakeMotors(); }));
 
+  frc2::CommandPtr backUp =
+      frc2::cmd::Run(
+          [this] { m_swerve.Drive(1_fps, 0_fps, 0_rad_per_s, false); },
+          {&m_swerve})
+          .WithTimeout(6_s);
+
   frc2::CommandPtr placeConeBack = frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { m_claw.SetPosition(false); }),
       m_arm.HighAngleCommand().WithTimeout(3_s),

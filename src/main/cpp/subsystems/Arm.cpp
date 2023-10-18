@@ -14,6 +14,7 @@ Arm::Arm()
   m_neckController.SetTolerance(1_deg, 10_deg_per_s);
   m_neckController.SetIntegratorRange(0, 3);
   m_motor.ConfigOpenloopRamp(0.5);
+  m_motor.SetNeutralMode(NeutralMode::Brake);
   // m_compressor.EnableDigital();
 }
 
